@@ -22,6 +22,18 @@ def localizar_archivos(ruta_raiz, carpeta, extension):
 
 
 def vista_preeliminar_texto(ruta, n_lineas=5):
+
+    """
+    ver el contenido de los archivos en modo texto para verificar legibilidad
+    imprime primero el nombre del archivo para ver qué estamos viendo
+    si algún archivo da error al abrirse no se abre 
+    te abre cada archivo en modo lectura y lo guarda en variable f
+        para cada archivo te lee las 5 primeras líneas y te quita los 
+        espacios y saltos de línea al principio y al final
+
+    cuando acaba cierra el archivo
+    """
+
     print(f"\n--- {ruta} ---")
     try:
         with open(ruta, "r", errors="ignore") as f:
