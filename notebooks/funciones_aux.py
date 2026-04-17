@@ -90,3 +90,37 @@ def buscar_lineas_por_intervalo(ruta, inicio, fin, formato="%m/%d/%Y %H:%M:%S", 
     except Exception as e:
         print(f"Error: {e}")
 
+
+def limpiar_spa_bilateral(df):
+
+    print("Iniciando limpieza del archivo .spa...")
+    
+    columnas_a_borrar = []
+    
+    for col in df.columns:
+        # 1. Fuera los canales de apoyo/ruido (_2 y _4)
+        if col.endswith('_2') or col.endswith('_4'):
+            columnas_a_borrar.append(col)
+            
+        # 2. Fuera las variables internas reservadas de Medtronic
+        elif col.startswith('RESVR'):
+            columnas_a_borrar.append(col)
+            
+        # 3. Fuera el fantasma de la Asimetría del canal derecho
+        elif col == 'ASYM09_3':
+            columnas_a_borrar.append(col)
+            
+        # 4. Fuera la fontanería física de la pegatina (Pines, Impedancias de cable)
+        elif col in ['C1POSIMP', 'C1NEGIMP', 'GNDIMP', 'C2POSIMP', 'C2NEGIMP', 
+                     'C3POSIMP', 'C3NEGIMP', 'C4POSIMP', 'C4NEGIMP', 'BILBITS']:
+            columnas_a_borrar.append(col)
+            
+    # Filtramos por si acaso alguna columna ya no estaba en el archivo
+    columnas_a_borrar = [c for c in columnas_a_borrar if c in df.columns]
+    
+    # Ejecutamos el borrado
+    df_limpio = df.drop(columns=columnas_a_borrar)
+    
+    print(f"Se han eliminado {len(columnas_a_borrar)} columnas basura.")
+    return df_limpio
+
