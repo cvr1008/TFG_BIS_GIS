@@ -124,3 +124,6 @@ def limpiar_spa_bilateral(df):
     print(f"Se han eliminado {len(columnas_a_borrar)} columnas basura.")
     return df_limpio
 
+
+    
+
