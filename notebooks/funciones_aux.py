@@ -403,6 +403,8 @@ def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máqui
         f_out.write("Tiempo_s,Canal_1,Canal_2\n")
 
         # cada 128 muestras será 1 segundo
+        # no son muestras totales del archivo, sino frames o instantes de muestreo
+        # cada frame contiene una muestra del canal 1 y una del canal 2
         contador_muestras = 0
 
         # hasta que le digamos que para
@@ -435,7 +437,7 @@ def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máqui
             """
             f_out.write(f"{tiempo_en_segundos:.4f},{canal_1},{canal_2}\n")
 
-            # avanza el reloj para leer los siguientes 4 bits
+            # avanza el reloj para leer los siguientes 4 bytes
             contador_muestras += 1
 
     print(f"Se procesaron {contador_muestras} muestras por canal.")
