@@ -4,8 +4,8 @@
 #  Universidad de Burgos · Escuela Politécnica Superior
 # ============================================================
 # DATOS DEL ALUMNO/A – edita estos campos
-title: " "
-author: " "
+title: "Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI"
+author: "Cristina Velázquez Romano"
 
 # Campos extra accesibles desde el preámbulo LaTeX
 # Se pasan como variables para que \tutor y \tutorb funcionen
@@ -46,7 +46,7 @@ knitr:
 
 ```{=latex}
 %% ── Datos de portada (editar aquí) ─────────────────────────
-\title{Título del Trabajo Fin de Grado}
+\title{Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI}
 \author{\nombre}
 \date{\today}
 
@@ -61,12 +61,11 @@ knitr:
 \noindent\includegraphics[width=\textwidth]{CabeceraEPS.png}\vspace{1cm}
 
 \noindent D. \nombreTutor, profesor/a del departamento de ~, área de ~.
-\noindent D. \nombreTutorb, profesor/a del departamento de ~, área de ~.
 
 \noindent Expone/n:
 
 \noindent Que el/la alumno/a D. \nombre, con DNI \dni, ha realizado el Trabajo
-final de Grado en Ingeniería de la Salud titulado \textit{título del trabajo}.
+final de Grado en Ingeniería de la Salud titulado titulado \textit{Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI}..
 
 \noindent Y que dicho trabajo ha sido realizado por el/la alumno/a bajo la
 dirección del/los que suscribe/n.
@@ -103,25 +102,24 @@ dirección del/los que suscribe/n.
 
 \renewcommand*\abstractname{Resumen}
 \begin{abstract}
-En este primer apartado se hace una \textbf{breve} presentación del tema
-que se aborda en el proyecto.
+Este Trabajo Fin de Grado plantea una prueba de concepto orientada a la integración temporal y visualización conjunta de señales procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA en pacientes de la unidad de cuidados intensivos. El objetivo es facilitar el análisis retrospectivo de la evolución del paciente mediante la unificación de diferentes fuentes de información clínica y neurofisiológica en una misma línea temporal. Para ello, se aborda la extracción de datos, su normalización temporal y el desarrollo de un visualizador que permita representar conjuntamente la matriz de densidad espectral, el índice BIS y variables clínicas seleccionadas.
 \end{abstract}
 
 \renewcommand*\abstractname{Descriptores}
 \begin{abstract}
-Palabras separadas por comas que identifiquen el contenido del proyecto.
+BIS, ICCA, unidad de cuidados intensivos, sincronización temporal, análisis retrospectivo, visualización de datos, prueba de concepto.
 \end{abstract}
 
 \clearpage
 
 \renewcommand*\abstractname{Abstract}
 \begin{abstract}
-A \textbf{brief} presentation of the topic addressed in the project.
+This Final Degree Project proposes a proof of concept focused on the temporal integration and joint visualization of signals from the BIS monitor and clinical variables extracted from the ICCA system in intensive care patients. The aim is to facilitate retrospective analysis of patient evolution by combining different clinical and neurophysiological data sources on a common timeline. To this end, data extraction, temporal normalization and the development of a visualizer capable of displaying the density spectral array, BIS index and selected clinical variables are addressed.
 \end{abstract}
 
 \renewcommand*\abstractname{Keywords}
 \begin{abstract}
-keywords separated by commas.
+BIS, ICCA, intensive care unit, temporal synchronization, retrospective analysis, data visualization, proof of concept.
 \end{abstract}
 
 \clearpage

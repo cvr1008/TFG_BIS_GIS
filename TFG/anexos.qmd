@@ -3,8 +3,8 @@
 #  anexos.qmd  –  Documentación Técnica (Anexos) TFG GIS UBU
 #  Universidad de Burgos · Escuela Politécnica Superior
 # ============================================================
-title: " "
-author: " "
+title: "Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI"
+author: "Cristina Velázquez Romano"
  
 format:
   pdf:
