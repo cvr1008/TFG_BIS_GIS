@@ -3,6 +3,17 @@
 \capitulo{1}{Introducción}
 ```
 
+La monitorización de los pacientes críticos en estado de sedación alojados en la Unidad de Cuidados Intensivos (UCI) requiere de la integración de información procedente de múltiples dispositivos de monitorización y otros sistemas clínicos con el fin de facilitar la toma de decisiones, el seguimiento del paciente y el ajuste de dosis recibida por el mismo.
+
+Entre estas fuentes de información, la monitorización neurofisiológica mediante el índice biespectral o BIS (Bispectral Index) constituye una herramienta de interés para valorar el estado de sedación a partir del procesamiento de la actividad electroencefalográfica.
+
+De forma complementaria, los sistemas de información clínica como ICCA permiten registrar constantes vitales, parámetros analíticos, tratamientos administrados y otra información relevante del paciente a lo largo del tiempo.
+
+Sin embargo, en la práctica, la información procedente del monitor BIS no siempre es comprendida por todos los profesionales y se desaprovecha una gran cantidad del potencial de la máquina. Además, el material obtenido de del BIS y la información clínica recogida por la ICCA no siempre se encuentra integrada de forma inmediata o fácilmente explorable de forma conjunta. Esto dificulta el análisis retrospectivo de la evolución del paciente, especialmente cuando se pretende estudiar la relación temporal entre la señal neurofisiológica, el índice BIS y otras variables clínicas, como constantes hemodinámicas, parámetros metabólicos o administración de fármacos.
+
+En este contexto, surge la necesidad de disponer de una aproximación que permita integrar ambas fuentes de información en una misma línea temporal, de manera que sea posible observar de forma conjunta la evolución del BIS y de variables clínicas relevantes. Esta necesidad es especialmente relevante en el entorno de la UCI, donde la monitorización continua, la hererogeneidad de los datos y la complejidad del estado clínico del paciente hacen especialmente útil contar con herramientas que faciliten la revisión estructurada de la información.
+
+
 En este capítulo se presenta el trabajo realizado y se contextualiza el problema abordado. 
 Se debe indicar el ámbito en el que se enmarca el Trabajo Fin de Grado, la motivación del mismo  y la relevancia del problema tratado. 
 Asimismo, se describirá brevemente la estructura de la memoria, indicando el contenido de cada capítulo.
