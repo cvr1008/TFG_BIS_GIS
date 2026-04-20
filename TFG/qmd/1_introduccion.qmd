@@ -13,6 +13,10 @@ Sin embargo, en la práctica, la información procedente del monitor BIS no siem
 
 En este contexto, surge la necesidad de disponer de una aproximación que permita integrar ambas fuentes de información en una misma línea temporal, de manera que sea posible observar de forma conjunta la evolución del BIS y de variables clínicas relevantes. Esta necesidad es especialmente relevante en el entorno de la UCI, donde la monitorización continua, la hererogeneidad de los datos y la complejidad del estado clínico del paciente hacen especialmente útil contar con herramientas que faciliten la revisión estructurada de la información.
 
+El presente Trabajo Fin de Grado se plantea como una prueba de concepto orientada a la integración temporal y visualización conjunta de datos procedentes del monitor BIS y del sistema ICCA. El trabajo no se enfoca como el desarrollo de un producto software final, sino como una aproximación inicial que permita estudiar la viabilidad de extraer, sincronizar, estructurar y representar conjuntamente ambos tipos de datos, sentando así una base para futuros desarrollos más avanzados.
+
+La motivación principal del proyecto radica, por tanto, en la necesidad de facilitar el análisis retrospectivo del paciente crítico mediante la combinación de información neurofisiológica y clínica en un entorno común de exploración. Para ello, se aborda el estudio de los datos accesibles del monitor BIS, incluyendo la matriz de densidad espectral (DSA) y el índice BIS, así como su integración con variables clínicas seleccionadas procedentes de ICCA mediante estrategias de normalización temporal.
+
 
 En este capítulo se presenta el trabajo realizado y se contextualiza el problema abordado. 
 Se debe indicar el ámbito en el que se enmarca el Trabajo Fin de Grado, la motivación del mismo  y la relevancia del problema tratado. 
