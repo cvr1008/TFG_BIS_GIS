@@ -14,10 +14,6 @@ Desarrollar una prueba de concepto para la integración y visualización conjunt
 3.	Desarrollar un visualizador como prueba de concepto que permita representar conjuntamente la matriz de densidad espectral (DSA), el índice BIS y variables clínicas seleccionadas, facilitando el análisis retrospectivo.
 4.	Explorar la detección de cambios relevantes mediante el análisis de ventanas temporales y reglas simples, como ampliación opcional del sistema de visualización. 
 
-
-**Objetivos marcados por los requisitos del software/hardware/análisis** 
-Este apartado se completará a medida que se definan de forma más precisa los requisitos funcionales y técnicos de la prueba de concepto.
-
 **Objetivos de aprendizaje** 
 Además de los objetivos técnicos del proyecto, este trabajo persigue una serie de objetivos formativos relacionados con las competencias propias del Grado en Ingeniería de la Salud. Entre ellos destacan:
 
@@ -26,3 +22,14 @@ Además de los objetivos técnicos del proyecto, este trabajo persigue una serie
  - Aplicar estrategias de sincronización temporal y estructuración de datos clínicos procedentes de distintas fuentes.
  - Desarrollar una prueba de concepto orientada a una necesidad real del entorno clínico.
  - Fortalecer la capacidad de documentación técnica, planificación y desarrollo de proyectos en el ámbito de la ingeniería de la salud.
+ 
+**Objetivos marcados por los requisitos del software/hardware/análisis** 
+Este apartado se completará a medida que se definan de forma más precisa los requisitos funcionales y técnicos de la prueba de concepto.
+
+
+**Requisitos funcionales y técnicos de la prueba de concepto**
+ - Permitir la carga de datos BIS y variables clínicas para un mismo periodo temporal.
+ - Integrar información con distinta resolución temporal.
+ -  de forma conjunta la DSA, el índice BIS y variables clínicas seleccionadas.
+ - Facilitar la exploración retrospectiva mediante navegación temporal.
+ - Permitir, de forma opcional, el análisis de cambios relevantes en ventanas temporales.

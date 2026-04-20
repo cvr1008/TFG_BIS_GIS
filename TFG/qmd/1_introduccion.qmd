@@ -3,9 +3,6 @@
 \capitulo{1}{Introducción}
 ```
 
-Descripción del contexto y motivación del trabajo. Se puede incluir texto
-normal en Markdown junto con bloques LaTeX cuando sea necesario.
-
 En este capítulo se presenta el trabajo realizado y se contextualiza el problema abordado. 
 Se debe indicar el ámbito en el que se enmarca el Trabajo Fin de Grado, la motivación del mismo  y la relevancia del problema tratado. 
 Asimismo, se describirá brevemente la estructura de la memoria, indicando el contenido de cada capítulo.
@@ -16,4 +13,18 @@ Este límite no incluye los anexos, que se entregarán en documentos independien
 
 ### Estructura del documento
 
-Breve descripción de cómo está organizado el resto de la memoria.
+La presente memoria se organiza en varios capítulos:
+
+Objetivos: se definen las metas del trabajo, tanto generales como específicas, así como los propósitos técnicos y académicos asociados al proyecto.
+
+Marco teórico: se ofrece una visión necesario para contextualizar el estudio,
+
+Metodología:  seguida para el desarrollo de la prueba de concepto, detallando el procedimiento de extracción, organización e integración temporal de los datos, así como el planteamiento del visualizador propuesto y las herremientas necesarias para desarrollarlo. 
+
+Resultados: 
+
+Discusión: se realiza un análisis crítico de los resultados y las limitaciones del trabajo. 
+
+Conclusiones:
+
+Líneas futuras: una vez terminado el proyecto, se proponen formas de mejorarlo en un futuro, ampliar sus funciones, etc.
