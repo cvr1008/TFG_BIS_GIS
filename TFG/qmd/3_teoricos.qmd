@@ -40,13 +40,36 @@ Además del análisis temporal, el EEG puede estudiarse en función de la potenc
 La interpretación clínica del EEG no depende únicamente de observar una forma de onda aislada, sino de integrar diferentes características de la señal dentro del contexto completo del registro. En este sentido, aunque la inspección visual sigue siendo importante, el análisis asistido por software facilita la detección y cuantificación de cambios en bandas de frecuencia específicas, mejorando la capacidad de describir la actividad cerebral de forma más objetiva [@Tatum2016].
 
 
-\subsubsection {Tipos de ondas del EEG}
+\subsubsection{Tipos de ondas del EEG}
+
+Desde el punto de vista frecuencial, la señal electroencefalográfica puede descomponerse en distintas bandas de frecuencia, cada una de las cuales se asocia a un rango determinado de hercios (Hz). Esta clasificación permite describir de forma más estructurada la actividad cerebral registrada y facilita su interpretación clínica y espectral. De forma habitual, se distinguen las bandas recogidas en la Tabla \ref{tab:bandas_eeg} [@TapiaMoreno2020].
 
 
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\hline
+\textbf{Tipo de onda} & \textbf{Rango de frecuencia (Hz)} & \textbf{Interpretación general} \\
+\hline
+Gamma & >30 & Actividad rápida \\
+Beta & 13--30 & Mayor activación cerebral \\
+Alfa & 9--12 & Vigilia relajada, ojos cerrados \\
+Theta & 5--8 & Somnolencia o menor nivel de alerta \\
+Delta & 1--4 & Sueño profundo o sedación intensa \\
+Lentas & <1 & Actividad muy lenta \\
+\hline
+\end{tabular}
+\caption{Bandas de frecuencia del EEG y su interpretación general. Elaboración propia a partir de [@ondas2019].}
+\label{tab:bandas_eeg}
+\end{table}
+
+El predominio de unas bandas u otras puede variar en función del estado funcional del cerebro, la administración de determinados fármacos o la profundidad de la sedación. Por ello, la distribución de la potencia entre bandas constituye una herramienta útil para el análisis del EEG y para su representación mediante técnicas espectrales como la matriz de densidad espectral.
 
 
 
 \subsection{Monitor BIS y monitorización del nivel de sedación}
+
+
 
 \subsubsection{Índice BIS}
 
