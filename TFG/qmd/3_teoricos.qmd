@@ -2,30 +2,37 @@
 %% ── Capítulo 3: Marco teórico ───────────────────────────────
 \capitulo{3}{Conceptos teóricos}
 
-
-
-
 \section{Conceptos teóricos básicos}
 
-\subsection{Unidad de Cuidados Intensivos (UCI)}
+En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. En primer lugar, se describe el entorno asistencial en el que se enmarca el proyecto, la unidad de cuidados intensivos, así como la importancia de la monitorización continua del paciente crítico. 
 
-\subsection{Monitor BIS}
+A continuación, se introducen los principales elementos relacionados con la monitorización neurofisiológica mediante el monitor BIS, la señal electroencefalográfica y su representación espectral. 
 
-\subsection{Electroencefalograma (EEG)}
-
-\subsection{Matriz de densidad espectral (DSA)}
-
-\subsection{Índice BIS}
-
-\subsection{Sistema IntelliSpace Cuidados Críticos y Anestesia (ICCA)}
+Finalmente, se presenta el sistema IntelliSpace Cuidados Críticos y Anestesia (ICCA) como fuente de variables clínicas y se justifica la necesidad de integrar temporalmente ambas fuentes de información.
 
 
-\subsubsection{Sub Subsección}
+\subsection{Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico}
+
+
+\subsection{Electroencefalograma (EEG) y ondas}
+
+
+\subsection{Monitor BIS y monitorización del nivel de sedación}
+
+\subsubsection{Índice BIS}
+
+\subsubsection{Matriz de densidad espectral (DSA)}
+
+
+\subsection{Sistema IntelliSpace Cuidados Críticos y Anestesia (ICCA) y registro de variables clínicas}
+
+\subsection{Integración temporal de datos clínicos y neurofisiológicos}
+
 
 
 \section{Estado del arte y trabajos relacionados.}
 
-\subsection{Monitorización basada en EEG en anestesia y cuidados intensivos}
+\subsection{Monitorización basada en EEG y BIS en anestesia y cuidados intensivos}
 
 \subsection{Representación espectral y análisis visual de señales EEG}
 
