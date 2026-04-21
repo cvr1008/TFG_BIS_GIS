@@ -6,6 +6,7 @@
 # DATOS DEL ALUMNO/A – edita estos campos
 title: "Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI"
 author: "Cristina Velázquez Romano"
+bibliography: bibliografia.bib
 
 # Campos extra accesibles desde el preámbulo LaTeX
 # Se pasan como variables para que \tutor y \tutorb funcionen
