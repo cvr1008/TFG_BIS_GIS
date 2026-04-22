@@ -389,7 +389,326 @@ def procesar_spa(ruta_spa):
     return df        
         
     
+    
+def limpiar_spa_para_dsa(df_spa):
+    
+    """ 
+    Coger el DF del .spa y asegurar que las columnas necesarias sean numéricas.
+    
+    """
+    
+    # Copiar el dF original para no modificar el original
+    df = df_spa.copy()
 
+    # Definir columnas necesarias para modificar la DSA: SEF, MEF, Calidad de la señal y Potencia total
+    # Se utilizan para superponer las curvas y detectar tramos inválidos
+    cols = ["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08"]
+    
+    # Va columna por columna para ver si está en la lista
+    # Convertir los valores a numéricos
+    for col in cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    return df
+
+
+
+def construir_mascara_no_valida(df_spa, umbral_sqi=14):
+    
+    """ 
+    Crea una máscara booleana que marca en qué filas la señal no debe considerarse válida.
+    
+    """
+    # Extrae la columna SQI10 
+    sqi = df_spa["SQI10"]
+    
+    # Extrae TOTPOW08 
+    totpow = df_spa["TOTPOW08"]
+
+    """ 
+    Se alinean y convierten las filas a True/False: es True si: 
+     - SQI10 < 14
+     - TOTPOW08 es igual o muy próximo a -327.7
+    Basta con que falle una condición para marcar la fila como no válida.
+    
+    Con números decimales a veces hay pequeñas diferencias de precisión.
+    Así se aceptan valores muy cercanos a -327.7, no solo el idéntico.
+    """
+    mask_no_valida = (sqi < umbral_sqi) | (np.isclose(totpow, -327.7))
+    
+    return mask_no_valida
+    
+    
+    
+def crear_cmap_bis():
+    
+    """ 
+    Crea un colormap personalizado parecido al del BIS
+    
+    """
+    
+    # colores
+    # Rampa aproximada a la leyenda del monitor BIS
+    colores_bis = [
+        "#001a8f",  # azul oscuro
+        "#004cff",  # azul
+        "#00c8ff",  # cian
+        "#46e6b2",  # verde-agua
+        "#d7ef3c",  # amarillo verdoso
+        "#ffe100",  # amarillo
+        "#ff8c00",  # naranja
+        "#d40000",  # rojo
+    ]
+    
+    # Construcción de un colormapcontinuo a partir de esos colores 
+    # Hace que el gradiente tenga 256 niveles de color transicionando entre los 8 definidos
+    cmap = LinearSegmentedColormap.from_list("bis_like", colores_bis, N=256)
+    
+    # qué color usar para valores inválidos
+    # cuando en el DF de la dsa haya una fila NaN se pinta de blanco
+    cmap.set_bad(color="white")
+    return cmap
+
+
+
+def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=None, gamma=0.55):
+
+    """ 
+    Parte de la matriz dsa del .f_a de la anterior función
+    Utiliza el .spa para usar la información procesada
+    Detectar los tramos no válidos
+    Tramos no válidos -> blanco
+    dibujar DSA
+    Superponer SEF y MEF
+    """
+    
+    # limpiar el dF y convertir columnas en numérico
+    df_spa = limpiar_spa_para_dsa(df_spa)
+
+    
+    """
+    Alinear el df del .spa con el df de la DSA por tiempo:
+     - tiempo, dsa: variables que vienen del .f_a (instantes de tiempo y decibelios según frecuencia)
+     - df_spa: DataFrame procedente del .spa. Lo hemos limpiado y quedan las columnas numéricas.
+               Están los instantes de tiempo y los valores de los campos 
+     
+    df_aux: Creación de un dF auxiliar que contiene solo la serie temporal de la DSA
+    df_merge: se hace una unión del DF de tiempo con las columnas limpias del dF del .spa
+        - on: como las dos tienen las columnas de tiempo en común se fusionan por ahí
+        - how="left": conserva todos los tiempos de la DSA, aunque en el .spa falte alguno
+    """
+    df_aux = pd.DataFrame({"Time": tiempo}).reset_index(drop=True)
+    df_merge = df_aux.merge(
+        df_spa[["Time", "SEF08", "MEDFRQ08", "SQI10", "TOTPOW08"]],
+        on="Time",
+        how="left"
+    )
+
+    
+    # guardar los valores de los campos del sef y mef para luego dibujar las curvas
+    sef = df_merge["SEF08"]
+    mf = df_merge["MEDFRQ08"]
+
+    
+    # copiar la matriz de densidad espectral para modificarla. Se copia y convierte a float
+    # van a entrar los NaN y hace falta float
+    dsa_plot = dsa.copy().astype(float)
+
+    
+    # metemos el dF de unión con el tiempo de la dsa y los campos del spa
+    # marca las filas que cumplen los requisitos como no válidas
+    mask_no_valida = construir_mascara_no_valida(df_merge, umbral_sqi=umbral_sqi)
+
+    
+    """ 
+    compara cada celda con el 0 y del true/false (1 y 0) se hace media por filas
+    si la media es > a 0.9 (más del 90% son ceros) se marca esa fila como no válida
+    
+    Si una fila tiene casi todo a cero, probablemente no aporta información útil
+    """
+    porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
+    mask_ceros = porcentaje_ceros > 0.9
+
+    
+    """ 
+    se calcula la diferencia entre cada tiempo y el anterior (la primera da NaT porque no tiene instante anterior) (se hace una columna)
+    se convierten las diferencias a segundos numéricos
+    
+    si los segundos son >1 se vuelven True esos valores y el resto false (mete false el NaN del inicio)
+    
+    mira si hay huecos temporales en la grabación si de repente pasas de un segundo a un salto de varios 
+    """
+    delta_t = tiempo.diff().dt.total_seconds()
+    mask_saltos = delta_t.gt(1).fillna(False)
+
+    
+    """
+    unir las tres condiciones con un OR lógico
+    una fila no es válida si :
+     - mala calidad/valor no válido según .spa
+     - casi todo ceros
+     - salto temporal
+    """
+    mask_total = mask_no_valida | mask_ceros | mask_saltos
+
+    
+    # en las filas marcadas como no válidas se sustituyen los valores por NaN (que saldrán en blanco)
+    dsa_plot.loc[mask_total.values, :] = np.nan
+
+    # convierte el DataFrame en una matriz de numPy
+    matriz = dsa_plot.values
+
+    # se crea una matriz del mismo tamaño con true/false (si es un valor finito normal o no)
+    # se guardan en un vector solo los valores que sean reales (los true)
+    vals = matriz[np.isfinite(matriz)]
+    
+    
+    # se calculan los percentiles con los valores del vector
+    if vmin is None:
+        vmin = np.nanpercentile(vals, 2)
+    if vmax is None:
+        vmax = np.nanpercentile(vals, 99.5)
+
+        
+    """ 
+    se controla cómo se reparten los colores sobre los valores de la DSA
+     - PowerNorm: transformación no lineal. Reparte los colores con una potencia controlada por gamma.
+                  normalización = ((x - vmin) / (vmax - vmin)) ^ gamma
+                 
+     - gamma: cambia la forma en que los valores intermedios se distribuyen entre vmin y vmax
+              gamma = 1: normalización lineal, no hay cambios
+              gamma < 1 (0.55): hace que los valores intermedios suban visualmente en la escala
+              gamma > 1 (1.2): comprime los intermedios hacia abajo y predominan más los tonos bajos
+    
+     - vmin: valor mínimo referencia. Lo que sea igual o por debajo va al extremo
+     - vmax: valor máximo referencia. Lo que sea igual o por encima va al extremo
+    """
+    norm = PowerNorm(gamma=gamma, vmin=vmin, vmax=vmax)
+    
+    # crear el colormap con los colores tipo BIS y blanco para el NaN
+    cmap = crear_cmap_bis()
+
+    
+    
+    # ---------------------------- Creación de la figura --------------------------------------
+    
+    fig, ax = plt.subplots(figsize=(4.8, 10))
+
+    
+    # definir el primer y último tiempo del registro
+    y0 = mdates.date2num(tiempo.iloc[0])
+    y1 = mdates.date2num(tiempo.iloc[-1])
+    
+    # definir la mínima y máxima frecuencia que se representa en la DSA
+    x0 = dsa_plot.columns.min()
+    x1 = dsa_plot.columns.max()
+
+    
+    """ 
+    mostrar la matriz:
+     - aspect="auto": Ajusta la forma
+     - origin="upper": primera fila de la matriz va arriba
+     - extent=[x0, x1, y1, y0]: coloca la imagen. En el eje X frecuencia e Y tiempo
+                                invierte el eje temporal para que el tiempo inicial quede arriba
+     - cmap=cmap: usa la paleta BIS
+     - norm=norm: normalización calculada
+     - interpolation="nearest": no suaviza artificialmente los píxeles
+    """
+    im = ax.imshow(
+        matriz,
+        aspect="auto",
+        origin="upper",
+        extent=[x0, x1, y1, y0],
+        cmap=cmap,
+        norm=norm,
+        interpolation="nearest"
+    )
+
+    
+    """ 
+    invert_xaxis(): los 30 Hz quedan a la izquierda y los 0.5 a la derecha
+    yaxis_date(): eje Y temporal
+    DateFormatter("%H:%M"): tiempo como horas y minutos
+    """
+    ax.invert_xaxis()
+    ax.yaxis_date()
+    ax.yaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+    
+    # texto descriptivo
+    ax.set_xlabel("Frecuencia")
+    ax.set_ylabel("Tiempo")
+    ax.set_title("DSA", loc="left", fontsize=9, pad=6)
+
+    # marcas de frecuencias de separación de las bandas
+    ax.set_xticks([30, 13, 8, 4])
+    ax.set_xticklabels(["30Hz", "13Hz", "8Hz", "4Hz"], fontsize=8)
+
+    # dibujar las líneas verticales para separar bandas
+    for f in [13, 8, 4]:
+        ax.axvline(f, color="gray", linestyle="--", linewidth=1, alpha=0.7)
+
+    bandas = {
+        "Beta":  (13 + 30) / 2,
+        "Alpha": (8 + 13) / 2,
+        "Theta": (4 + 8) / 2,
+        "Delta": (0.5 + 4) / 2,
+    }
+
+    
+    
+    for nombre, xpos in bandas.items():
+        ax.text(
+            xpos, 1.01, nombre,
+            transform=ax.get_xaxis_transform(),
+            ha="center", va="bottom",
+            fontsize=8, rotation=45
+        )
+
+    """
+    curvas SEF y MF con datos válidos
+    
+    creación de máscaras booleanas para decidir qué puntos se pueden dibujar sobre la DSA
+     - se quitan los valores NaN y los valores por fuera del rango de frecuencias
+    """
+    mask_sef = sef.notna() & (sef >= 0.5) & (sef <= 30)
+    mask_mf = mf.notna() & (mf >= 0.5) & (mf <= 30)
+
+    # dibujar las líneas blanca y morada
+    ax.plot(
+    sef[mask_sef], tiempo[mask_sef],
+    color="white", linewidth=2.0, alpha=0.95, label="SEF"
+    )
+
+    ax.plot(
+        mf[mask_mf], tiempo[mask_mf],
+        color="purple", linewidth=2.0, alpha=0.95, label="MEF"
+    )
+    
+    # colocar la leyenda fuera del gráfico a la derecha
+    ax.legend(
+    loc="upper left",
+    bbox_to_anchor=(1.25, 0.92),
+    frameon=True,
+    facecolor="white",
+    framealpha=0.85,
+    fontsize=8,
+    borderaxespad=0
+    )
+
+    # añadir la barra de color con etiqueta vertical y máximo y mínimo
+    cbar = plt.colorbar(im, ax=ax, pad=0.03)
+    cbar.set_ticks([vmin, vmax])
+    cbar.set_ticklabels(["Min", "Max"])
+    cbar.ax.tick_params(length=0)
+    cbar.set_label("Intensidad espectral (dB)", rotation=90, labelpad=12)
+
+    
+    plt.tight_layout()
+    plt.show()
+    
+
+    
 def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máquina
 
     """ 
