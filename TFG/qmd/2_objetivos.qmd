@@ -48,3 +48,6 @@ Este apartado se completará a medida que se definan de forma más precisa los r
  - Facilitar la exploración retrospectiva mediante navegación temporal.
  
  - Permitir, de forma opcional, el análisis de cambios relevantes en ventanas temporales.
+
+ #tbl-
+ @

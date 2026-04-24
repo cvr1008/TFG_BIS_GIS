@@ -1,9 +1,11 @@
 ```{=latex}
 %% ── Capítulo 3: Marco teórico ───────────────────────────────
 \capitulo{3}{Conceptos teóricos}
+```
 
 
-\section{Conceptos teóricos básicos}  
+# Conceptos teóricos básicos
+
 En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. En primer lugar, se describe el entorno asistencial en el que se enmarca el proyecto, la unidad de cuidados intensivos, así como la importancia de la monitorización continua del paciente crítico. 
 
 A continuación, se introducen los principales elementos relacionados con la monitorización neurofisiológica mediante el monitor BIS, la señal electroencefalográfica y su representación espectral. 
@@ -11,7 +13,8 @@ A continuación, se introducen los principales elementos relacionados con la mon
 Finalmente, se presenta el sistema IntelliSpace Cuidados Críticos y Anestesia (ICCA) como fuente de variables clínicas y se justifica la necesidad de integrar temporalmente ambas fuentes de información.
 
 
-\subsection{Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico}  
+## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
+
 La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
 
 En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor.
@@ -19,7 +22,7 @@ En este entorno, la inestabilidad fisiológica de los pacientes exige una monito
 El control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
 
-\subsection{Electroencefalograma (EEG) y ondas} 
+##  Electroencefalograma (EEG) y ondas
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
 El EEG registra variaciones de voltaje muy pequeñas en la superficie del cuero cabelludo. Estos voltajes reflejan la suma espacial y temporal de corrientes postsinápticas generadas por grandes poblaciones de neuronas corticales. Dado que la señal llega atenuada hasta la superficie craneal, el equipo de registro necesita amplificarla y compararla entre pares o conjuntos de electrodos, organizados en distintos montajes.
@@ -114,4 +117,8 @@ A pesar de la extensa validación del monitor BIS en el entorno del quirófano, 
 
 
 
+* 5464684
+* 3213213
+- 3515151
+- 3222
 

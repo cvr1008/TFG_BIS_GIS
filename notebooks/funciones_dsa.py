@@ -332,16 +332,8 @@ def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=Non
     
     
     
-def figura_dsa_y_variables_alineadas(
-    tiempo,
-    dsa,
-    df_spa,
-    umbral_sqi=14,
-    vmin=None,
-    vmax=None,
-    gamma=0.55,
-    incluir=("EMGLOW01", "BURST", "DB13U01")
-):
+def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=None, gamma=0.55, incluir=("EMGLOW01", "BURST", "DB13U01")):
+    
     """
     Figura conjunta con:
     - DSA horizontal arriba
@@ -350,15 +342,12 @@ def figura_dsa_y_variables_alineadas(
     """
 
     # 1) Alinear .spa con el tiempo de la DSA
-    df_merge = alinear_spa_con_tiempo(
-        tiempo,
-        df_spa,
+    df_merge = alinear_spa_con_tiempo(tiempo, df_spa,
         columnas=["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08", "EMGLOW01", "BURST", "DB13U01"]
     )
 
     # 2) Preparar DSA con máscara de invalidez
-    dsa_plot, mask_total = preparar_dsa_para_plot(
-        tiempo,
+    dsa_plot, mask_total = preparar_dsa_para_plot(tiempo, 
         dsa,
         df_merge,
         umbral_sqi=umbral_sqi,

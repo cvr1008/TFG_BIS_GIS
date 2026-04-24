@@ -385,29 +385,28 @@ def procesar_spa(ruta_spa):
         )
 
     return df        
-         
-
+                   
+                                
     
-def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máquina
-
+def traducir_r2a(archivo_entrada, archivo_salida, factor_uv=0.05):
+    
     """ 
     Abrimos el .r2a a la vez que el .csv uno para leer la info de ahí y otro para escribir
     f_in: abrir el .r2a en modo lectura binaria pura, sin intentar leerlo como texto. 
     f_out:abrir el .csv en modo escritura normal de texto.
     """
+    
     with open(archivo_entrada, "rb") as f_in, open(archivo_salida, "w") as f_out:
 
-        # escribir cabeceras 
-        f_out.write("Tiempo_s,Canal_1,Canal_2\n")
+        f_out.write("Tiempo_s,Canal_1_raw,Canal_2_raw,Canal_1_uV,Canal_2_uV\n")
 
         # cada 128 muestras será 1 segundo
         # no son muestras totales del archivo, sino frames o instantes de muestreo
         # cada frame contiene una muestra del canal 1 y una del canal 2
         contador_muestras = 0
 
-        # hasta que le digamos que para
         while True:
-
+            
             # Leemos 4 bytes (2 canales * 2 bytes/canal)
             bytes_muestra = f_in.read(4)
 
@@ -415,6 +414,7 @@ def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máqui
             if not bytes_muestra or len(bytes_muestra) < 4:
                 break
 
+            
             """ 
             traductor struct pasándole el molde '<hh' para desencriptar los 4 bytes:
              - < estaba en little endian: dar la vuelta a los bytes porque la máquina los guardó al revés para sumar más rápido
@@ -424,17 +424,24 @@ def traducir_r2a(archivo_entrada, archivo_salida): # Traducir el lenguaje máqui
             """
             canal_1, canal_2 = struct.unpack('<hh', bytes_muestra)
 
+            # Conversión a microvoltios
+            canal_1_uv = canal_1 * factor_uv
+            canal_2_uv = canal_2 * factor_uv
+
             # el tiempo avanza 1 segundo cada 128 muestras
             tiempo_en_segundos = contador_muestras / 128.0
 
+            
             """ 
             Forma de escribir el archivo en .csv: 
              - escribir el tiempo en segundos con 4 decimales
              - separar las columnas por comas
              - salto de línea al final para que el siguiente segundo vaya después
             """
-            f_out.write(f"{tiempo_en_segundos:.4f},{canal_1},{canal_2}\n")
-
+            f_out.write(
+                f"{tiempo_en_segundos:.4f},{canal_1},{canal_2},{canal_1_uv:.4f},{canal_2_uv:.4f}\n"
+            )
+            
             # avanza el reloj para leer los siguientes 4 bytes
             contador_muestras += 1
 
