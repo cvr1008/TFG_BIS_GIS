@@ -3,7 +3,6 @@
 \capitulo{3}{Conceptos teóricos}
 ```
 
-
 # Conceptos teóricos básicos
 
 En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. En primer lugar, se describe el entorno asistencial en el que se enmarca el proyecto, la unidad de cuidados intensivos, así como la importancia de la monitorización continua del paciente crítico. 
@@ -23,6 +22,7 @@ El control adecuado del nivel de sedación resulta fundamental, ya que una dosif
 
 
 ##  Electroencefalograma (EEG) y ondas
+
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
 El EEG registra variaciones de voltaje muy pequeñas en la superficie del cuero cabelludo. Estos voltajes reflejan la suma espacial y temporal de corrientes postsinápticas generadas por grandes poblaciones de neuronas corticales. Dado que la señal llega atenuada hasta la superficie craneal, el equipo de registro necesita amplificarla y compararla entre pares o conjuntos de electrodos, organizados en distintos montajes.
@@ -32,9 +32,8 @@ En la práctica, el registro electroencefalográfico varía en función del esta
 
 Para describir la señal electroencefalográfica se utilizan habitualmente ciertos conceptos básicos [@Kane2017]: 
 
- - Amplitud o voltaje del EEG: expresa la magnitud de la diferencia de potencial registrada entre electrodos y suele medirse en microvoltios. 
-
- - La frecuencia indica el número de ciclos completos que realiza una onda en un segundo y se expresa en hercios. 
+ - Amplitud o voltaje del EEG: expresa la magnitud de la diferencia de potencial registrada entre electrodos y suele medirse en microvoltios o decibelios. 
+ - Frecuencia: indica el número de ciclos completos que realiza una onda en un segundo y se expresa en hercios. 
  
  A partir de estas magnitudes, la señal puede analizarse en términos de ondas o patrones oscilatorios, entendidos como cambios repetitivos en la diferencia de potencial registrada a lo largo del tiempo [@Kane2017].
 
@@ -43,7 +42,8 @@ Además del análisis temporal, el EEG puede estudiarse en función de la potenc
 La interpretación clínica del EEG no depende únicamente de observar una forma de onda aislada, sino de integrar diferentes características de la señal dentro del contexto completo del registro. En este sentido, aunque la inspección visual sigue siendo importante, el análisis asistido por software facilita la detección y cuantificación de cambios en bandas de frecuencia específicas, mejorando la capacidad de describir la actividad cerebral de forma más objetiva [@Tatum2016].
 
 
-\subsubsection{Tipos de ondas del EEG} 
+### Tipos de ondas del EEG
+
 Desde el punto de vista frecuencial, la señal electroencefalográfica puede descomponerse en distintas bandas de frecuencia, cada una de las cuales se asocia a un rango determinado de hercios (Hz). Esta clasificación permite describir de forma más estructurada la actividad cerebral registrada y facilita su interpretación clínica y espectral. De forma habitual, se distinguen las bandas recogidas en la Tabla @tbl:bandas-eeg [@TapiaMoreno2020].
 
 
@@ -61,13 +61,15 @@ Desde el punto de vista frecuencial, la señal electroencefalográfica puede des
 El predominio de unas bandas u otras puede variar en función del estado funcional del cerebro, la administración de determinados fármacos o la profundidad de la sedación. Por ello, la distribución de la potencia entre bandas constituye una herramienta útil para el análisis del EEG y para su representación mediante técnicas espectrales como la matriz de densidad espectral.
 
 
-\subsection{Monitor BIS y monitorización del nivel de sedación}  
-El monitor BIS (\textit{Bispectral Index}) es un dispositivo de monitorización neurofisiológica utilizado para estimar el nivel de sedación o hipnosis del paciente a partir del análisis procesado de la actividad electroencefalográfica registrada mediante electrodos frontales. Su uso se ha extendido especialmente en anestesia y en contextos donde resulta relevante disponer de una medida continua del estado de consciencia basada en la actividad cerebral.
+## Monitor BIS y monitorización del nivel de sedación
+
+El monitor BIS (Bispectral Index) es un dispositivo de monitorización neurofisiológica utilizado para estimar el nivel de sedación o hipnosis del paciente a partir del análisis procesado de la actividad electroencefalográfica registrada mediante electrodos frontales. Su uso se ha extendido especialmente en anestesia y en contextos donde resulta relevante disponer de una medida continua del estado de consciencia basada en la actividad cerebral.
 
 En el entorno de la unidad de cuidados intensivos, este tipo de monitorización adquiere especial interés en situaciones en las que las escalas clínicas pierden utilidad o resultan insuficientes, como ocurre en pacientes con sedación profunda o sometidos a bloqueo neuromuscular. En estos casos, la monitorización instrumental puede ayudar a detectar situaciones de sobresedación o infrasedación y contribuir a un ajuste más preciso del tratamiento sedante [@TapiaMoreno2020].
 
 
-\subsubsection{Índice BIS} 
+### Índice BIS
+
 El índice BIS es un parámetro numérico procesado derivado del análisis del EEG frontal. Se expresa en una escala entre 0 y 100, en la que los valores más altos se asocian a un mayor nivel de consciencia y los valores más bajos a una mayor depresión de la actividad cerebral. En términos generales, un valor cercano a 100 corresponde a un paciente despierto, mientras que valores muy bajos se relacionan con una supresión marcada de la actividad eléctrica cerebral [@TapiaMoreno2020].
 
 En la práctica clínica habitual, el mantenimiento de valores de BIS entre 40 y 60 se ha asociado a un nivel de sedación profunda adecuado. Por el contrario, alcanzar valores de BIS inferiores a 40 no suele aportar un beneficio clínico adicional y puede indicar un estado de sobresedación de riesgo [@chamorro2008].
@@ -75,10 +77,11 @@ En la práctica clínica habitual, el mantenimiento de valores de BIS entre 40 y
 No obstante, el índice BIS representa una simplificación de la señal electroencefalográfica original. Por ello, su interpretación debe realizarse siempre en contexto clínico y, cuando sea posible, complementarse con otras formas de representación de la señal, como la matriz de densidad espectral.
 
 
-\subsubsection{Matriz de densidad espectral (DSA)} 
-La matriz de densidad espectral o DSA (\textit{Density Spectral Array}) es una representación espectral del EEG que facilita la interpretación visual de la actividad cerebral a lo largo del tiempo. Puede entenderse como un espectrograma en el que el eje horizontal representa el tiempo, el eje vertical la frecuencia y la potencia de la señal se codifica mediante un mapa de color.
+### Matriz de densidad espectral (DSA)
 
-La DSA puede considerarse una evolución de la matriz espectral comprimida (\textit{Compressed Spectral Array}, CSA), que representaba la potencia de las distintas frecuencias en un gráfico tridimensional apilado. Frente a este formato, la DSA ofrece una visualización bidimensional más intuitiva y más útil para la práctica clínica, al permitir identificar de forma rápida cómo cambia la distribución espectral del EEG en el tiempo.
+La matriz de densidad espectral o DSA (Density Spectral Array) es una representación espectral del EEG que facilita la interpretación visual de la actividad cerebral a lo largo del tiempo. Puede entenderse como un espectrograma en el que el eje horizontal representa el tiempo, el eje vertical la frecuencia y la potencia de la señal se codifica mediante un mapa de color.
+
+La DSA puede considerarse una evolución de la matriz espectral comprimida (Compressed Spectral Array, CSA), que representaba la potencia de las distintas frecuencias en un gráfico tridimensional apilado. Frente a este formato, la DSA ofrece una visualización bidimensional más intuitiva y más útil para la práctica clínica, al permitir identificar de forma rápida cómo cambia la distribución espectral del EEG en el tiempo.
 
 En este tipo de representación, los colores cálidos suelen indicar una mayor potencia de la señal, mientras que los colores fríos corresponden a potencias menores. De esta manera, la DSA resume simultáneamente la dimensión temporal, la distribución en frecuencia y la potencia relativa de la actividad electroencefalográfica.
 
@@ -87,30 +90,39 @@ Su utilidad clínica radica en que permite reconocer patrones asociados a distin
 En el caso del propofol, por ejemplo, la transición hacia la inconsciencia se ha relacionado con un aumento de la potencia de baja frecuencia, la desaparición de las oscilaciones alfa occipitales coherentes y la aparición de actividad alfa frontal coherente. Estos cambios ponen de manifiesto que la representación espectral aporta información relevante sobre el estado cerebral que no siempre queda recogida de forma suficiente en un índice procesado único.
 
 
-\subsubsection{Limitaciones del monitor BIS y artefactos}
+### Variables complementarias: tasa de supresión y calidad de señal
+
+
+### Limitaciones del monitor BIS y artefactos
+
 A pesar de su utilidad, el monitor BIS presenta limitaciones importantes derivadas tanto del procesamiento simplificado de la señal como de la presencia de artefactos. Una de las principales fuentes de error es la actividad electromiográfica (EMG) de la musculatura frontal del paciente [@chamorro2008]. Dado que el EMG puede generar señales en un espectro de frecuencias elevado, este ruido puede solaparse con el EEG y provocar una sobreestimación artificial del valor numérico del BIS.
 
 Además, distintos factores pueden condicionar la interpretación del BIS, entre ellos la edad del paciente, el tipo de fármaco administrado y la calidad de la señal registrada. Por este motivo, el valor del BIS no debe evaluarse de forma aislada, sino integrarse junto con otras variables clínicas y, cuando sea posible, con representaciones complementarias de la señal como la DSA [@TapiaMoreno2020]. 
 
 Estas limitaciones refuerzan la conveniencia de complementar el valor del BIS con otras representaciones del EEG y con la información clínica del paciente.
 
-\subsection{Sistema ICCA y registro de variables clínicas} 
+
+## Sistema ICCA y registro de variables clínicas
 
 
-\subsection{Integración temporal de datos clínicos y neurofisiológicos}
+## Integración temporal de datos clínicos y neurofisiológicos
 
 
 
-\section{Estado del arte y trabajos relacionados} 
+# Estado del arte y trabajos relacionados
 
-\subsection{Monitorización basada en EEG y BIS en anestesia y cuidados intensivos} 
+
+## Monitorización basada en EEG y BIS en anestesia y cuidados intensivos
+
 A pesar de la extensa validación del monitor BIS en el entorno del quirófano, su utilidad de forma aislada en la Unidad de Cuidados Intensivos sigue siendo objeto de debate. Una revisión sistemática reciente sobre el uso del BIS en pacientes críticos ventilados mecánicamente concluyó que, si bien esta monitorización puede asociarse con una reducción en la dosis de sedantes y en el tiempo de despertar, la evidencia actual es metodológicamente limitada [@bilgili2017]. Los autores señalan que la superioridad del índice BIS frente a las escalas clínicas de sedación subjetivas no está claramente demostrada de forma aislada, evidenciando la necesidad de no tratar este parámetro como un indicador absoluto, sino de integrarlo en un contexto clínico multivariable más amplio [@bilgili2017].
 
-\subsection{Representación espectral y análisis visual de señales EEG}
+## Representación espectral y análisis visual de señales EEG
 
-\subsection{Integración de datos clínicos procedentes de múltiples fuentes}
 
-\subsection{Justificación del enfoque adoptado}
+## Integración de datos clínicos procedentes de múltiples fuentes
+
+
+## Justificación del enfoque adoptado
 
 
 

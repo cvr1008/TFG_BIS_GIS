@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE E – Manual del Desarrollador
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Manual del desarrollador / programador / investigador.} % usar el término que mejor se corresponda.
 
 \section{Estructura de directorios}
@@ -21,4 +23,3 @@ Se describirán las pruebas realizadas para validar el correcto funcionamiento d
 \section{Instrucciones para la modificación o mejora del proyecto.}
 
 Se proporcionarán indicaciones y recomendaciones para facilitar futuras ampliaciones o mejoras del trabajo realizado.
-```

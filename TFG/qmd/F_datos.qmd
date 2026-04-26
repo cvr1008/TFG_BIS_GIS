@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE F – Descripción de datos
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Descripción de adquisición y tratamiento de datos}
 
 
@@ -13,7 +15,6 @@ Tablas, imágenes, señales, secuencias de ADN…
 \section{Descripción clínica de los datos.}
 
 Descripción y explicaciones clinicas del significado o interpretación de los datos.
-```
 
 
 A continuación se muestra un **ejemplo de análisis exploratorio con R**

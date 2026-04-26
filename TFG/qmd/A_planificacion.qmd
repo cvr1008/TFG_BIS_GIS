@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE A – Plan de Proyecto
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Plan de Proyecto}
 
 \section{Introducción}
@@ -28,5 +30,4 @@ Se presentará la planificación temporal del proyecto, preferiblemente mediante
 Si corresponde, incluir aquí el documento de aprovación por parte de la Comisión de Bioética.
 
 Ojo \footnote{Los anexos deben de tener su propia bibliografía, eso es tan fácil como utilizar referencias igual que en la memoria \cite{bortolot2005}}
-```
 

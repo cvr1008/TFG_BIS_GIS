@@ -2,6 +2,7 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE I – Registro de interacciones con sistemas de IA
 %% ══════════════════════════════════════════════════════
+```
 
 \apendice{Registro de interacciones con sistemas de IA}
 
@@ -33,5 +34,4 @@ menos, la siguiente información:
 Este anexo podrá estructurarse en forma de tablas o listados numerados, y
 solo deberá incluir aquellas interacciones que hayan tenido una influencia
 significativa en el desarrollo del trabajo. 
-```
 

@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE C – Especificación de Requisitos
 %% ══════════════════════════════════════════════════════
+```
+
 
 \apendice{Especificación de Requisitos}
 
@@ -46,4 +48,3 @@ Una muestra de cómo podría ser una tabla de casos de uso:
 
 \section{Prototipos de interfaz o interacción con el proyecto.}
 Se incluirán bocetos, prototipos o capturas de pantalla que muestren la interacción del usuario con el sistema desarrollado.
-```

@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE H – Sostenibilidad curricular
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Anexo de sostenibilización curricular}
 
 \section{Introducción}
@@ -11,4 +13,3 @@ Se pueden incluir tantas subsecciones como sean necesarias con la intención de 
 Más información en el documento de la CRUE \url{https://www.crue.org/wp-content/uploads/2020/02/Directrices_Sosteniblidad_Crue2012.pdf}.
 
 Este anexo tendrá una extensión comprendida entre 600 y 800 palabras.
-```

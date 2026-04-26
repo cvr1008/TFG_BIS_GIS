@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE G – Resultados experimentales
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Estudio experimental}
 
 
@@ -14,5 +16,4 @@ Se detallarán los parámetros utilizados en los experimentos y la justificació
 
 \section{Detalle de resultados.}
 Se presentarán los resultados obtenidos mediante tablas, figuras y métricas relevantes.
-```
 

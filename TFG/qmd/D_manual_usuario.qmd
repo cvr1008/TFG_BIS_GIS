@@ -2,6 +2,8 @@
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE D – Manual de Usuario
 %% ══════════════════════════════════════════════════════
+```
+
 \apendice{Documentación de usuario}
 
 
@@ -13,4 +15,3 @@ Se describirá el proceso de instalación y ejecución del sistema de forma clar
 
 \section{Manuales y/o Demostraciones prácticas}
 Se incluirán instrucciones de uso del sistema y ejemplos prácticos que faciliten su comprensión por parte del usuario final.
-```
