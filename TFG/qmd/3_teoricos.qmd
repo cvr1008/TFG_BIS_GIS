@@ -25,45 +25,53 @@ El control adecuado del nivel de sedación resulta fundamental, ya que una dosif
 
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
-El EEG registra variaciones de voltaje muy pequeñas en la superficie del cuero cabelludo. Estos voltajes reflejan la suma espacial y temporal de corrientes postsinápticas generadas por grandes poblaciones de neuronas corticales. Dado que la señal llega atenuada hasta la superficie craneal, el equipo de registro necesita amplificarla y compararla entre pares o conjuntos de electrodos, organizados en distintos montajes.
-
-En la práctica, el registro electroencefalográfico varía en función del estado funcional del cerebro. Así, la señal puede presentar características distintas cuando la persona se encuentra despierta, relajada, con los ojos cerrados, somnolienta o dormida. Del mismo modo, el EEG también puede modificarse ante la apertura ocular, la estimulación visual, la administración de fármacos o la presencia de alteraciones neurológicas.
-
 
 Para describir la señal electroencefalográfica se utilizan habitualmente ciertos conceptos básicos [@Kane2017]: 
 
- - Amplitud o voltaje del EEG: expresa la magnitud de la diferencia de potencial registrada entre electrodos y suele medirse en microvoltios o decibelios. 
- - Frecuencia: indica el número de ciclos completos que realiza una onda en un segundo y se expresa en hercios. 
+ - Ciclo de una onda: oscilación o vibración completa de una onda. Pasa por un máximo (cresta) y un mínimo (valle), hasta regresar a la posición original, completando una forma de onda completa.
+ - Amplitud: medida de la variación de voltaje de de las ondas del EEG con respecto al valor medio, generalmente medida en microvoltios (µV), y a menudo expresada en el contexto del EEG, como la diferencia entre la línea base y el pico.
+ - Frecuencia: número de ciclos completos de ondas o complejos repetitivos en 1 s. Se mide en ciclos por segundo (c/s) o Hercios (Hz).
+ - Potencia: medida de la cantidad de actividad eléctrica que la onda transporta por unidad de tiempo. Suele medirse en microvoltios al cuadrado (µV^2) o decibelios (dB) para análisis técnicos, como en este trabajo.
  
  A partir de estas magnitudes, la señal puede analizarse en términos de ondas o patrones oscilatorios, entendidos como cambios repetitivos en la diferencia de potencial registrada a lo largo del tiempo [@Kane2017].
 
-Además del análisis temporal, el EEG puede estudiarse en función de la potencia de la señal en distintas bandas de frecuencia. La potencia de onda permite cuantificar la cantidad de actividad eléctrica contenida en un rango frecuencial determinado, lo que resulta especialmente útil para resumir e interpretar la señal desde un punto de vista espectral [@Kane2017].
 
-La interpretación clínica del EEG no depende únicamente de observar una forma de onda aislada, sino de integrar diferentes características de la señal dentro del contexto completo del registro. En este sentido, aunque la inspección visual sigue siendo importante, el análisis asistido por software facilita la detección y cuantificación de cambios en bandas de frecuencia específicas, mejorando la capacidad de describir la actividad cerebral de forma más objetiva [@Tatum2016].
+Además del análisis temporal, el EEG puede estudiarse en función de la potencia de la señal en distintas bandas de frecuencia, lo que resulta especialmente útil para resumir e interpretar la señal desde un punto de vista espectral [@Kane2017].
+
+
+En la práctica, la interpretación de un EEG requiere conocer previamente las características normales de la actividad cerebral según la edad del paciente y su estado clínico. También es necesario identificar posibles artefactos y variantes no patológicas, con el fin de evitar errores de interpretación. El registro electroencefalográfico puede variar de forma notable en función del estado funcional del cerebro, la edad, la apertura ocular, la estimulación visual, la administración de fármacos o el ciclo sueño-vigilia [@Er2006].
 
 
 ### Tipos de ondas del EEG
 
-Desde el punto de vista frecuencial, la señal electroencefalográfica puede descomponerse en distintas bandas de frecuencia, cada una de las cuales se asocia a un rango determinado de hercios (Hz). Esta clasificación permite describir de forma más estructurada la actividad cerebral registrada y facilita su interpretación clínica y espectral. De forma habitual, se distinguen las bandas recogidas en la Tabla @tbl:bandas-eeg [@TapiaMoreno2020].
+Desde el punto de vista frecuencial, la señal electroencefalográfica puede descomponerse en distintas bandas de frecuencia, cada una de las cuales se asocia a un rango determinado de hercios (Hz). Esta clasificación permite describir de forma más estructurada la actividad cerebral registrada y facilita su interpretación clínica y espectral. De forma habitual, se distinguen las bandas recogidas en la Tabla @tbl:bandas-eeg [@Er2006].
 
 
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
 | Gamma | >30 | Actividad rápida |
-| Beta | 13–30 | Estado de alerta o activación |
-| Alfa | 9–12 | Vigilia relajada, escasa actividad mental |
-| Theta | 5–8 | Somnolencia o menor nivel de alerta |
+| Beta | 12–30 | Estado de alerta o activación |
+| Alfa | 8–12 | Vigilia relajada, escasa actividad mental |
+| Theta | 4–8 | Somnolencia o menor nivel de alerta |
 | Delta | 1–4 | Sueño profundo o sedación intensa |
-| Lentas | <1 | Actividad de muy baja frecuencia |
 
-: Bandas de frecuencia del EEG y su interpretación general. Elaboración propia a partir de la bibliografía revisada. {#tbl:bandas-eeg}
+Bandas de frecuencia del EEG y su interpretación general 
 
-El predominio de unas bandas u otras puede variar en función del estado funcional del cerebro, la administración de determinados fármacos o la profundidad de la sedación. Por ello, la distribución de la potencia entre bandas constituye una herramienta útil para el análisis del EEG y para su representación mediante técnicas espectrales como la matriz de densidad espectral.
+(Elaboración propia a partir de la bibliografía revisada [@Er2006])
+
+
+El predominio de unas bandas de frecuencia u otras puede variar en función del estado funcional del cerebro, la edad del paciente, la administración de determinados fármacos o la profundidad de la sedación. Asimismo, determinados hallazgos, como la actividad epileptiforme, la presencia de ondas lentas focales o generalizadas, las alteraciones marcadas de la amplitud o la asimetría del ritmo de fondo, pueden orientar hacia un EEG patológico. Por este motivo, el análisis del EEG debe realizarse siempre considerando el contexto clínico y las condiciones en las que se ha obtenido el registro [@Er2006].
+
+En este sentido, la interpretación clínica del EEG no depende únicamente de observar una forma de onda aislada, sino de integrar distintas características de la señal, como su amplitud, frecuencia, distribución espacial y evolución temporal. Aunque la inspección visual continúa siendo relevante, el análisis asistido por software facilita la detección y cuantificación de cambios en bandas de frecuencia específicas, permitiendo describir la actividad cerebral de forma más objetiva [@Tatum2016].
+
+
+Por ello, la distribución de la potencia entre bandas constituye una herramienta útil para el análisis del EEG y sirve de base para representaciones espectrales como la matriz de densidad espectral, que permiten visualizar de forma conjunta la evolución temporal y frecuencial de la señal.
 
 
 ## Monitor BIS y monitorización del nivel de sedación
 
-El monitor BIS (Bispectral Index) es un dispositivo de monitorización neurofisiológica utilizado para estimar el nivel de sedación o hipnosis del paciente a partir del análisis procesado de la actividad electroencefalográfica registrada mediante electrodos frontales. Su uso se ha extendido especialmente en anestesia y en contextos donde resulta relevante disponer de una medida continua del estado de consciencia basada en la actividad cerebral.
+
+
 
 En el entorno de la unidad de cuidados intensivos, este tipo de monitorización adquiere especial interés en situaciones en las que las escalas clínicas pierden utilidad o resultan insuficientes, como ocurre en pacientes con sedación profunda o sometidos a bloqueo neuromuscular. En estos casos, la monitorización instrumental puede ayudar a detectar situaciones de sobresedación o infrasedación y contribuir a un ajuste más preciso del tratamiento sedante [@TapiaMoreno2020].
 
