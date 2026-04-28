@@ -89,8 +89,6 @@ No obstante, el índice BIS representa una simplificación de la señal electroe
 
 La matriz de densidad espectral o DSA (Density Spectral Array) es una representación espectral del EEG que facilita la interpretación visual de la actividad cerebral a lo largo del tiempo. Puede entenderse como un espectrograma en el que el eje horizontal representa el tiempo, el eje vertical la frecuencia y la potencia de la señal se codifica mediante un mapa de color.
 
-La DSA puede considerarse una evolución de la matriz espectral comprimida (Compressed Spectral Array, CSA), que representaba la potencia de las distintas frecuencias en un gráfico tridimensional apilado. Frente a este formato, la DSA ofrece una visualización bidimensional más intuitiva y más útil para la práctica clínica, al permitir identificar de forma rápida cómo cambia la distribución espectral del EEG en el tiempo.
-
 En este tipo de representación, los colores cálidos suelen indicar una mayor potencia de la señal, mientras que los colores fríos corresponden a potencias menores. De esta manera, la DSA resume simultáneamente la dimensión temporal, la distribución en frecuencia y la potencia relativa de la actividad electroencefalográfica.
 
 Su utilidad clínica radica en que permite reconocer patrones asociados a distintos estados de sedación y a la acción de diferentes fármacos anestésicos o sedantes. En lugar de reducir toda la información a un único número, la DSA muestra la evolución dinámica del contenido espectral del EEG, lo que facilita la identificación de tendencias, cambios bruscos y firmas electroencefalográficas características de determinados sedantes. Cada sedante puede generar patrones espectrales característicos, de modo que la distribución relativa de la potencia en bandas lentas, theta, alfa o beta puede cambiar según el fármaco administrado y la profundidad de la sedación.
@@ -99,6 +97,7 @@ En el caso del propofol, por ejemplo, la transición hacia la inconsciencia se h
 
 
 ### Variables complementarias: tasa de supresión y calidad de señal
+
 
 
 ### Limitaciones del monitor BIS y artefactos
