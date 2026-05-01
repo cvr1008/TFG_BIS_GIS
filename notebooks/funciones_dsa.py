@@ -12,7 +12,10 @@ import struct
 from funciones_aux import *
 
 
+
+from scipy.signal import welch
 from matplotlib.colors import LinearSegmentedColormap, PowerNorm
+
 
 
 
@@ -126,7 +129,7 @@ def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None):
     
     df_aux = pd.DataFrame({"Time": tiempo}).reset_index(drop=True)
     df_merge = df_aux.merge(
-        df_spa[cols],   # <- aquí estaba el fallo
+        df_spa[cols],   
         on="Time",
         how="left"
     )
@@ -517,3 +520,229 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
     axes_vars[-1].set_xlabel("Tiempo")
 
     return fig, [ax_dsa] + axes_vars
+
+
+
+
+# ---------------------------------------- Funciones de EEG a DSA -----------------------------------------------
+
+def leer_r2a(ruta_archivo, fs=128, escala_uv=0.0511):
+    """
+    Lee un archivo .r2a del BIS.
+
+    Estructura:
+    - 2 canales
+    - int16 little-endian
+    - canales intercalados: ch1, ch2, ch1, ch2...
+    - escala: 0.0511 µV/step
+    """
+
+    datos = np.fromfile(ruta_archivo, dtype="<i2")
+
+    if len(datos) % 2 != 0:
+        datos = datos[:-1]
+
+    datos = datos.reshape(-1, 2)
+
+    canal_1_raw = datos[:, 0]
+    canal_2_raw = datos[:, 1]
+
+    canal_1_uV = canal_1_raw * escala_uv
+    canal_2_uV = canal_2_raw * escala_uv
+
+    tiempo_s = np.arange(len(canal_1_uV)) / fs
+
+    df_eeg = pd.DataFrame({
+        "tiempo_s": tiempo_s,
+        "canal_1_raw": canal_1_raw,
+        "canal_2_raw": canal_2_raw,
+        "canal_1_uV": canal_1_uV,
+        "canal_2_uV": canal_2_uV
+    })
+
+    return df_eeg
+
+
+
+def crear_matriz_dsa_fft_welch_desde_eeg(
+    df_eeg,
+    fs=128,
+    canal="canal_1_uV",
+    ventana_seg=2,
+    paso_seg=1,
+    fmin=0.5,
+    fmax=30.0,
+    paso_freq=0.5,
+    modo="db",
+    tiempo_referencia="centro"
+):
+    """
+    Crea una matriz tiempo-frecuencia para DSA desde EEG crudo mediante FFT/Welch.
+
+    Salida:
+    - df_dsa: DataFrame con columna tiempo_s y columnas 0.5_Hz ... 30.0_Hz
+    - frecuencias: array de frecuencias usadas
+
+    modo:
+    - "db": potencia en decibelios
+    - "potencia": potencia espectral en µV²
+    - "densidad": densidad espectral en µV²/Hz
+    - "amplitud": amplitud espectral estimada en µV
+
+    tiempo_referencia:
+    - "inicio": etiqueta cada fila con el inicio de la ventana
+    - "centro": etiqueta cada fila con el centro de la ventana
+    - "final": etiqueta cada fila con el final de la ventana
+    """
+
+    x = df_eeg[canal].to_numpy(dtype=float)
+
+    nperseg = int(ventana_seg * fs)      # 2 s * 128 Hz = 256 muestras
+    paso = int(paso_seg * fs)            # 1 s * 128 Hz = 128 muestras
+    nfft = int(fs / paso_freq)           # 128 / 0.5 = 256
+
+    tiempos = []
+    espectros = []
+
+    for inicio in range(0, len(x) - nperseg + 1, paso):
+        fin = inicio + nperseg
+        segmento = x[inicio:fin]
+
+        scaling = "density" if modo == "densidad" else "spectrum"
+
+        f, pxx = welch(
+            segmento,
+            fs=fs,
+            window="hann",
+            nperseg=nperseg,
+            noverlap=0,
+            nfft=nfft,
+            detrend="constant",
+            scaling=scaling
+        )
+
+        mascara = (f >= fmin) & (f <= fmax)
+        f_sel = f[mascara]
+        pxx_sel = pxx[mascara]
+
+        if modo == "db":
+            valores = 10 * np.log10(pxx_sel + 1e-12)
+        elif modo in ["potencia", "densidad"]:
+            valores = pxx_sel
+        elif modo == "amplitud":
+            valores = np.sqrt(pxx_sel)
+        else:
+            raise ValueError("modo debe ser 'db', 'potencia', 'densidad' o 'amplitud'")
+
+        if tiempo_referencia == "inicio":
+            tiempo_s = inicio / fs
+        elif tiempo_referencia == "centro":
+            tiempo_s = (inicio + nperseg / 2) / fs
+        elif tiempo_referencia == "final":
+            tiempo_s = fin / fs
+        else:
+            raise ValueError("tiempo_referencia debe ser 'inicio', 'centro' o 'final'")
+
+        tiempos.append(tiempo_s)
+        espectros.append(valores)
+
+    df_dsa = pd.DataFrame(
+        espectros,
+        columns=[f"{freq:.1f}_Hz" for freq in f_sel]
+    )
+
+    df_dsa.insert(0, "tiempo_s", tiempos)
+
+    return df_dsa, f_sel
+
+
+
+def adaptar_dsa_reconstruida_para_plot(df_dsa, frecuencias, hora_inicio):
+    """
+    Convierte la matriz DSA reconstruida desde EEG al formato esperado
+    por tus funciones de visualización.
+
+    Devuelve:
+    - tiempo: Serie datetime
+    - dsa: DataFrame solo con columnas espectrales
+    """
+
+    hora_inicio = pd.Timestamp(hora_inicio)
+
+    tiempo = pd.Series(
+        hora_inicio + pd.to_timedelta(df_dsa["tiempo_s"], unit="s"),
+        name="Time"
+    ).dt.floor("s")
+
+    columnas_freq = [f"{f:.1f}_Hz" for f in frecuencias]
+
+    dsa = df_dsa[columnas_freq].copy()
+
+    return tiempo, dsa
+
+
+def plot_dsa_con_sef_mef(
+    tiempo,
+    frecuencias,
+    matriz,
+    norm,
+    cmap,
+    df_merge=None,
+    titulo="DSA reconstruida desde EEG crudo",
+    etiqueta_colorbar="Potencia espectral (dB)",
+    mostrar_sef=True,
+    mostrar_mef=True
+):
+    """
+    Dibuja la DSA y superpone las curvas SEF y MEF si están disponibles.
+
+    Parámetros:
+    - tiempo: Serie datetime de la DSA.
+    - frecuencias: array de frecuencias.
+    - matriz: matriz DSA con forma tiempo x frecuencia.
+    - norm: normalización de color.
+    - cmap: mapa de color.
+    - df_merge: DataFrame alineado con tiempo que contiene SEF08 y MEDFRQ08.
+    """
+
+    plt.figure(figsize=(15, 6))
+
+    plt.pcolormesh(
+        tiempo,
+        frecuencias,
+        matriz.T,
+        shading="auto",
+        cmap=cmap,
+        norm=norm
+    )
+
+    plt.colorbar(label=etiqueta_colorbar)
+
+    if df_merge is not None:
+        if mostrar_sef and "SEF08" in df_merge.columns:
+            plt.plot(
+                tiempo,
+                df_merge["SEF08"],
+                color="white",
+                linewidth=1.5,
+                label="SEF"
+            )
+
+        if mostrar_mef and "MEDFRQ08" in df_merge.columns:
+            plt.plot(
+                tiempo,
+                df_merge["MEDFRQ08"],
+                color="purple",
+                linewidth=1.5,
+                label="MEF"
+            )
+
+    plt.xlabel("Tiempo")
+    plt.ylabel("Frecuencia (Hz)")
+    plt.title(titulo)
+    plt.ylim(np.min(frecuencias), np.max(frecuencias))
+    plt.legend(loc="upper right")
+    plt.tight_layout()
+    plt.show()
+    
+    
