@@ -11,6 +11,7 @@ import struct
 
 from funciones_aux import *
 
+from scipy.stats import pearsonr, spearmanr
 
 
 from scipy.signal import welch
@@ -745,7 +746,7 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
         fin = inicio + nperseg
         segmento = x[inicio:fin]
 
-        scaling = "density" if modo == "densidad" else "spectrum"
+        scaling = "density" if modo in ["densidad", "db_densidad"] else "spectrum"
 
         f, pxx = welch(
             segmento,
@@ -764,12 +765,14 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
 
         if modo == "db":
             valores = 10 * np.log10(pxx_sel + 1e-12)
+        elif modo == "db_densidad":
+            valores = 10 * np.log10(pxx_sel + 1e-12)
         elif modo in ["potencia", "densidad"]:
             valores = pxx_sel
         elif modo == "amplitud":
             valores = np.sqrt(pxx_sel)
         else:
-            raise ValueError("modo debe ser 'db', 'potencia', 'densidad' o 'amplitud'")
+            raise ValueError("modo debe ser 'db', 'db_densidad', 'potencia', 'densidad' o 'amplitud'")
 
         if tiempo_referencia == "inicio":
             tiempo_s = inicio / fs
@@ -875,7 +878,8 @@ def plot_dsa_con_sef_mef(
     etiqueta_colorbar="Potencia espectral (dB)",
     mostrar_sef=True,
     mostrar_mef=True,
-    mostrar= True
+    mostrar=True,
+    mask_total=None
 ):
     """
     Dibuja la DSA y superpone las curvas SEF y MEF si están disponibles.
@@ -924,30 +928,45 @@ def plot_dsa_con_sef_mef(
     )
 
     # SEF y MEF
+    # SEF y MEF
     if df_merge is not None:
+
         if mostrar_sef and "SEF08" in df_merge.columns:
-            sef = df_merge["SEF08"]
-            mask_sef = sef.notna() & (sef >= y0) & (sef <= y1)
+            sef_plot = df_merge["SEF08"].copy()
+
+            # Fuera del rango visible → NaN
+            sef_plot[(sef_plot < y0) | (sef_plot > y1)] = np.nan
+
+            # Donde la DSA está en blanco → NaN
+            if mask_total is not None:
+                sef_plot.loc[np.asarray(mask_total)] = np.nan
 
             ax.plot(
-                tiempo[mask_sef],
-                sef[mask_sef],
+                tiempo,
+                sef_plot,
                 color="white",
                 linewidth=2.0,
                 label="SEF"
             )
 
         if mostrar_mef and "MEDFRQ08" in df_merge.columns:
-            mef = df_merge["MEDFRQ08"]
-            mask_mef = mef.notna() & (mef >= y0) & (mef <= y1)
+            mef_plot = df_merge["MEDFRQ08"].copy()
+
+            # Fuera del rango visible → NaN
+            mef_plot[(mef_plot < y0) | (mef_plot > y1)] = np.nan
+
+            # Donde la DSA está en blanco → NaN
+            if mask_total is not None:
+                mef_plot.loc[np.asarray(mask_total)] = np.nan
 
             ax.plot(
-                tiempo[mask_mef],
-                mef[mask_mef],
+                tiempo,
+                mef_plot,
                 color="#7a1fa2",
                 linewidth=2.0,
                 label="MEF"
             )
+            
 
     # Leyenda
     handles, labels = ax.get_legend_handles_labels()
@@ -1007,11 +1026,13 @@ def plot_dsa_con_sef_mef(
     # Barra de color
     cbar = fig.colorbar(im, cax=cax)
     cbar.set_label(etiqueta_colorbar, rotation=90, labelpad=12)
+    
 
     if mostrar:
         plt.show()
 
     return fig, ax, ax_band, cax
+
 
 # -------------------------------------- Funciones de EEG a DSA Bilateral --------------------------------------
 
@@ -1204,3 +1225,188 @@ def plot_dsa_bilateral_con_sef_mef(
 
     plt.tight_layout()
     plt.show()
+    
+    
+    
+# --------------------------------- Funciones calibración ------------------------------------------------
+
+
+def preparar_matrices_para_comparacion(dsa_1, dsa_2):
+    """
+    Asegura que las dos DSA tengan:
+    - mismas columnas
+    - misma longitud
+    - columnas en el mismo orden
+    """
+
+    dsa_1 = dsa_1.copy()
+    dsa_2 = dsa_2.copy()
+
+    # Convertir nombres de columnas a float para evitar diferencias tipo "0.5" vs 0.5
+    dsa_1.columns = [float(c) for c in dsa_1.columns]
+    dsa_2.columns = [float(c) for c in dsa_2.columns]
+
+    columnas_comunes = sorted(set(dsa_1.columns).intersection(set(dsa_2.columns)))
+
+    n = min(len(dsa_1), len(dsa_2))
+
+    dsa_1 = dsa_1.iloc[:n][columnas_comunes]
+    dsa_2 = dsa_2.iloc[:n][columnas_comunes]
+
+    return dsa_1, dsa_2
+
+
+def zscore_global(df):
+    """
+    Normaliza toda la matriz con media y desviación típica global, ignorando NaN.
+    """
+    # convierte la DSA a matriz numérica
+    matriz = df.to_numpy(dtype=float)
+
+    # media y desviación típica ignorando NaN
+    media = np.nanmean(matriz)
+    std = np.nanstd(matriz)
+
+    # aplica la fórmula
+    matriz_z = (matriz - media) / std
+
+    return pd.DataFrame(matriz_z, index=df.index, columns=df.columns)
+
+
+def comparar_dsa_global(dsa_1, dsa_2):
+    """
+    Calcula métricas globales entre dos matrices DSA.
+    Compara solo posiciones donde ambas matrices tienen valores válidos.
+    """
+
+    A = dsa_1.to_numpy(dtype=float)
+    B = dsa_2.to_numpy(dtype=float)
+
+    mask = np.isfinite(A) & np.isfinite(B)
+
+    A_valid = A[mask]
+    B_valid = B[mask]
+
+    if len(A_valid) == 0:
+        raise ValueError("No hay valores válidos comunes para comparar.")
+
+    mae = np.mean(np.abs(A_valid - B_valid))
+    rmse = np.sqrt(np.mean((A_valid - B_valid) ** 2))
+    bias = np.mean(B_valid - A_valid)
+
+    pearson = pearsonr(A_valid, B_valid)[0]
+    spearman = spearmanr(A_valid, B_valid)[0]
+
+    return {
+        "n_valores_comparados": len(A_valid),
+        "MAE": mae,
+        "RMSE": rmse,
+        "bias_B_menos_A": bias,
+        "Pearson": pearson,
+        "Spearman": spearman
+    }
+
+
+def correlacion_por_frecuencia(dsa_1, dsa_2):
+    """
+    Calcula la correlación entre ambas DSA para cada frecuencia.
+    """
+
+    resultados = []
+
+    for col in dsa_1.columns:
+        a = dsa_1[col].to_numpy(dtype=float)
+        b = dsa_2[col].to_numpy(dtype=float)
+
+        mask = np.isfinite(a) & np.isfinite(b)
+
+        if mask.sum() > 2:
+            r = pearsonr(a[mask], b[mask])[0]
+        else:
+            r = np.nan
+
+        resultados.append({
+            "frecuencia_Hz": col,
+            "correlacion": r
+        })
+
+    return pd.DataFrame(resultados)
+
+
+def correlacion_por_tiempo(dsa_1, dsa_2, tiempo=None):
+    """
+    Calcula la correlación fila a fila.
+    Cada fila representa un instante temporal.
+    """
+
+    resultados = []
+
+    for i in range(len(dsa_1)):
+        a = dsa_1.iloc[i].to_numpy(dtype=float)
+        b = dsa_2.iloc[i].to_numpy(dtype=float)
+
+        mask = np.isfinite(a) & np.isfinite(b)
+
+        if mask.sum() > 2:
+            r = pearsonr(a[mask], b[mask])[0]
+        else:
+            r = np.nan
+
+        resultados.append(r)
+
+    df = pd.DataFrame({"correlacion": resultados})
+
+    if tiempo is not None:
+        df.insert(0, "Time", tiempo.iloc[:len(df)].values)
+
+    return df
+
+
+def probar_suavizado_y_shifts(
+    dsa_eeg,
+    dsa_fa,
+    ventanas_suavizado=(5, 10, 15, 25, 30, 40, 60, 80),
+    shifts=range(-60, 61)
+):
+    resultados = []
+
+    for w in ventanas_suavizado:
+        dsa_eeg_suav = dsa_eeg.rolling(
+            window=w,
+            min_periods=1,
+            center=False
+        ).mean()
+
+        for shift in shifts:
+
+            if shift < 0:
+                A = dsa_eeg_suav.iloc[-shift:].reset_index(drop=True)
+                B = dsa_fa.iloc[:len(A)].reset_index(drop=True)
+
+            elif shift > 0:
+                A = dsa_eeg_suav.iloc[:-shift].reset_index(drop=True)
+                B = dsa_fa.iloc[shift:].reset_index(drop=True)
+
+            else:
+                A = dsa_eeg_suav.reset_index(drop=True)
+                B = dsa_fa.reset_index(drop=True)
+
+            n = min(len(A), len(B))
+            A = A.iloc[:n]
+            B = B.iloc[:n]
+
+            A_z = zscore_global(A)
+            B_z = zscore_global(B)
+
+            met = comparar_dsa_global(A_z, B_z)
+
+            resultados.append({
+                "suavizado_s": w,
+                "shift_s": shift,
+                "Pearson": met["Pearson"],
+                "Spearman": met["Spearman"],
+                "MAE": met["MAE"],
+                "RMSE": met["RMSE"]
+            })
+
+    return pd.DataFrame(resultados)
