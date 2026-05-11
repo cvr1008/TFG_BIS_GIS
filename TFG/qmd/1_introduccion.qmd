@@ -7,7 +7,7 @@ La monitorización de los pacientes críticos en estado de sedación alojados en
 
 Entre estas fuentes de información, la monitorización neurofisiológica mediante el índice biespectral o BIS (Bispectral Index) constituye una herramienta de interés para valorar el estado de sedación a partir del procesamiento de la actividad electroencefalográfica.
 
-De forma complementaria, los sistemas de información clínica como ICCA permiten registrar constantes vitales, parámetros analíticos, tratamientos administrados y otra información relevante del paciente a lo largo del tiempo.
+De forma complementaria, los sistemas de información clínica como el IntelliSpace Critical Care & Anesthesia (ICCA) permiten registrar constantes vitales, parámetros analíticos, tratamientos administrados y otra información relevante del paciente a lo largo del tiempo.
 
 Sin embargo, en la práctica, la información procedente del monitor BIS no siempre es comprendida por todos los profesionales y se desaprovecha una gran cantidad del potencial de la máquina. Además, el material obtenido de del BIS y la información clínica recogida por la ICCA no siempre se encuentra integrada de forma inmediata o fácilmente explorable de forma conjunta. Esto dificulta el análisis retrospectivo de la evolución del paciente, especialmente cuando se pretende estudiar la relación temporal entre la señal neurofisiológica, el índice BIS y otras variables clínicas, como constantes hemodinámicas, parámetros metabólicos o administración de fármacos.
 
