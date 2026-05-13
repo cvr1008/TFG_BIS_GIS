@@ -123,7 +123,6 @@ Estas limitaciones refuerzan la conveniencia de complementar el valor del BIS co
 
 ## Dashboards clínicos y visualización de datos en UCI
 
-A pesar de la extensa validación del monitor BIS en el entorno del quirófano, su utilidad de forma aislada en la Unidad de Cuidados Intensivos sigue siendo objeto de debate. Una revisión sistemática reciente sobre el uso del BIS en pacientes críticos ventilados mecánicamente concluyó que, si bien esta monitorización puede asociarse con una reducción en la dosis de sedantes y en el tiempo de despertar, la evidencia actual es metodológicamente limitada [@bilgili2017]. Los autores señalan que la superioridad del índice BIS frente a las escalas clínicas de sedación subjetivas no está claramente demostrada de forma aislada, evidenciando la necesidad de no tratar este parámetro como un indicador absoluto, sino de integrarlo en un contexto clínico multivariable más amplio [@bilgili2017].
 
 ## Integración de datos multimodales y heterogéneos en cuidados críticos
 
