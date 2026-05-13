@@ -486,3 +486,95 @@ def limpiar_spa_bilateral(df):
 
     
 
+def explicar_frames_r2a(ruta_r2a, n_frames=8, factor_uv=0.05, mostrar=True):
+    """
+    Lee los primeros n_frames de un archivo .r2a y:
+    - separa los frames de 4 bytes
+    - divide cada frame en canal 1 y canal 2
+    - traduce cada pareja de bytes a entero con signo de 16 bits
+    - convierte los valores a microvoltios
+    
+    Devuelve un DataFrame con el detalle.
+    """
+
+    """ 
+    "rb" = lectura en modo binario
+    read(n_frames * 4) = leer los primeros 32 bytes del archivo
+    """
+    with open(ruta_r2a, "rb") as f:
+        bruto = f.read(n_frames * 4)
+
+        
+    # lista vacía en la que se guardan las filas (diccionarios con las características de los frames)
+    filas = []
+
+    if mostrar:
+        print("ANÁLISIS DEL ARCHIVO .r2a")
+        print("-" * 60)
+        print(f"Se leen los primeros {n_frames * 4} bytes del archivo.")
+        print("Cada frame temporal ocupa 4 bytes:")
+        print("  - 2 bytes para el canal 1")
+        print("  - 2 bytes para el canal 2")
+        print(f"Conversión a microvoltios: valor_crudo × {factor_uv}")
+        print()
+        
+    
+    """
+    recorrer los frames desde 0 a n-1
+    bloque: se cogen los 4 bytes de cada frame. Si se lee que el bloque es más pequeño que eso se detiene
+            del bloque principal se divide en 2 sub-bloques uno por cada canal
+    """
+    for i in range(n_frames):
+        bloque = bruto[i*4:(i+1)*4]
+
+        if len(bloque) < 4:
+            break
+
+        bytes_c1 = bloque[:2]
+        bytes_c2 = bloque[2:]
+
+        
+        """        
+        Interpreta cada pareja de bytes como un entero con signo de 16 bits
+        struct.unpack("<h", bytes_c1):
+            h: entero corto con signo, 16 bits, 2 bytes
+            <: little-endian
+            [0]: porque struct.unpack(...) devuelve una tupla y hay que quedarse con el primer elemento
+        """        
+        raw_c1 = struct.unpack("<h", bytes_c1)[0]
+        raw_c2 = struct.unpack("<h", bytes_c2)[0]
+
+        """ 
+        Fórmula de procesamiento: 
+        Para obtener la amplitud real de la onda cerebral, debes coger el número entero extraído y multiplicarlo por 0.05. 
+        El resultado será el valor de la onda en microvoltios (µV).
+        """
+        uv_c1 = raw_c1 * factor_uv
+        uv_c2 = raw_c2 * factor_uv
+
+        # crea un diccionario con toda la información útil del frame actual
+        fila = {
+            "Frame": i + 1,
+            "Bytes frame": bloque.hex(" "),
+            "Bytes C1": bytes_c1.hex(" "),
+            "Bytes C2": bytes_c2.hex(" "),
+            "Raw C1": raw_c1,
+            "Raw C2": raw_c2,
+            "C1 (µV)": uv_c1,
+            "C2 (µV)": uv_c2,
+        }
+        filas.append(fila)
+
+        if mostrar:
+            print(f"Frame/Muestra {i+1}")
+            print(f"  Bytes del frame: {bloque.hex(' ')}")
+            print(f"  Canal 1 -> bytes: {bytes_c1.hex(' ')} -> entero: {raw_c1} -> µV: {uv_c1:.2f}")
+            print(f"  Canal 2 -> bytes: {bytes_c2.hex(' ')} -> entero: {raw_c2} -> µV: {uv_c2:.2f}")
+            print()
+
+    """
+    convierte la lista de diccionarios en un DataFrame de pandas
+    cada diccionario será una fila
+    """
+    df_frames = pd.DataFrame(filas)
+    return df_frames
