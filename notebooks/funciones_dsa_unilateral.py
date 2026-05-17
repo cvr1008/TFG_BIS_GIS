@@ -81,7 +81,4 @@ def limpiar_spa_unilateral(df_spa):
     cols_num = [c for c in df_out.columns if c != "Time"]
     df_out[cols_num] = df_out[cols_num].replace(sentinelas, np.nan)
 
-    df_out["modo_spa"] = "unilateral"
-    df_out["canal_procesado_spa"] = "canal_3"
-
     return df_out

@@ -332,6 +332,8 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
         umbral_sqi=umbral_sqi,
         umbral_ceros=0.9
     )
+    
+    
 
     # 3) Preparar escala de color
     _, vmin, vmax, norm, cmap = preparar_escala_color_dsa(
@@ -402,18 +404,35 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
     )
 
     # 8) Curvas SEF y MEF
-    mask_sef = sef.notna() & (sef >= 0.5) & (sef <= 30)
-    mask_mf = mf.notna() & (mf >= 0.5) & (mf <= 30)
+    sef_plot = sef.copy()
+    mf_plot = mf.copy()
+
+    sef_plot[(sef_plot < 0.5) | (sef_plot > 30)] = np.nan
+    mf_plot[(mf_plot < 0.5) | (mf_plot > 30)] = np.nan
+
+    sef_plot.loc[mask_total.values] = np.nan
+    mf_plot.loc[mask_total.values] = np.nan
+
+    
+    ax_dsa.plot(
+        tiempo,
+        sef_plot,
+        color="white",
+        linewidth=2.0,
+        alpha=0.95,
+        label="SEF"
+    )
 
     ax_dsa.plot(
-        tiempo[mask_sef], sef[mask_sef],
-        color="white", linewidth=2.0, label="SEF"
+        tiempo,
+        mf_plot,
+        color="purple",
+        linewidth=2.0,
+        alpha=0.95,
+        label="MEF"
     )
-    ax_dsa.plot(
-        tiempo[mask_mf], mf[mask_mf],
-        color="#7a1fa2", linewidth=2.0, label="MEF"
-    )
-
+    
+    
     ax_dsa.legend(
         loc="upper left",
         bbox_to_anchor=(1.02, 1),
