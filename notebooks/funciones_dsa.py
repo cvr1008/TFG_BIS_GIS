@@ -68,11 +68,13 @@ def crear_cmap_bis():
     # colores
     # Rampa aproximada a la leyenda del monitor BIS
     colores_bis = [
+        "#000080",  # azul oscuro
         "#0033cc",  # azul intenso
-        "#00bfff",  # cian
-        "#4cd964",  # verde
-        "#f5f532",  # amarillo vivo
-        "#d90000"   # rojo intenso
+        "#25fade",  # cian
+        "#94ff6e",  # verde
+        "#f5f532",  # amarillo
+        "#FF3F34",  # rojo-naranja
+        "#ac0505"   # rojo oscuro
     ]
     
     # Construcción de un colormapcontinuo a partir de esos colores 
