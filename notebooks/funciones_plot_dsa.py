@@ -14,13 +14,15 @@ from funciones_dsa import (
 
 # ------------------------------------------ UNILATERAL ------------------------------------------------------
 
-def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=None, gamma=0.55):
+def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=None, gamma=0.55,  aplicar_clip=False):
     
     """
     DSA vertical estilo PDF usando:
     - DSA del .f_a
     - SEF y MEF del .spa
     - máscara de tramos no válidos
+    
+    Si aplicar_clip=True y se pasan vmin/vmax, los valores se recortan visualmente a ese rango para imitar mejor la saturación de pantalla.
     """
 
     # 1) Alinear el .spa con el tiempo de la DSA
@@ -28,6 +30,12 @@ def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=Non
 
     # 2) Preparar la DSA con NaN en tramos no válidos
     dsa_plot, mask_total = preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=umbral_sqi, umbral_ceros=0.9)
+    
+    
+    # 2.5) Recorte visual opcional
+    if aplicar_clip and (vmin is not None) and (vmax is not None):
+        dsa_plot = dsa_plot.clip(lower=vmin, upper=vmax)
+    
 
     # 3) Preparar matriz y escala de color
     matriz, vmin, vmax, norm, cmap = preparar_escala_color_dsa(dsa_plot, vmin=vmin, vmax=vmax, gamma=gamma)

@@ -4,6 +4,8 @@ import numpy as np
 from scipy.signal import welch
 from scipy.stats import pearsonr, spearmanr
 from matplotlib.colors import LinearSegmentedColormap, PowerNorm
+from matplotlib.colors import BoundaryNorm
+
 
 
 
@@ -66,14 +68,12 @@ def crear_cmap_bis():
     # colores
     # Rampa aproximada a la leyenda del monitor BIS
     colores_bis = [
-        "#001a8f",  # azul oscuro
-        "#004cff",  # azul
-        "#00c8ff",  # cian
-        "#46e6b2",  # verde-agua
-        "#d7ef3c",  # amarillo verdoso
-        "#ffe100",  # amarillo
-        "#ff8c00",  # naranja
-        "#d40000",  # rojo
+        "#0033cc",  # azul intenso
+        "#00bfff",  # cian
+        "#4cd964",  # verde
+        "#f5f532",  # amarillo vivo
+        "#ff9900",  # naranja
+        "#d90000"   # rojo intenso
     ]
     
     # Construcción de un colormapcontinuo a partir de esos colores 
