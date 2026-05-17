@@ -72,7 +72,6 @@ def crear_cmap_bis():
         "#00bfff",  # cian
         "#4cd964",  # verde
         "#f5f532",  # amarillo vivo
-        "#ff9900",  # naranja
         "#d90000"   # rojo intenso
     ]
     
