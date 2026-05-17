@@ -168,7 +168,7 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.
     Si una fila tiene casi todo a cero, probablemente no aporta información útil
     """
     porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
-    mask_ceros = porcentaje_ceros > 0.9
+    mask_ceros = porcentaje_ceros > umbral_ceros
 
     
     """ 
@@ -254,7 +254,7 @@ def preparar_escala_color_dsa(dsa_plot, vmin=None, vmax=None, gamma=0.55):
 def crear_matriz_dsa_fft_welch_desde_eeg(
     df_eeg,
     fs=128,
-    canal="canal_1_uV",
+    canal,
     ventana_seg=2,
     paso_seg=1,
     fmin=0.5,
