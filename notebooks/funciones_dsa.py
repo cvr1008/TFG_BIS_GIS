@@ -5,6 +5,9 @@ from scipy.signal import welch
 from scipy.stats import pearsonr, spearmanr
 from matplotlib.colors import LinearSegmentedColormap, PowerNorm
 from matplotlib.colors import BoundaryNorm
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
 
 
 
@@ -581,3 +584,177 @@ def probar_suavizado_y_shifts(
             })
 
     return pd.DataFrame(resultados)
+
+
+def dibujar_panel_dsa_en_grid(
+    fig,
+    subgs,
+    tiempo,
+    frecuencias,
+    matriz,
+    norm,
+    cmap,
+    df_merge=None,
+    titulo="DSA",
+    etiqueta_colorbar="Intensidad espectral (dB)",
+    mostrar_sef=True,
+    mostrar_mef=True,
+    mask_total=None
+):
+    """
+    Dibuja un único panel DSA dentro de una subrejilla de 1x3:
+    [DSA | bandas | colorbar]
+    """
+
+    frecuencias = np.asarray(frecuencias, dtype=float)
+
+    x0 = mdates.date2num(tiempo.iloc[0] if hasattr(tiempo, "iloc") else tiempo[0])
+    x1 = mdates.date2num(tiempo.iloc[-1] if hasattr(tiempo, "iloc") else tiempo[-1])
+
+    y0 = np.min(frecuencias)
+    y1 = np.max(frecuencias)
+
+    # matriz: tiempo x frecuencia -> para imshow usamos frecuencia x tiempo
+    matriz_hor = matriz.T
+
+    ax = fig.add_subplot(subgs[0, 0])
+    ax_band = fig.add_subplot(subgs[0, 1])
+    cax = fig.add_subplot(subgs[0, 2])
+
+    im = ax.imshow(
+        matriz_hor,
+        aspect="auto",
+        origin="lower",
+        extent=[x0, x1, y0, y1],
+        cmap=cmap,
+        norm=norm,
+        interpolation="nearest"
+    )
+
+    # SEF / MEF
+    if df_merge is not None:
+        if mostrar_sef and "SEF08" in df_merge.columns:
+            sef_plot = df_merge["SEF08"].copy()
+            sef_plot[(sef_plot < y0) | (sef_plot > y1)] = np.nan
+
+            if mask_total is not None:
+                sef_plot.loc[np.asarray(mask_total)] = np.nan
+
+            ax.plot(
+                tiempo,
+                sef_plot,
+                color="white",
+                linewidth=1.8,
+                label="SEF"
+            )
+
+        if mostrar_mef and "MEDFRQ08" in df_merge.columns:
+            mef_plot = df_merge["MEDFRQ08"].copy()
+            mef_plot[(mef_plot < y0) | (mef_plot > y1)] = np.nan
+
+            if mask_total is not None:
+                mef_plot.loc[np.asarray(mask_total)] = np.nan
+
+            ax.plot(
+                tiempo,
+                mef_plot,
+                color="#7a1fa2",
+                linewidth=1.8,
+                label="MEF"
+            )
+
+    handles, labels = ax.get_legend_handles_labels()
+    if handles:
+        ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.02, 1),
+            borderaxespad=0,
+            frameon=True,
+            facecolor="white",
+            framealpha=0.8,
+            fontsize=8
+        )
+
+    # formato eje X
+    ax.xaxis_date()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+    plt.setp(ax.get_xticklabels(), rotation=45, fontsize=8)
+
+    ax.set_xlabel("Tiempo")
+    ax.set_ylabel("Frecuencia (Hz)")
+    ax.set_title(titulo, fontsize=10)
+    ax.set_ylim(y0, y1)
+
+    # líneas de bandas
+    for f in [4, 8, 13]:
+        ax.axhline(
+            f,
+            color="gray",
+            linestyle="--",
+            linewidth=1,
+            alpha=0.7
+        )
+
+    # eje lateral de bandas
+    ax_band.set_ylim(y0, y1)
+    ax_band.set_xlim(0, 1)
+    ax_band.axis("off")
+
+    bandas = {
+        "Delta": (0.5 + 4) / 2,
+        "Theta": (4 + 8) / 2,
+        "Alpha": (8 + 13) / 2,
+        "Beta":  (13 + 30) / 2,
+    }
+
+    for nombre, ypos in bandas.items():
+        ax_band.text(
+            0.05,
+            ypos,
+            nombre,
+            va="center",
+            ha="left",
+            fontsize=8
+        )
+
+    cbar = fig.colorbar(im, cax=cax)
+    cbar.set_label(etiqueta_colorbar, rotation=90, labelpad=10, fontsize=8)
+    cbar.ax.tick_params(labelsize=8)
+
+    return ax, ax_band, cax
+
+
+def plot_cuadricula_4_dsa(paneles, titulo_general="Comparación de matrices DSA"):
+    """
+    paneles: lista de 4 diccionarios, uno por panel.
+    Cada panel debe contener los argumentos necesarios para dibujar_panel_dsa_en_grid.
+    """
+
+    if len(paneles) != 4:
+        raise ValueError("Se esperan exactamente 4 paneles.")
+
+    fig = plt.figure(figsize=(26, 14), constrained_layout=True)
+    outer = fig.add_gridspec(2, 2, wspace=0.10, hspace=0.14)
+
+    axes_out = []
+
+    for i, panel in enumerate(paneles):
+        fila, col = divmod(i, 2)
+
+        subgs = outer[fila, col].subgridspec(
+            1, 3,
+            width_ratios=[20, 1.5, 0.8],
+            wspace=0.06
+        )
+
+        ax_pack = dibujar_panel_dsa_en_grid(
+            fig=fig,
+            subgs=subgs,
+            **panel
+        )
+        axes_out.append(ax_pack)
+
+    fig.suptitle(titulo_general, fontsize=15)
+
+    plt.show()
+    return fig, axes_out

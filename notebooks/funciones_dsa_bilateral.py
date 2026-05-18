@@ -171,3 +171,58 @@ def preparar_escala_color_dsa_bilateral(dsa_plot_1, dsa_plot_2, gamma=0.55):
     cmap = crear_cmap_bis()
 
     return matriz_1, matriz_2, vmin, vmax, norm, cmap
+
+# -------------------------------------------------------------------------- lo del csv --------------------------------------------------
+
+def convertir_r4a_a_csv(archivo_entrada, archivo_salida):
+    """
+    Convierte un archivo de ondas crudas .r4a (Bilateral, 4 canales) a formato CSV.
+    Basado en las especificaciones del monitor BIS: 
+    - 128 muestras por segundo (Hz).
+    - Los valores enteros se multiplican por 0.05 para obtener microvoltios (µV).
+    
+    Parámetros:
+    - archivo_entrada (str): Ruta al archivo .r4a que se desea leer.
+    - archivo_salida (str): Ruta donde se guardará el archivo .csv resultante.
+    """
+    print(f"Iniciando conversión de ondas crudas (BIS Bilateral) a 128 Hz...")
+    print(f"Archivo origen: {archivo_entrada}")
+    
+    try:
+        with open(archivo_entrada, "rb") as f_in, open(archivo_salida, "w") as f_out:
+            # 1. Escribimos la cabecera indicando las unidades en microvoltios
+            f_out.write("Tiempo_s,Canal_1_uV,Canal_2_uV,Canal_3_uV,Canal_4_uV\n")
+            
+            contador_muestras = 0
+            
+            # 2. Bucle de lectura de 8 en 8 bytes (4 canales * 2 bytes/canal)
+            while True:
+                bytes_muestra = f_in.read(8)
+                if not bytes_muestra or len(bytes_muestra) < 8:
+                    break
+                
+                # 3. Desempaquetar 4 enteros de 16 bits con signo ('<hhhh')
+                canal_1, canal_2, canal_3, canal_4 = struct.unpack('<hhhh', bytes_muestra)
+                
+                # 4. Convertir a microvoltios (µV) multiplicando por 0.05
+                c1_uv = canal_1 * 0.05
+                c2_uv = canal_2 * 0.05
+                c3_uv = canal_3 * 0.05
+                c4_uv = canal_4 * 0.05
+                
+                # 5. Calcular tiempo en segundos usando la frecuencia de muestreo (128 Hz)
+                tiempo_en_segundos = contador_muestras / 128.0
+                
+                # 6. Escribir en el CSV con 4 decimales de precisión
+                f_out.write(f"{tiempo_en_segundos:.4f},{c1_uv:.4f},{c2_uv:.4f},{c3_uv:.4f},{c4_uv:.4f}\n")
+                
+                contador_muestras += 1
+
+        print(f"- Muestras por canal procesadas: {contador_muestras}")
+        print(f"- Tiempo total del registro: {contador_muestras / 128.0:.2f} segundos.")
+        print(f"- Archivo guardado en: {os.path.abspath(archivo_salida)}\n")
+
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo '{archivo_entrada}'. Por favor, verifica la ruta.\n")
+    except Exception as e:
+        print(f"Ocurrió un error inesperado al procesar el archivo: {e}\n")
