@@ -253,8 +253,8 @@ def preparar_escala_color_dsa(dsa_plot, vmin=None, vmax=None, gamma=0.55):
 
 def crear_matriz_dsa_fft_welch_desde_eeg(
     df_eeg,
-    fs=128,
     canal,
+    fs=128,
     ventana_seg=2,
     paso_seg=1,
     fmin=0.5,
