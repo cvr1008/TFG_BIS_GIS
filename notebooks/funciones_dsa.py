@@ -397,6 +397,61 @@ def adaptar_dsa_reconstruida_para_plot(df_dsa, frecuencias, hora_inicio, inserta
 
     return tiempo, dsa
 
+
+
+def calcular_sef_mef_desde_potencia(
+    potencia,
+    frecuencias,
+    percentil_sef=0.95,
+    percentil_mef=0.50
+):
+    """
+    Calcula SEF y MEF a partir de una matriz de potencia lineal.
+
+    Parámetros:
+    - potencia: matriz numpy o DataFrame con forma tiempo x frecuencia.
+    - frecuencias: array/lista con las frecuencias correspondientes a las columnas.
+    - percentil_sef: por defecto 0.95 para SEF95.
+    - percentil_mef: por defecto 0.50 para frecuencia mediana.
+
+    Devuelve:
+    - sef: array con la frecuencia bajo la cual se acumula el 95% de la potencia.
+    - mef: array con la frecuencia bajo la cual se acumula el 50% de la potencia.
+    """
+
+    potencia = np.asarray(potencia, dtype=float)
+    frecuencias = np.asarray(frecuencias, dtype=float)
+
+    sef = np.full(potencia.shape[0], np.nan)
+    mef = np.full(potencia.shape[0], np.nan)
+
+    for i in range(potencia.shape[0]):
+        p = potencia[i, :]
+
+        mask = np.isfinite(p) & (p >= 0)
+
+        if mask.sum() == 0:
+            continue
+
+        p_valid = p[mask]
+        f_valid = frecuencias[mask]
+
+        potencia_total = np.sum(p_valid)
+
+        if potencia_total <= 0:
+            continue
+
+        acumulada = np.cumsum(p_valid)
+        proporcion = acumulada / potencia_total
+
+        idx_mef = np.searchsorted(proporcion, percentil_mef)
+        idx_sef = np.searchsorted(proporcion, percentil_sef)
+
+        mef[i] = f_valid[min(idx_mef, len(f_valid) - 1)]
+        sef[i] = f_valid[min(idx_sef, len(f_valid) - 1)]
+
+    return sef, mef
+
    
     
 # --------------------------------- Funciones calibración ------------------------------------------------
