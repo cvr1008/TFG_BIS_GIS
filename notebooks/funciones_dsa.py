@@ -350,7 +350,6 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
 
 
 
-
 def adaptar_dsa_reconstruida_para_plot(df_dsa, frecuencias, hora_inicio, insertar_fila_inicial_nan=False):
     """
     Convierte la DSA reconstruida desde EEG crudo al formato esperado
@@ -465,17 +464,24 @@ def preparar_matrices_para_comparacion(dsa_1, dsa_2):
     - columnas en el mismo orden
     """
 
+    # copias para no alterar los datos originales
     dsa_1 = dsa_1.copy()
     dsa_2 = dsa_2.copy()
 
-    # Convertir nombres de columnas a float para evitar diferencias tipo "0.5" vs 0.5
+    # recorrer los nombres de las columnas (las frecuencias en Hz)
+    # forzar a float para que estén en un mismo formato
     dsa_1.columns = [float(c) for c in dsa_1.columns]
     dsa_2.columns = [float(c) for c in dsa_2.columns]
 
+    # convertir las columnas en conjuntos y extraer solo las que existen en ambas matrices: intersección
+    # luego ordena las columnas de menor a mayor frecuencia
     columnas_comunes = sorted(set(dsa_1.columns).intersection(set(dsa_2.columns)))
 
+    # busca cuál es la matriz más corta
+    # si el eeg graba más que lo que tenemos en el f_a se recorta 
     n = min(len(dsa_1), len(dsa_2))
 
+    # coge las filas desde la 0 hasta la n y filtra solo las frecuencias compartidas y ordenadas.
     dsa_1 = dsa_1.iloc[:n][columnas_comunes]
     dsa_2 = dsa_2.iloc[:n][columnas_comunes]
 
@@ -639,6 +645,7 @@ def probar_suavizado_y_shifts(
             })
 
     return pd.DataFrame(resultados)
+
 
 
 def dibujar_panel_dsa_en_grid(
