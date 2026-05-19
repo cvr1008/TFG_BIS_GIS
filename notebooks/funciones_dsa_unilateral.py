@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 from funciones_dsa import obtener_hora_inicio_desde_spa
+import struct
 
 
 def leer_r2a(ruta_archivo, fs=128, escala_uv=0.0511):

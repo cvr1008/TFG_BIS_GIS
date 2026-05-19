@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 
 from matplotlib.colors import PowerNorm
+import struct
+
 
 from funciones_dsa import (
     obtener_hora_inicio_desde_spa,
