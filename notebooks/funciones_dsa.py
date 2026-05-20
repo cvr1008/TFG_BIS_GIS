@@ -629,7 +629,7 @@ def correlacion_por_tiempo(dsa_1, dsa_2, tiempo=None):
 def probar_suavizado_y_shifts(
     dsa_eeg,
     dsa_fa,
-    ventanas_suavizado=(5, 10, 15, 25, 30, 40, 60, 80),
+    ventanas_suavizado=(0, 5, 10, 30, 60),
     shifts=range(-60, 61)
 ):
     resultados = []
