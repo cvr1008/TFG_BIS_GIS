@@ -567,21 +567,26 @@ def correlacion_por_frecuencia(dsa_1, dsa_2):
 
     resultados = []
 
+    # itera columna a columna (frecuencia a frec. Cada 0.5 Hz)
     for col in dsa_1.columns:
+        # convertir esa columna (de cada dsa) a array numérico de numpy
         a = dsa_1[col].to_numpy(dtype=float)
         b = dsa_2[col].to_numpy(dtype=float)
 
+        # máscara donde solo son true las celdas en las que ambas matrices tienen un número real
         mask = np.isfinite(a) & np.isfinite(b)
 
+        # contar cuántos True hay
+        # pearson requiere de 3 puntos de datos para calcular una correlación. Si no, devuelve NaN
         if mask.sum() > 2:
             r = pearsonr(a[mask], b[mask])[0]
         else:
             r = np.nan
 
+        # guardar cada frecuencia con su correlación
         resultados.append({
             "frecuencia_Hz": col,
-            "correlacion": r
-        })
+            "correlacion": r})
 
     return pd.DataFrame(resultados)
 
@@ -594,12 +599,17 @@ def correlacion_por_tiempo(dsa_1, dsa_2, tiempo=None):
 
     resultados = []
 
+    # itera segundo a segundo (fila)
     for i in range(len(dsa_1)):
+        # convertir esa columna (de cada dsa) a array numérico de numpy
         a = dsa_1.iloc[i].to_numpy(dtype=float)
         b = dsa_2.iloc[i].to_numpy(dtype=float)
 
+        # máscara donde solo son true las celdas en las que ambas matrices tienen un número real
         mask = np.isfinite(a) & np.isfinite(b)
 
+        # contar cuántos True hay
+        # pearson requiere de 3 puntos de datos para calcular una correlación. Si no, devuelve NaN
         if mask.sum() > 2:
             r = pearsonr(a[mask], b[mask])[0]
         else:
@@ -609,6 +619,7 @@ def correlacion_por_tiempo(dsa_1, dsa_2, tiempo=None):
 
     df = pd.DataFrame({"correlacion": resultados})
 
+    # al pasarle una columna de marcas temporales reales, se inserta la primera
     if tiempo is not None:
         df.insert(0, "Time", tiempo.iloc[:len(df)].values)
 
