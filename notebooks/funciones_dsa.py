@@ -481,7 +481,7 @@ def preparar_matrices_para_comparacion(dsa_1, dsa_2):
     # si el eeg graba más que lo que tenemos en el f_a se recorta 
     n = min(len(dsa_1), len(dsa_2))
 
-    # coge las filas desde la 0 hasta la n y filtra solo las frecuencias compartidas y ordenadas.
+    # coge las filas desde la 0 hasta la n y filtra solo las frecuencias compartidas y ordenadas
     dsa_1 = dsa_1.iloc[:n][columnas_comunes]
     dsa_2 = dsa_2.iloc[:n][columnas_comunes]
 
@@ -491,21 +491,27 @@ def preparar_matrices_para_comparacion(dsa_1, dsa_2):
 def zscore_global(df):
     """
     Normaliza toda la matriz con media y desviación típica global, ignorando NaN.
+    
+    Z(t, f) = (D(t, f) - media_D)/std_D
     """
-    # convierte la DSA a matriz numérica
+    # convierte la DSA a matriz numérica en float
     matriz = df.to_numpy(dtype=float)
 
-    # media y desviación típica ignorando NaN
+    # media y desviación típica. Ignora los huecos (NaN) para que no devuelva NaN ante un solo hueco
     media = np.nanmean(matriz)
     std = np.nanstd(matriz)
 
+    # evitar problemas al calcular el z-score por intentar dividir entre 0
     if std == 0 or np.isnan(std):
-        raise ValueError("No se puede aplicar z-score: desviación típica nula o NaN.")
+        raise ValueError("Desviación típica nula")
     
-    # aplica la fórmula
+    # fórmula z-score a cada celda simultáneamente
     matriz_z = (matriz - media) / std
 
-    return pd.DataFrame(matriz_z, index=df.index, columns=df.columns)
+    # volver a convertir la matriz a dataFrame con sus índices de tiempo y columnas de frecuencias
+    matriz_normalizada = pd.DataFrame(matriz_z, index=df.index, columns=df.columns)
+    
+    return matriz_normalizada
 
 
 def comparar_dsa_global(dsa_1, dsa_2):
@@ -514,17 +520,29 @@ def comparar_dsa_global(dsa_1, dsa_2):
     Compara solo posiciones donde ambas matrices tienen valores válidos.
     """
 
+    # se pasan las dsa a arrays de numpy en float
     A = dsa_1.to_numpy(dtype=float)
     B = dsa_2.to_numpy(dtype=float)
 
+    # se crea una máscara donde solo son true las celdas en las que ambas matrices tienen un número real
     mask = np.isfinite(A) & np.isfinite(B)
 
+    # se le aplica la máscara a las matrices y se extraen los valores donde la máscara es true
+    # la matriz pierde su forma rectangular (una matriz no puede tener huecos) -> convertir a listas planas -> A_valid y B_valid tienen la misma longitud
     A_valid = A[mask]
     B_valid = B[mask]
 
     if len(A_valid) == 0:
         raise ValueError("No hay valores válidos comunes para comparar.")
 
+    """ 
+    Métricas
+    MAE: mide error medio absoluto -> resta un array del otro, lo pone en valor absoluto y saca la media
+    RMSE: penaliza más los errores grandes -> resta, eleva al cuadrado, hace la media, y saca la raíz cuadrada
+    bias: resta para ver hacia donde se dirige el error
+    pearson: cuantificar la similitud lineal entre los valores normalizados de ambas matrices DSA
+    spearman: evaluar la fuerza y dirección de la asociación entre los arrays. Evaluar si la estructura de intensidades se mantenía entre matrices aunque la relación no fuera estrictamente lineal.
+    """
     mae = np.mean(np.abs(A_valid - B_valid))
     rmse = np.sqrt(np.mean((A_valid - B_valid) ** 2))
     bias = np.mean(B_valid - A_valid)
