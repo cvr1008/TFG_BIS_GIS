@@ -688,8 +688,8 @@ def dibujar_panel_dsa_en_grid(
     df_merge=None,
     titulo="DSA",
     etiqueta_colorbar="Intensidad espectral (dB)",
-    mostrar_sef=True,
-    mostrar_mef=True,
+    mostrar_sef=False,
+    mostrar_mef=False,
     mask_total=None
 ):
     """
