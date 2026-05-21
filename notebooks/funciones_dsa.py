@@ -729,9 +729,9 @@ def dibujar_panel_dsa_en_grid(
     # matriz: tiempo x frecuencia -> para imshow usamos frecuencia x tiempo
     matriz_hor = matriz.T
 
-    ax = fig.add_subplot(subgs[0, 0])
-    ax_band = fig.add_subplot(subgs[0, 1])
-    cax = fig.add_subplot(subgs[0, 2])
+    ax = fig.add_subplot(subgs[0])
+    ax_band = fig.add_subplot(subgs[1])
+    cax = fig.add_subplot(subgs[2])
     
     im = ax.imshow(
         matriz_hor,
@@ -838,35 +838,74 @@ def dibujar_panel_dsa_en_grid(
 
 def plot_cuadricula_4_dsa(paneles, titulo_general="Comparación de matrices DSA"):
     """
-    paneles: lista de 4 diccionarios, uno por panel.
-    Cada panel debe contener los argumentos necesarios para dibujar_panel_dsa_en_grid.
+    Dibuja 4 DSA una debajo de otra con el mismo tamaño de eje.
+
+    Estructura global:
+    fila 1: [DSA | bandas | colorbar]
+    fila 2: [DSA | bandas | colorbar]
+    fila 3: [DSA | bandas | colorbar]
+    fila 4: [DSA | bandas | colorbar]
     """
 
     if len(paneles) != 4:
         raise ValueError("Se esperan exactamente 4 paneles.")
 
-    fig = plt.figure(figsize=(14, 20), constrained_layout=True)
-    outer = fig.add_gridspec(4, 1, wspace=0.10, hspace=0.15)
+    fig = plt.figure(figsize=(16, 20))
+
+    # Una sola rejilla global para todas las filas.
+    # Esto fuerza que todas las columnas tengan el mismo ancho en todos los paneles.
+    gs = fig.add_gridspec(
+        nrows=4,
+        ncols=3,
+        width_ratios=[20, 1.5, 0.8],
+        height_ratios=[1, 1, 1, 1],
+        left=0.06,
+        right=0.94,
+        bottom=0.06,
+        top=0.94,
+        wspace=0.06,
+        hspace=0.35
+    )
 
     axes_out = []
 
-    for i, panel in enumerate(paneles):
-        # Al tener 1 sola columna, el iterador 'i' corresponde directamente a la fila.
-        # Ya no hace falta el "divmod(i, 2)"
-        subgs = outer[i].subgridspec(
-            1, 3,
-            width_ratios=[20, 1.5, 0.8],
-            wspace=0.06
-        )
+    # Límites temporales globales para que todos tengan exactamente el mismo eje X
+    x0_global = min([p["tiempo"].iloc[0] for p in paneles])
+    x1_global = max([p["tiempo"].iloc[-1] for p in paneles])
+    x0_global = mdates.date2num(x0_global)
+    x1_global = mdates.date2num(x1_global)
 
-        ax_pack = dibujar_panel_dsa_en_grid(
+    # Límites de frecuencia globales
+    todas_freq = np.concatenate([
+        np.asarray(p["frecuencias"], dtype=float) for p in paneles
+    ])
+    y0_global = np.nanmin(todas_freq)
+    y1_global = np.nanmax(todas_freq)
+
+    for i, panel in enumerate(paneles):
+
+        subgs = [gs[i, 0], gs[i, 1], gs[i, 2]]
+
+        ax, ax_band, cax = dibujar_panel_dsa_en_grid(
             fig=fig,
             subgs=subgs,
             **panel
         )
-        axes_out.append(ax_pack)
+
+        # Forzar mismos límites en todos los paneles
+        ax.set_xlim(x0_global, x1_global)
+        ax.set_ylim(y0_global, y1_global)
+        ax_band.set_ylim(y0_global, y1_global)
+
+        # Solo dejamos etiqueta X en el último panel para que no sature
+        if i < len(paneles) - 1:
+            ax.set_xlabel("")
+            plt.setp(ax.get_xticklabels(), visible=False)
+
+        axes_out.append((ax, ax_band, cax))
 
     fig.suptitle(titulo_general, fontsize=15)
 
     plt.show()
+
     return fig, axes_out
