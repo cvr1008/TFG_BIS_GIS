@@ -170,8 +170,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.
     
     Si una fila tiene casi todo a cero, probablemente no aporta información útil
     """
-    porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
-    mask_ceros = porcentaje_ceros > umbral_ceros
+    #porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
+    #mask_ceros = porcentaje_ceros > umbral_ceros
 
     
     """ 
@@ -182,8 +182,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.
     
     mira si hay huecos temporales en la grabación si de repente pasas de un segundo a un salto de varios 
     """
-    delta_t = tiempo.diff().dt.total_seconds()
-    mask_saltos = delta_t.gt(1).fillna(False)
+    #delta_t = tiempo.diff().dt.total_seconds()
+    #mask_saltos = delta_t.gt(1).fillna(False)
 
     
     """
@@ -193,7 +193,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.
      - casi todo ceros
      - salto temporal
     """
-    mask_total = mask_no_valida | mask_ceros | mask_saltos
+    #| mask_ceros | mask_saltos
+    mask_total = mask_no_valida 
 
     
     # en las filas marcadas como no válidas se sustituyen los valores por NaN (que saldrán en blanco)
@@ -369,29 +370,47 @@ def adaptar_dsa_reconstruida_para_plot(df_dsa, frecuencias, hora_inicio, inserta
     - dsa: DataFrame solo con columnas espectrales.
     """
 
+    # asegurarse de que la hora está en formato Timestamp para pandas
+    # redondeamos ese tiempo al segundo más cercano (hacia abajo)
     hora_inicio = pd.Timestamp(hora_inicio).floor("s")
 
+    # cada una de las frecuencias las convierte en un string y las almacena en una lista
     columnas_freq = [f"{f:.1f}" for f in frecuencias]
 
+    # mete aquí todas las columnas que puedan faltar en el dF y sí que hubiera en la dsa
     columnas_faltantes = [col for col in columnas_freq if col not in df_dsa.columns]
     if columnas_faltantes:
-        raise ValueError(f"Faltan columnas de frecuencia en df_dsa: {columnas_faltantes[:5]}...")
+        raise ValueError(f"Faltan columnas de frecuencia en df_dsa")
 
+    # copia del df
     df = df_dsa.copy()
 
+    # pedimos una fila inicial de NaN para poder suplir la falta del primer segundo 
+    # a causa de la ventana de 2 segundos
     if insertar_fila_inicial_nan:
+        
+        # establece el tiempo en 0.0 segundos y llena las columnas de frecuencia con NaN
         primera_fila = {"tiempo_s": 0.0}
 
         for col in columnas_freq:
             primera_fila[col] = np.nan
 
+        # convierte la primera fila en un dF de una fila y lo concatena al inicio del dF
         df = pd.concat(
             [pd.DataFrame([primera_fila]), df],
             ignore_index=True
         )
-
+    
+    """
+     - Las filas de la columna tiempo_s (los segundos de medición de tiempo) se convierten en deltas de tiempo -> duraciones/cantidades de tiempo.
+     - Se suman esos segundos a la hora de inicio extraída de la función y se vuelve a crear la columna tiempo con la fecha y hora, minuto y segundo de cada registro
+     - Se guarda en una Serie de Pandas llamada "Time" y vuelve a redondear al segundo exacto: .dt.floor("s")
+    """
+    
     tiempo = pd.Series(hora_inicio + pd.to_timedelta(df["tiempo_s"], unit="s"), name="Time").dt.floor("s")
-
+    
+    # nos quedamos únicamente con las columnas que contienen los valores de frecuencia
+    # deja fuera la columna de tiempo
     dsa = df[columnas_freq].copy()
 
     return tiempo, dsa
@@ -640,6 +659,8 @@ def probar_suavizado_y_shifts(
             min_periods=1,
             center=False
         ).mean()
+    
+        #dsa_eeg_suav.loc[mask_total.values, :] = np.nan
 
         for shift in shifts:
 
@@ -711,7 +732,7 @@ def dibujar_panel_dsa_en_grid(
     ax = fig.add_subplot(subgs[0, 0])
     ax_band = fig.add_subplot(subgs[0, 1])
     cax = fig.add_subplot(subgs[0, 2])
-
+    
     im = ax.imshow(
         matriz_hor,
         aspect="auto",
@@ -824,15 +845,15 @@ def plot_cuadricula_4_dsa(paneles, titulo_general="Comparación de matrices DSA"
     if len(paneles) != 4:
         raise ValueError("Se esperan exactamente 4 paneles.")
 
-    fig = plt.figure(figsize=(26, 14), constrained_layout=True)
-    outer = fig.add_gridspec(2, 2, wspace=0.10, hspace=0.14)
+    fig = plt.figure(figsize=(14, 20), constrained_layout=True)
+    outer = fig.add_gridspec(4, 1, wspace=0.10, hspace=0.15)
 
     axes_out = []
 
     for i, panel in enumerate(paneles):
-        fila, col = divmod(i, 2)
-
-        subgs = outer[fila, col].subgridspec(
+        # Al tener 1 sola columna, el iterador 'i' corresponde directamente a la fila.
+        # Ya no hace falta el "divmod(i, 2)"
+        subgs = outer[i].subgridspec(
             1, 3,
             width_ratios=[20, 1.5, 0.8],
             wspace=0.06
