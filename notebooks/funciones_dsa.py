@@ -153,7 +153,7 @@ def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None):
 
 
 
-def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.9):
+def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9):
     
     # copiar la matriz de densidad espectral para modificarla. Se copia y convierte a float
     # van a entrar los NaN y hace falta float
@@ -184,7 +184,6 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=14, umbral_ceros=0.
     """
     #delta_t = tiempo.diff().dt.total_seconds()
     #mask_saltos = delta_t.gt(1).fillna(False)
-
     
     """
     unir las tres condiciones con un OR lógico
