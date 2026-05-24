@@ -98,23 +98,41 @@ def obtener_hora_inicio_desde_spa(df_spa, columna_tiempo="Time"):
     - hora_inicio
     
     No solamente hay queçobtener hora_inicio, también el df_spa que se usará después tenga Time en formato datetime para que el merge funcione bien.
+    
+    Parámetros:
+     - df_spa: DataFrame procedente del archivo .spa.
+     - columna_tiempo="Time": nombre de la columna donde está la fecha y hora. Por defecto se llama "Time".
+    
+    Devuelve:
+     - df: el DataFrame .spa preparado, con la columna Time en formato datetime y redondeada al segundo.
+     - hora_inicio: el primer instante temporal del .spa.
     """
 
+    # copia del dF original para no modificar el spa y siga intacto
     df = df_spa.copy()
 
+    # comprobación de si la columna temporal existe en el dF y lanzamiento de error para parar el programa
     if columna_tiempo not in df.columns:
         raise ValueError(f"El DataFrame del .spa no contiene la columna '{columna_tiempo}'.")
 
+    """
+    Conversión de la columna temporal a formato datetime de pandas. Para convertirlo a fecha-hora real.
+     - errors="coerce": valores inválidos se convierten en NaT.
+     - ).dt.floor("s"): redondear los tiempos hacia abajo al segundo más cercano.
+    """
     df[columna_tiempo] = pd.to_datetime(
         df[columna_tiempo],
         errors="coerce"
     ).dt.floor("s")
+    
 
+    # elimina las filas donde la columna Time es inválida o está vacía
     df = df.dropna(subset=[columna_tiempo])
 
     if df.empty:
         raise ValueError("No hay tiempos válidos en el .spa.")
 
+    # como df[columna_tiempo] tiene todos los tiempos válidos, .min() devuelve la fecha y hora del primero
     hora_inicio = df[columna_tiempo].min()
 
     return df, hora_inicio
