@@ -18,6 +18,11 @@ def limpiar_spa_para_dsa(df_spa):
     """ 
     Coger el DF del .spa y asegurar que las columnas necesarias sean numéricas.
     
+    Parámetros:
+     - df_spa: spa original
+    
+    Devuelve:
+     - df: spa en el cual las columnas de valores centinelas han sido pasados a NaN
     """
     
     # Copiar el dF original para no modificar el original
@@ -34,17 +39,27 @@ def limpiar_spa_para_dsa(df_spa):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # definir los valores centinelas
     sentinelas = [-327.7, -3276.0, -3276.8, -3276, -32767, -32768]
+    # si la variable está en el spa, la metemos en el nuevo spa limpio
     cols_presentes = [c for c in cols if c in df.columns]
+    # si la columna tiene valores centinelas los convertimos a NaN
     df[cols_presentes] = df[cols_presentes].replace(sentinelas, np.nan)
 
     return df
 
 
 
-def construir_mascara_no_valida(df_spa, umbral_sqi=14):
+def construir_mascara_no_valida(df_spa, umbral_sqi=15):
     """ 
     Crea una máscara booleana que marca en qué filas la señal no debe considerarse válida.
+    
+    Parámetros:
+     - df_spa: dF con el spa original
+     - umbral_sqi=15: criterio para la creación de una máscara basada en la calidad de la señal
+    
+    Devuelve:
+     - mask_no_valida: serie de pandas que pone true a los segundos de variables no válidas y false a los segundos donde sí había información útil.
     """
 
     mask_no_valida = pd.Series(False, index=df_spa.index)
@@ -66,6 +81,8 @@ def crear_cmap_bis():
     """ 
     Crea un colormap personalizado parecido al del BIS
     
+    Devuelve:
+     - cmap: colormap con los valores válidos en color y los inválidos en blanco
     """
     
     # colores
@@ -93,10 +110,6 @@ def crear_cmap_bis():
 
 def obtener_hora_inicio_desde_spa(df_spa, columna_tiempo="Time"):
     """
-    Convierte la columna Time del .spa a datetime, redondea al segundo y devuelve:
-    - df_spa preparado
-    - hora_inicio
-    
     No solamente hay queçobtener hora_inicio, también el df_spa que se usará después tenga Time en formato datetime para que el merge funcione bien.
     
     Parámetros:
@@ -140,26 +153,31 @@ def obtener_hora_inicio_desde_spa(df_spa, columna_tiempo="Time"):
 
 
 def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None):
-    
-    if columnas is None:
-        columnas = ["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08", "EMGLOW01", "BURST", "DB13U01", "ASYM09"]
-
-    df_spa = limpiar_spa_para_dsa(df_spa)
-
-    cols = ["Time"] + [c for c in columnas if c in df_spa.columns]
-
     """
     Alinear el df del .spa con el df de la DSA por tiempo:
+    
+    Parámetros:
      - tiempo, dsa: variables que vienen del .f_a (instantes de tiempo y decibelios según frecuencia)
      - df_spa: DataFrame procedente del .spa. Lo hemos limpiado y quedan las columnas numéricas.
                Están los instantes de tiempo y los valores de los campos 
+     - columnas: variables del spa que queremos incluir en el dF de fusión
      
-    df_aux: Creación de un dF auxiliar que contiene solo la serie temporal de la DSA
+    Devuelve:
     df_merge: se hace una unión del DF de tiempo con las columnas limpias del dF del .spa
         - on: como las dos tienen las columnas de tiempo en común se fusionan por ahí
         - how="left": conserva todos los tiempos de la DSA, aunque en el .spa falte alguno
     """
-    
+    # si no le pasamos las variables del spa tenemos algunas por defecto
+    if columnas is None:
+        columnas = ["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08", "EMGLOW01", "BURST", "DB13U01", "ASYM09"]
+
+    # llamada a la función de limpieza y obtenemos un spa sin valores centinela
+    df_spa = limpiar_spa_para_dsa(df_spa)
+
+    # lista con las columnas de variables procesadas cada segundo y la columna de tiempo
+    cols = ["Time"] + [c for c in columnas if c in df_spa.columns]
+
+    # creación de un dF auxiliar que contiene solo la serie temporal de la DSA
     df_aux = pd.DataFrame({"Time": tiempo}).reset_index(drop=True)
     df_merge = df_aux.merge(
         df_spa[cols],   
@@ -171,7 +189,20 @@ def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None):
 
 
 
-def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9):
+def preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9):
+    
+    """
+    Parámetros:
+     - tiempo:
+     - dsa:
+     - df_merge:
+     - umbral_sqi=15:
+     - umbral_ceros=0.9:
+    
+    Devuelve:
+     - dsa_plot:
+     - mask_total:
+    """
     
     # copiar la matriz de densidad espectral para modificarla. Se copia y convierte a float
     # van a entrar los NaN y hace falta float
@@ -188,8 +219,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.
     
     Si una fila tiene casi todo a cero, probablemente no aporta información útil
     """
-    #porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
-    #mask_ceros = porcentaje_ceros > umbral_ceros
+    porcentaje_ceros = (dsa_plot == 0).mean(axis=1)
+    mask_ceros = porcentaje_ceros > umbral_ceros
 
     
     """ 
@@ -200,8 +231,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.
     
     mira si hay huecos temporales en la grabación si de repente pasas de un segundo a un salto de varios 
     """
-    #delta_t = tiempo.diff().dt.total_seconds()
-    #mask_saltos = delta_t.gt(1).fillna(False)
+    delta_t = tiempo.diff().dt.total_seconds()
+    mask_saltos = delta_t.gt(1).fillna(False)
     
     """
     unir las tres condiciones con un OR lógico
@@ -210,8 +241,8 @@ def preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.
      - casi todo ceros
      - salto temporal
     """
-    #| mask_ceros | mask_saltos
-    mask_total = mask_no_valida 
+    
+    mask_total = mask_no_valida | mask_ceros | mask_saltos
 
     
     # en las filas marcadas como no válidas se sustituyen los valores por NaN (que saldrán en blanco)
