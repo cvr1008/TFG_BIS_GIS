@@ -317,39 +317,87 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
 ):
     """
     Crea una matriz tiempo-frecuencia para DSA desde EEG crudo mediante FFT/Welch.
+    
+    Parámetros:
+     - df_eeg: DataFrame que contiene el EEG cr.udo ya leído desde el archivo .r2a.
+     - canal: qué columna del DataFrame se analiza (canal="canal_1_uV" o canal="canal_2_uV")
+     - fs: frecuencia de muestreo (128)
+     - ventana_seg: duración de cada ventana de análisis (2 segundos)
+     - paso_seg: cuánto avanza la ventana cada vez (1 segundo). Esto significa que las ventanas se solapan.
+     - fmin: frecuencia mínima que se conserva (0.5 Hz)
+     - fmax: frecuencia máxima que se conserva (30 Hz)
+     - paso_freq: resolución frecuencial (0.5 Hz)
+     - modo: en qué unidad se va a devolver el espectro
+            - "db": potencia en decibelios usando scaling="spectrum"
+            - "db_densidad": densidad espectral en dB usando scaling="density"
+            - "potencia": potencia espectral en µV²
+            - "densidad": densidad espectral en µV²/Hz 
+            - "amplitud": amplitud espectral estimada en µV
+     - tiempo_referencia: indica qué tiempo se asigna a cada ventana.
+                         - "inicio": etiqueta cada fila con el inicio de la ventana
+                         - "centro": etiqueta cada fila con el centro de la ventana
+                         - "final": etiqueta cada fila con el final de la ventana
 
-    Salida:
-    - df_dsa: DataFrame con columna tiempo_s y columnas 0.5 ... 30.0
-    - frecuencias: array de frecuencias usadas
-
-    modo:
-    - "db": potencia en decibelios usando scaling="spectrum"
-    - "db_densidad": densidad espectral en dB usando scaling="density"
-    - "potencia": potencia espectral en µV²
-    - "densidad": densidad espectral en µV²/Hz
-    - "amplitud": amplitud espectral estimada en µV
-
-    tiempo_referencia:
-    - "inicio": etiqueta cada fila con el inicio de la ventana
-    - "centro": etiqueta cada fila con el centro de la ventana
-    - "final": etiqueta cada fila con el final de la ventana
+    Devuelve:
+    - df_dsa:un DataFrame donde cada fila es una ventana temporal y cada columna es una frecuencia.
+    - frecuencias: array numérico con las frecuencias seleccionadas.
     """
 
+    # Coge la columna de la señal cruda en  uV del dF 
+    # .to_numpy(dtype=float) la convierte en un array numérico de np
+    # x será: [valor1, valor2, valor3, valor4, ...]
     x = df_eeg[canal].to_numpy(dtype=float)
 
-    nperseg = int(ventana_seg * fs)      # 2 s * 128 Hz = 256 muestras
-    paso = int(paso_seg * fs)            # 1 s * 128 Hz = 128 muestras
-    nfft = int(fs / paso_freq)           # 128 / 0.5 = 256
-
+    # cuántas muestras hay en cada ventana
+    nperseg = int(ventana_seg * fs)                                    # 2 s * 128 Hz = 256 muestras
+    # cuántas muestras avanza la ventana cada vez
+    paso = int(paso_seg * fs)                                          # 1 s * 128 Hz = 128 muestras
+    """
+    -tamaño de la FFT
+    -como la resolución frecuencial de una FFT 
+     se calcula como: resolución = fs / nfft
+    -con nfft=256 se consiguen frecuencias separadas cada 0.5 Hz
+    """
+    nfft = int(fs / paso_freq)                                         # 128 / 0.5 = 256
+ 
+    # lista vacía con los tiempos asociados a cada ventana
     tiempos = []
+    # lista donde se guardarán los espectros calculados para cada ventana
+    # cada elemento de la lista es una fila de la DSA
     espectros = []
 
     for inicio in range(0, len(x) - nperseg + 1, paso):
+        """
+        Recorrido de la señal por ventanas:
+         - Empieza en 0.
+         - Termina en len(x) - nperseg + 1, para que la ventana completa.
+         - Avanza de paso en paso.
+        """
+        
+        # dónde termina la ventana: 0+256, 128+256, 256+256, ...
         fin = inicio + nperseg
+        # extrae el fragmento de EEG correspondiente a esa ventana.
         segmento = x[inicio:fin]
 
+        # elegir tipo de salida de Welch
         scaling = "density" if modo in ["densidad", "db_densidad"] else "spectrum"
 
+        """
+        Cálculo espectral con Welch:
+        Parámetros:
+         - segmento: fragmento de EEG de 2 segundos, la ventana
+         - fs: frecuencia de muestreo, 128 Hz. Para que Welch devuelva frecuencias en Hz reales
+         - window="hann": Aplica una ventana de Hann al segmento antes de calcular el espectro (reduce discontinuidades en los bordes)
+         - nperseg=nperseg: tamaño del segmento usado por Welch (256 muestras)
+         - noverlap=0: dentro de cada llamada a welch no hay solapamiento entre subsegmentos
+         - nfft=nfft:
+         - detrend="constant":
+         - scaling=scaling:
+         
+        Devuelve:
+         - f: vector de frecuencias.
+         - pxx: potencia o densidad espectral asociada a cada frecuencia.
+        """
         f, pxx = welch(
             segmento,
             fs=fs,
