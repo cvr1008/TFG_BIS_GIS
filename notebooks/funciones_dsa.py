@@ -380,7 +380,8 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
         segmento = x[inicio:fin]
 
         # elegir tipo de salida de Welch
-        scaling = "density" if modo in ["densidad", "db_densidad"] else "spectrum"
+        scaling = "density" if modo == "densidad" else "spectrum"
+
 
         """
         Cálculo espectral con Welch:
@@ -390,12 +391,12 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
          - window="hann": Aplica una ventana de Hann al segmento antes de calcular el espectro (reduce discontinuidades en los bordes)
          - nperseg=nperseg: tamaño del segmento usado por Welch (256 muestras)
          - noverlap=0: dentro de cada llamada a welch no hay solapamiento entre subsegmentos
-         - nfft=nfft:
-         - detrend="constant":
-         - scaling=scaling:
+         - nfft=nfft: Tamaño de la FFT.
+         - detrend="constant": Elimina la componente constante del segmento antes de calcular el espectro.
+         - scaling=scaling: tipo de escala decidido antes: density o spectrum
          
         Devuelve:
-         - f: vector de frecuencias.
+         - f: vector de frecuencias. Ejemplo: [0.0, 0.5, 1.0, ..., 64.0]
          - pxx: potencia o densidad espectral asociada a cada frecuencia.
         """
         f, pxx = welch(
@@ -409,15 +410,14 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
             scaling=scaling
         )
 
+        # máscara booleana para quedarme con las frecuencias entre fmin y fmax
         mascara = (f >= fmin) & (f <= fmax)
+        # seleccionar las frecuencias en el rango
         f_sel = f[mascara]
+        # seleccionar los valores espectrales correspondientes a esas frecuencias.
         pxx_sel = pxx[mascara]
 
-        if modo == "db":
-            valores = 10 * np.log10(pxx_sel + 1e-12)
-        elif modo == "db_densidad":
-            valores = 10 * np.log10(pxx_sel + 1e-12)
-        elif modo in ["potencia", "densidad"]:
+        if modo in ["potencia", "densidad"]:
             valores = pxx_sel
         elif modo == "amplitud":
             valores = np.sqrt(pxx_sel)
@@ -425,22 +425,42 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
             raise ValueError("modo debe ser 'db', 'db_densidad', 'potencia', 'densidad' o 'amplitud'")
 
         if tiempo_referencia == "inicio":
+            # Convierte índice de muestra inicial a segundos.
             tiempo_s = inicio / fs
         elif tiempo_referencia == "centro":
+            # Calcula el centro de la ventana.
             tiempo_s = (inicio + nperseg / 2) / fs
         elif tiempo_referencia == "final":
+            # Convierte el índice final de la ventana a segundos.
             tiempo_s = fin / fs
         else:
             raise ValueError("tiempo_referencia debe ser 'inicio', 'centro' o 'final'")
 
+        """
+        tiempos = [1.0, 2.0, 3.0, ...]
+        espectros = [
+            [potencias de la ventana 1],
+            [potencias de la ventana 2],
+            [potencias de la ventana 3], ...]
+        """
+        # Añade el tiempo de esta ventana a la lista tiempos.
         tiempos.append(tiempo_s)
+        # Añade el espectro calculado para esta ventana a la lista espectros.
         espectros.append(valores)
 
+    
+    """
+    Convierte la lista de espectros en un DataFrame.
+    Cada fila es una ventana temporal.
+    Cada columna es una frecuencia.
+     - {freq:.1f}: Los nombres de columnas se formatean con un decimal.
+    """
     df_dsa = pd.DataFrame(
         espectros,
         columns=[f"{freq:.1f}" for freq in f_sel]
     )
 
+    # Insertar la columna tiempo_s al principio del DataFrame
     df_dsa.insert(0, "tiempo_s", tiempos)
 
     return df_dsa, f_sel
