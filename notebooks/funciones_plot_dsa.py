@@ -5,7 +5,7 @@ import matplotlib.dates as mdates
 
 from funciones_dsa import (
     alinear_spa_con_tiempo,
-    preparar_dsa_para_plot,
+    preparar_dsa_con_mask,
     preparar_escala_color_dsa,
     construir_mascara_no_valida
 )
