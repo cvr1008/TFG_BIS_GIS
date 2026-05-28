@@ -29,7 +29,7 @@ def plot_dsa_pdf_con_spa(tiempo, dsa, df_spa, umbral_sqi=14, vmin=None, vmax=Non
     df_merge = alinear_spa_con_tiempo(tiempo, df_spa, columnas=["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08"])
 
     # 2) Preparar la DSA con NaN en tramos no válidos
-    dsa_plot, mask_total = preparar_dsa_para_plot(tiempo, dsa, df_merge, umbral_sqi=umbral_sqi, umbral_ceros=0.9)
+    dsa_plot, mask_total = preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=umbral_sqi, umbral_ceros=0.9)
     
     
     # 2.5) Recorte visual opcional
@@ -326,7 +326,7 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
     )
 
     # 2) Preparar DSA con máscara de invalidez
-    dsa_plot, mask_total = preparar_dsa_para_plot(tiempo, 
+    dsa_plot, mask_total = preparar_dsa_con_mask(tiempo, 
         dsa,
         df_merge,
         umbral_sqi=umbral_sqi,
