@@ -307,7 +307,7 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
     df_eeg,
     canal,
     fs=128,
-    ventana_seg=2,
+    ventana_seg=1,
     paso_seg=1,
     fmin=0.5,
     fmax=30.0,
