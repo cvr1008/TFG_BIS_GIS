@@ -312,7 +312,7 @@ def crear_matriz_dsa_fft_welch_desde_eeg(
     fmin=0.5,
     fmax=30.0,
     paso_freq=0.5,
-    modo="db",
+    modo="densidad",
     tiempo_referencia="centro"
 ):
     """
