@@ -5,7 +5,10 @@ from funciones_dsa import obtener_hora_inicio_desde_spa
 import struct
 
 
-def leer_r2a(ruta_archivo, fs=128, escala_uv=0.0511):
+def leer_r2a(archivo_r2a,
+    escala_uv,
+    offset, 
+    fs=128,):
     """
     Lee un archivo .r2a del BIS.
 
@@ -16,7 +19,7 @@ def leer_r2a(ruta_archivo, fs=128, escala_uv=0.0511):
     - escala: 0.0511 µV/step
     """
 
-    datos = np.fromfile(ruta_archivo, dtype="<i2")
+    datos = np.fromfile(archivo_r2a, dtype="<i2")
 
     if len(datos) % 2 != 0:
         datos = datos[:-1]
@@ -26,8 +29,8 @@ def leer_r2a(ruta_archivo, fs=128, escala_uv=0.0511):
     canal_1_raw = datos[:, 0]
     canal_2_raw = datos[:, 1]
 
-    canal_1_uV = canal_1_raw * escala_uv
-    canal_2_uV = canal_2_raw * escala_uv
+    canal_1_uV = canal_1_raw * escala_uv + offset
+    canal_2_uV = canal_2_raw * escala_uv + offset
 
     tiempo_s = np.arange(len(canal_1_uV)) / fs
 

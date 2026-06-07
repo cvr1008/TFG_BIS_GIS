@@ -109,6 +109,7 @@ def buscar_filas_por_intervalo(df, inicio, fin, columna_tiempo="Time",
         return None
 
         
+# ------------------------------------- explorar campos -------------------------------------------------        
         
 def buscar_filas_por_valor(df, columna, operador, valor1, valor2=None, max_resultados=300, mostrar=True):
     """
@@ -178,47 +179,7 @@ def buscar_filas_por_valor(df, columna, operador, valor1, valor2=None, max_resul
         print(f"Error: {e}")
         return None
     
-    
-        
-def lectura_h_a(archivo_bin):
-
-    with open(archivo_bin, "rb") as archivo:
-        contenido = archivo.read()
-
-    print("ARCHIVO DE CABECERA (.h_a)")
-    print("-" * 50)
-
-    # 1. Leer el nombre del archivo (Bytes 18 al 31)
-    inicio, fin = 18, 32
-    texto_crudo = struct.unpack('14s', contenido[inicio:fin])[0]
-    nombre_archivo = texto_crudo.decode('ascii').replace('\x00', '')
-    print(f"Nombre del archivo:      {nombre_archivo}")
-
-    # Extraer la hora real desde el nombre del archivo (L + Mes + Día + Hora + Min)
-    # Sabiendo que el formato es L03041035
-    hora_inicio = nombre_archivo[5:7]
-    minuto_inicio = nombre_archivo[7:9]
-    print(f"Hora de inicio deducida: {hora_inicio}:{minuto_inicio}:")
-
-    # 2. Encontrar el nombre del Algoritmo
-    texto_buscar = b"BIS-R2"
-    posicion_algo = contenido.find(texto_buscar)
-
-    if posicion_algo != -1:
-        inicio, fin = posicion_algo, posicion_algo + 6
-        version_algo = struct.unpack('6s', contenido[inicio:fin])[0].decode('ascii')
-        print(f"Motor del algoritmo:     {version_algo}")
-
-    # 3. Encontrar los parámetros de Filtro Float (0.05 Hz)
-    secuencia_float = bytes.fromhex('cdcc4c3d')
-    posicion_float = contenido.find(secuencia_float)
-
-    if posicion_float != -1:
-        inicio, fin = posicion_float, posicion_float + 4
-        valor_filtro = struct.unpack('<f', contenido[inicio:fin])[0]
-        print(f"Configuración de Filtro: {valor_filtro:.2f} Hz")
-
-
+ 
         
 def cargar_fa_directo(ruta_fa, escalar_db=True):
     """
@@ -338,6 +299,107 @@ def cargar_fa_directo(ruta_fa, escalar_db=True):
 
 
 
+def cargar_fa_bilateral(ruta_fa, escalar_db=True):
+    """
+    Carga un archivo .f_a bilateral del BIS.
+
+    Estructura esperada:
+        Time | Left Spectra | Right Spectra
+
+    Devuelve:
+    - tiempo: serie temporal
+    - dsa_L: matriz espectral izquierda
+    - dsa_R: matriz espectral derecha
+
+    Las matrices DSA tienen:
+    - filas = tiempo
+    - columnas = frecuencias de 0.5 a 30 Hz
+    - valores = potencia espectral en dB si escalar_db=True
+    """
+
+    df = pd.read_csv(
+        ruta_fa,
+        sep="|",
+        header=None,
+        skiprows=2,
+        engine="python"
+    )
+
+    # Limpiar columnas vacías generadas por separadores finales
+    df = df.dropna(axis=1, how="all")
+    df = df.dropna(axis=0, how="all").reset_index(drop=True)
+
+    if df.shape[1] < 3:
+        raise ValueError(
+            f"El archivo {ruta_fa} no parece bilateral: "
+            f"tiene {df.shape[1]} columnas tras limpieza y se esperaban al menos 3."
+        )
+
+    # Conservar Time, Left Spectra y Right Spectra
+    df = df.iloc[:, :3]
+    df.columns = ["Time", "Left Spectra", "Right Spectra"]
+
+    # Convertir tiempo
+    df["Time"] = pd.to_datetime(
+        df["Time"].astype(str).str.strip(),
+        format="%m/%d/%Y %H:%M:%S",
+        errors="coerce"
+    )
+
+    # Quitar filas sin tiempo válido
+    df = df[df["Time"].notna()].reset_index(drop=True)
+
+    # Eje de frecuencias esperado
+    frecuencias = np.arange(0.5, 30.0 + 0.5, 0.5)
+
+    def procesar_columna_spectra(serie_spectra, nombre):
+        """
+        Convierte una columna tipo 'Spectra' en matriz DSA.
+        """
+
+        dsa = (
+            serie_spectra
+            .astype(str)
+            .str.strip()
+            .str.split(",", expand=True)
+        )
+
+        dsa = dsa.apply(pd.to_numeric, errors="coerce")
+
+        # Eliminar columnas completamente vacías, si aparecen por comas extra
+        dsa = dsa.dropna(axis=1, how="all")
+
+        if dsa.shape[1] < len(frecuencias):
+            raise ValueError(
+                f"{nombre} tiene {dsa.shape[1]} columnas espectrales, "
+                f"pero se esperaban {len(frecuencias)}."
+            )
+
+        # Si hubiera alguna columna extra, se toman las 60 primeras
+        dsa = dsa.iloc[:, :len(frecuencias)]
+
+        if escalar_db:
+            dsa = dsa / 100
+
+        dsa.columns = frecuencias
+
+        return dsa
+
+    dsa_L = procesar_columna_spectra(
+        df["Left Spectra"],
+        nombre="Left Spectra"
+    )
+
+    dsa_R = procesar_columna_spectra(
+        df["Right Spectra"],
+        nombre="Right Spectra"
+    )
+
+    return df["Time"], dsa_L, dsa_R
+
+
+
+# ------------------------------------------------ archivo spa --------------------------------------------------
 def procesar_spa(ruta_spa):
     # Leer los datos
     df = pd.read_csv(
@@ -386,106 +448,44 @@ def procesar_spa(ruta_spa):
 
     return df        
                    
-                                
     
-def traducir_r2a(archivo_entrada, archivo_salida, factor_uv=0.05):
     
-    """ 
-    Abrimos el .r2a a la vez que el .csv uno para leer la info de ahí y otro para escribir
-    f_in: abrir el .r2a en modo lectura binaria pura, sin intentar leerlo como texto. 
-    f_out:abrir el .csv en modo escritura normal de texto.
+# ---------------------------------------- archivo header ----------------------------------------------------
+def extraer_parametros_eeg(ruta_h_a):
     """
+    Abre un archivo de cabecera (.h_a) del monitor BIS y extrae únicamente
+    los parámetros matemáticos necesarios para procesar la señal de EEG bruta.
     
-    with open(archivo_entrada, "rb") as f_in, open(archivo_salida, "w") as f_out:
-
-        f_out.write("Tiempo_s,Canal_1_raw,Canal_2_raw,Canal_1_uV,Canal_2_uV\n")
-
-        # cada 128 muestras será 1 segundo
-        # no son muestras totales del archivo, sino frames o instantes de muestreo
-        # cada frame contiene una muestra del canal 1 y una del canal 2
-        contador_muestras = 0
-
-        while True:
+    Retorna:
+        Un diccionario con los parámetros, o None si ocurre un error.
+    """
+    try:
+        with open(ruta_h_a, 'rb') as f:
+            # 1. Número de canales EEG (Offset 178, entero de 2 bytes)
+            f.seek(178)
+            num_canales = struct.unpack('<h', f.read(2))[0]
             
-            # Leemos 4 bytes (2 canales * 2 bytes/canal)
-            bytes_muestra = f_in.read(4)
-
-            # si queda un trozo de menos de 4 bytes 
-            if not bytes_muestra or len(bytes_muestra) < 4:
-                break
-
+            # 2. Frecuencia de muestreo (Offset 186, entero de 4 bytes)
+            f.seek(186)
+            fs = struct.unpack('<i', f.read(4))[0]
             
-            """ 
-            traductor struct pasándole el molde '<hh' para desencriptar los 4 bytes:
-             - < estaba en little endian: dar la vuelta a los bytes porque la máquina los guardó al revés para sumar más rápido
-             - hh short integer: 
-                - Guardar en la variable canal_1: Los primeros 2 bytes son un entero de 16 bits con signos positivos y negativos
-                - Guardar en la variable canal_2: Los siguientes 2 bytes son otro entero igual
-            """
-            canal_1, canal_2 = struct.unpack('<hh', bytes_muestra)
-
-            # Conversión a microvoltios
-            canal_1_uv = canal_1 * factor_uv
-            canal_2_uv = canal_2 * factor_uv
-
-            # el tiempo avanza 1 segundo cada 128 muestras
-            tiempo_en_segundos = contador_muestras / 128.0
-
+            # 3. Pendiente de calibración "m" (Offset 702, float de 32 bits)
+            f.seek(702)
+            pendiente = struct.unpack('<f', f.read(4))[0]
             
-            """ 
-            Forma de escribir el archivo en .csv: 
-             - escribir el tiempo en segundos con 4 decimales
-             - separar las columnas por comas
-             - salto de línea al final para que el siguiente segundo vaya después
-            """
-            f_out.write(
-                f"{tiempo_en_segundos:.4f},{canal_1},{canal_2},{canal_1_uv:.4f},{canal_2_uv:.4f}\n"
-            )
+            # 4. Intersección "b" u Offset (Offset 766, float de 32 bits)
+            f.seek(766)
+            offset = struct.unpack('<f', f.read(4))[0]
             
-            # avanza el reloj para leer los siguientes 4 bytes
-            contador_muestras += 1
-
-    print(f"Se procesaron {contador_muestras} muestras por canal.")
-    print(f"Tiempo total real: {contador_muestras / 128.0:.2f} segundos.")
-    
-    
-    
-def limpiar_spa_bilateral(df):
-
-    print("Iniciando limpieza del archivo .spa...")
-    
-    columnas_a_borrar = []
-    
-    for col in df.columns:
-        # 1. Fuera los canales de apoyo/ruido (_2 y _4)
-        if col.endswith('_2') or col.endswith('_4'):
-            columnas_a_borrar.append(col)
+            # Agrupamos los resultados en un diccionario para usarlos fácilmente
+            return num_canales, fs, pendiente, offset
             
-        # 2. Fuera las variables internas reservadas de Medtronic
-        elif col.startswith('RESVR'):
-            columnas_a_borrar.append(col)
-            
-        # 3. Fuera el fantasma de la Asimetría del canal derecho
-        elif col == 'ASYM09_3':
-            columnas_a_borrar.append(col)
-            
-        # 4. Fuera la fontanería física de la pegatina (Pines, Impedancias de cable)
-        elif col in ['C1POSIMP', 'C1NEGIMP', 'GNDIMP', 'C2POSIMP', 'C2NEGIMP', 
-                     'C3POSIMP', 'C3NEGIMP', 'C4POSIMP', 'C4NEGIMP', 'BILBITS']:
-            columnas_a_borrar.append(col)
-            
-    # Filtramos por si acaso alguna columna ya no estaba en el archivo
-    columnas_a_borrar = [c for c in columnas_a_borrar if c in df.columns]
-    
-    # Ejecutamos el borrado
-    df_limpio = df.drop(columns=columnas_a_borrar)
-    
-    print(f"Se han eliminado {len(columnas_a_borrar)} columnas basura.")
-    return df_limpio
-
+    except Exception as e:
+        print(f"Error al extraer parámetros de {ruta_h_a}: {e}")
+        return None
 
     
-
+# ------------------------------------------------ explicar logica crudos ------------------------------------------------
 def explicar_frames_r2a(ruta_r2a, n_frames=8, factor_uv=0.05, mostrar=True):
     """
     Lee los primeros n_frames de un archivo .r2a y:
