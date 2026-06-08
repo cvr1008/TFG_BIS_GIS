@@ -239,42 +239,17 @@ def recortar_raw_segun_ta_y_spa(
     verbose=True
 ):
     """
-    Recorta el EEG crudo para alinearlo con el archivo .spa.
+    Alinea el EEG crudo con el archivo .spa usando el .t_a.
 
-    Lógica:
-    1. El .t_a contiene la hora real de inicio del raw.
-    2. El primer Time del .spa indica el primer instante con variables procesadas.
-    3. La diferencia entre ambos tiempos indica cuántos segundos sobran
-       al inicio del raw.
-    4. Tras recortar el inicio, se conserva una duración equivalente
-       al número de filas del .spa.
+    Casos:
+    - Si el raw empieza antes que el .spa:
+        se recortan muestras iniciales del raw.
+    - Si el .spa empieza antes que el raw:
+        se añaden muestras NaN al inicio del raw, porque esos segundos
+        no existen en el archivo crudo.
 
-    Parámetros
-    ----------
-    df_raw : DataFrame
-        Señal cruda leída desde .r2a o .r4a.
-        Filas = muestras.
-        Columnas = canales.
-
-    ruta_ta : str o Path
-        Ruta al archivo .t_a.
-
-    df_spa : DataFrame
-        Archivo .spa procesado o limpio, con columna Time.
-
-    columna_time : str
-        Nombre de la columna temporal del .spa.
-
-    fs : int
-        Frecuencia de muestreo del raw. Para BIS exportado: 128 Hz.
-
-    verbose : bool
-        Si True, imprime resumen del recorte.
-
-    Devuelve
-    --------
-    df_raw_recortado : DataFrame
-        Raw recortado y reiniciado en índice 0.
+    Devuelve:
+    - df_raw_alineado: raw con duración igual al .spa.
     """
 
     inicio_raw = leer_inicio_ta(ruta_ta)
@@ -282,55 +257,106 @@ def recortar_raw_segun_ta_y_spa(
 
     desfase_s = (inicio_spa - inicio_raw).total_seconds()
 
-    if desfase_s < 0:
-        raise ValueError(
-            "El .spa empieza antes que el raw. Revisa las fechas.\n"
-            f"inicio_raw (.t_a): {inicio_raw}\n"
-            f"inicio_spa (.spa): {inicio_spa}\n"
-            f"desfase_s: {desfase_s}"
-        )
-
-    muestras_recorte_inicio = int(round(desfase_s * fs))
-
-    # Asumimos una fila del .spa por segundo
     n_segundos_spa = len(df_spa)
     muestras_objetivo = int(n_segundos_spa * fs)
 
-    inicio = muestras_recorte_inicio
-    fin = inicio + muestras_objetivo
+    df_raw = df_raw.copy().reset_index(drop=True)
 
-    if inicio >= len(df_raw):
-        raise ValueError(
-            "El recorte inicial supera la longitud del raw.\n"
-            f"muestras_recorte_inicio: {muestras_recorte_inicio}\n"
-            f"longitud_raw: {len(df_raw)}"
+    # Guardar columnas originales
+    columnas_raw = df_raw.columns.tolist()
+
+    # ------------------------------------------------------------
+    # Caso 1: el raw empieza antes que el .spa
+    # ------------------------------------------------------------
+    if desfase_s >= 0:
+
+        muestras_recorte_inicio = int(round(desfase_s * fs))
+
+        inicio = muestras_recorte_inicio
+        fin = inicio + muestras_objetivo
+
+        df_raw_alineado = df_raw.iloc[inicio:fin].copy().reset_index(drop=True)
+
+        accion = "recorte_inicio"
+        muestras_nan_inicio = 0
+        muestras_recortadas_inicio = muestras_recorte_inicio
+
+    # ------------------------------------------------------------
+    # Caso 2: el .spa empieza antes que el raw
+    # ------------------------------------------------------------
+    else:
+
+        segundos_faltantes_inicio = abs(desfase_s)
+        muestras_nan_inicio = int(round(segundos_faltantes_inicio * fs))
+
+        # Crear bloque NaN inicial con las mismas columnas
+        df_nan_inicio = pd.DataFrame(
+            np.nan,
+            index=np.arange(muestras_nan_inicio),
+            columns=columnas_raw
         )
 
-    df_raw_recortado = df_raw.iloc[inicio:fin].reset_index(drop=True)
+        # Concatenar NaN inicial + raw real
+        df_raw_expandido = pd.concat(
+            [df_nan_inicio, df_raw],
+            ignore_index=True
+        )
+
+        # Recortar a la duración del .spa
+        df_raw_alineado = df_raw_expandido.iloc[:muestras_objetivo].copy().reset_index(drop=True)
+
+        accion = "relleno_nan_inicio"
+        muestras_recortadas_inicio = 0
+
+    # ------------------------------------------------------------
+    # Si aun así falta señal al final, rellenar con NaN
+    # ------------------------------------------------------------
+
+    if len(df_raw_alineado) < muestras_objetivo:
+
+        muestras_faltantes_final = muestras_objetivo - len(df_raw_alineado)
+
+        df_nan_final = pd.DataFrame(
+            np.nan,
+            index=np.arange(muestras_faltantes_final),
+            columns=columnas_raw
+        )
+
+        df_raw_alineado = pd.concat(
+            [df_raw_alineado, df_nan_final],
+            ignore_index=True
+        )
+
+    else:
+        muestras_faltantes_final = 0
+
+    # ------------------------------------------------------------
+    # Reconstruir tiempo_s si existe o si quieres tenerlo actualizado
+    # ------------------------------------------------------------
+
+    if "tiempo_s" in df_raw_alineado.columns:
+        df_raw_alineado["tiempo_s"] = np.arange(len(df_raw_alineado)) / fs
+
+    # ------------------------------------------------------------
+    # Resumen
+    # ------------------------------------------------------------
 
     if verbose:
-        print("=== Recorte temporal raw vs spa ===")
+        print("=== Alineación temporal raw vs spa ===")
         print("Inicio raw (.t_a):", inicio_raw)
         print("Inicio .spa:", inicio_spa)
-        print("Desfase inicial:", desfase_s, "s")
-        print("Muestras recortadas al inicio:", muestras_recorte_inicio)
+        print("Desfase spa - raw:", desfase_s, "s")
+        print("Acción aplicada:", accion)
         print("Filas .spa:", n_segundos_spa)
         print("Muestras objetivo:", muestras_objetivo)
-        print("Muestras raw antes:", len(df_raw))
-        print("Muestras raw después:", len(df_raw_recortado))
+        print("Muestras raw originales:", len(df_raw))
+        print("Muestras recortadas al inicio:", muestras_recortadas_inicio)
+        print("Muestras NaN añadidas al inicio:", muestras_nan_inicio)
+        print("Muestras NaN añadidas al final:", muestras_faltantes_final)
+        print("Muestras raw alineado:", len(df_raw_alineado))
+        print("Duración raw alineado:", len(df_raw_alineado) / fs, "s")
 
-        if len(df_raw_recortado) < muestras_objetivo:
-            print(
-                "Aviso: el raw recortado tiene menos muestras de las esperadas. "
-                "Puede faltar señal al final del archivo."
-            )
-
-        muestras_sobrantes_final = len(df_raw) - fin
-        print("Muestras sobrantes al final:", max(muestras_sobrantes_final, 0))
-        print("Segundos sobrantes al final:", max(muestras_sobrantes_final, 0) / fs)
-
-    return df_raw_recortado
-
+    return df_raw_alineado
 
 
 # -------------------------------------------------------------------------------------------------------
