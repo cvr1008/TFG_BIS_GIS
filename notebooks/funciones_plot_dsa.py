@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.patheffects as pe
 
 from funciones_dsa import (
     alinear_spa_con_tiempo,
@@ -518,7 +519,7 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
 
 
 
-# ---------------------------BILATERAL------------------------------------------------------
+# ------------------------------------------------ BILATERAL ----------------------------------------------------
 
 def plot_dsa_bilateral_con_sef_mef(
     tiempo,
@@ -531,6 +532,7 @@ def plot_dsa_bilateral_con_sef_mef(
     df_merge_der=None,
     mask_izq=None,
     mask_der=None,
+    asimetria=None,
     titulo_izq="DSA bilateral - Hemisferio izquierdo",
     titulo_der="DSA bilateral - Hemisferio derecho",
     titulo_general="DSA bilateral",
@@ -540,25 +542,51 @@ def plot_dsa_bilateral_con_sef_mef(
     mostrar=True
 ):
     """
-    Dibuja dos DSA bilaterales (izquierda y derecha) con la misma escala de color.
+    Dibuja dos DSA bilaterales y, si se proporciona, coloca ASYM09
+    entre la matriz izquierda y la derecha.
     """
-
-    import matplotlib.patheffects as pe
 
     frecuencias = np.asarray(frecuencias, dtype=float)
     y0 = np.min(frecuencias)
     y1 = np.max(frecuencias)
 
-    fig, axes = plt.subplots(
-        nrows=2,
-        ncols=1,
-        figsize=(20, 10),
-        sharex=True,
-        sharey=True,
-        constrained_layout=True
-    )
+    # ------------------------------------------------------------
+    # Crear figura
+    # ------------------------------------------------------------
 
-    im1 = axes[0].pcolormesh(
+    if asimetria is None:
+        fig, axes = plt.subplots(
+            nrows=2,
+            ncols=1,
+            figsize=(20, 10),
+            sharex=True,
+            sharey=True,
+            constrained_layout=True
+        )
+
+        ax_izq = axes[0]
+        ax_asym = None
+        ax_der = axes[1]
+
+    else:
+        fig, axes = plt.subplots(
+            nrows=3,
+            ncols=1,
+            figsize=(20, 12),
+            sharex=True,
+            constrained_layout=True,
+            gridspec_kw={"height_ratios": [3, 1, 3]}
+        )
+
+        ax_izq = axes[0]
+        ax_asym = axes[1]
+        ax_der = axes[2]
+
+    # ------------------------------------------------------------
+    # DSA izquierda
+    # ------------------------------------------------------------
+
+    im_izq = ax_izq.pcolormesh(
         tiempo,
         frecuencias,
         matriz_izq.T,
@@ -567,11 +595,56 @@ def plot_dsa_bilateral_con_sef_mef(
         norm=norm
     )
 
-    axes[0].set_title(titulo_izq)
-    axes[0].set_ylabel("Frecuencia (Hz)")
-    axes[0].set_ylim(y0, y1)
+    ax_izq.set_title(titulo_izq)
+    ax_izq.set_ylabel("Frecuencia (Hz)")
+    ax_izq.set_ylim(y0, y1)
 
-    im2 = axes[1].pcolormesh(
+    # ------------------------------------------------------------
+    # ASYM09 entre ambas matrices
+    # ------------------------------------------------------------
+
+    if ax_asym is not None:
+        asimetria_plot = pd.Series(asimetria).reset_index(drop=True).astype(float)
+
+        if mask_izq is not None and mask_der is not None:
+            mask_asym = np.asarray(mask_izq) | np.asarray(mask_der)
+            asimetria_plot.loc[mask_asym] = np.nan
+
+        ax_asym.plot(
+            tiempo,
+            asimetria_plot,
+            linewidth=1.5,
+            label="ASYM09"
+        )
+
+        valores_validos = asimetria_plot[np.isfinite(asimetria_plot)]
+
+        if len(valores_validos) > 0:
+            if valores_validos.min() < 0:
+                ax_asym.axhline(
+                    0,
+                    color="black",
+                    linewidth=0.8,
+                    alpha=0.7
+                )
+            else:
+                ax_asym.axhline(
+                    50,
+                    color="black",
+                    linewidth=0.8,
+                    alpha=0.7
+                )
+
+        ax_asym.set_title("Asimetría bilateral ASYM09")
+        ax_asym.set_ylabel("ASYM09")
+        ax_asym.grid(True, alpha=0.3)
+        ax_asym.legend(loc="upper right")
+
+    # ------------------------------------------------------------
+    # DSA derecha
+    # ------------------------------------------------------------
+
+    im_der = ax_der.pcolormesh(
         tiempo,
         frecuencias,
         matriz_der.T,
@@ -580,12 +653,16 @@ def plot_dsa_bilateral_con_sef_mef(
         norm=norm
     )
 
-    axes[1].set_title(titulo_der)
-    axes[1].set_ylabel("Frecuencia (Hz)")
-    axes[1].set_xlabel("Tiempo")
-    axes[1].set_ylim(y0, y1)
+    ax_der.set_title(titulo_der)
+    ax_der.set_ylabel("Frecuencia (Hz)")
+    ax_der.set_xlabel("Tiempo")
+    ax_der.set_ylim(y0, y1)
 
-    for ax in axes:
+    # ------------------------------------------------------------
+    # Líneas de bandas EEG
+    # ------------------------------------------------------------
+
+    for ax in [ax_izq, ax_der]:
         for f in [4, 8, 13]:
             ax.axhline(
                 f,
@@ -595,8 +672,12 @@ def plot_dsa_bilateral_con_sef_mef(
                 alpha=0.7
             )
 
-    # IZQUIERDA
+    # ------------------------------------------------------------
+    # SEF/MEF izquierda
+    # ------------------------------------------------------------
+
     if df_merge_izq is not None:
+
         if mostrar_sef and "SEF08" in df_merge_izq.columns:
             sef_izq = df_merge_izq["SEF08"].copy()
             sef_izq[(sef_izq < y0) | (sef_izq > y1)] = np.nan
@@ -604,7 +685,7 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_izq is not None:
                 sef_izq.loc[np.asarray(mask_izq)] = np.nan
 
-            axes[0].plot(
+            ax_izq.plot(
                 tiempo,
                 sef_izq,
                 color="white",
@@ -623,7 +704,7 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_izq is not None:
                 mef_izq.loc[np.asarray(mask_izq)] = np.nan
 
-            axes[0].plot(
+            ax_izq.plot(
                 tiempo,
                 mef_izq,
                 color="purple",
@@ -631,8 +712,12 @@ def plot_dsa_bilateral_con_sef_mef(
                 label="MEF"
             )
 
-    # DERECHA
+    # ------------------------------------------------------------
+    # SEF/MEF derecha
+    # ------------------------------------------------------------
+
     if df_merge_der is not None:
+
         if mostrar_sef and "SEF08" in df_merge_der.columns:
             sef_der = df_merge_der["SEF08"].copy()
             sef_der[(sef_der < y0) | (sef_der > y1)] = np.nan
@@ -640,7 +725,7 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_der is not None:
                 sef_der.loc[np.asarray(mask_der)] = np.nan
 
-            axes[1].plot(
+            ax_der.plot(
                 tiempo,
                 sef_der,
                 color="white",
@@ -659,7 +744,7 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_der is not None:
                 mef_der.loc[np.asarray(mask_der)] = np.nan
 
-            axes[1].plot(
+            ax_der.plot(
                 tiempo,
                 mef_der,
                 color="purple",
@@ -667,22 +752,35 @@ def plot_dsa_bilateral_con_sef_mef(
                 label="MEF"
             )
 
-    for ax in axes:
+    # ------------------------------------------------------------
+    # Leyendas
+    # ------------------------------------------------------------
+
+    for ax in [ax_izq, ax_der]:
         handles, labels = ax.get_legend_handles_labels()
         if handles:
             ax.legend(loc="upper right")
 
-    axes[1].xaxis_date()
-    axes[1].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
-    plt.setp(axes[1].get_xticklabels(), rotation=45)
+    # ------------------------------------------------------------
+    # Formato eje X
+    # ------------------------------------------------------------
+
+    ax_der.xaxis_date()
+    ax_der.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+    plt.setp(ax_der.get_xticklabels(), rotation=45)
+
+    # ------------------------------------------------------------
+    # Barra de color común para las dos DSA
+    # ------------------------------------------------------------
 
     cbar = fig.colorbar(
-        im2,
-        ax=axes,
+        im_der,
+        ax=[ax_izq, ax_der],
         orientation="vertical",
         fraction=0.025,
         pad=0.02
     )
+
     cbar.set_label(etiqueta_colorbar)
 
     fig.suptitle(titulo_general, fontsize=14)
