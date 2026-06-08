@@ -152,37 +152,96 @@ def obtener_hora_inicio_desde_spa(df_spa, columna_tiempo="Time"):
 
 
 
-def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None):
+def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None, resolver_duplicados="last"):
     """
-    Alinear el df del .spa con el df de la DSA por tiempo:
-    
-    Parámetros:
-     - tiempo, dsa: variables que vienen del .f_a (instantes de tiempo y decibelios según frecuencia)
-     - df_spa: DataFrame procedente del .spa. Lo hemos limpiado y quedan las columnas numéricas.
-               Están los instantes de tiempo y los valores de los campos 
-     - columnas: variables del spa que queremos incluir en el dF de fusión
-     
-    Devuelve:
-    df_merge: se hace una unión del DF de tiempo con las columnas limpias del dF del .spa
-        - on: como las dos tienen las columnas de tiempo en común se fusionan por ahí
-        - how="left": conserva todos los tiempos de la DSA, aunque en el .spa falte alguno
-    """
-    # si no le pasamos las variables del spa tenemos algunas por defecto
-    if columnas is None:
-        columnas = ["SEF08", "MEDFRQ08", "SQI10", "TOTPOW08", "EMGLOW01", "BURST", "DB13U01", "ASYM09"]
+    Alinea el df del .spa con el tiempo de la DSA.
 
-    # llamada a la función de limpieza y obtenemos un spa sin valores centinela
+    Si el .spa contiene tiempos duplicados, se colapsa a una única fila
+    por cada Time antes del merge. Esto evita que pandas duplique filas
+    de la DSA durante la fusión.
+    """
+
+    if columnas is None:
+        columnas = [
+            "SEF08", "MEDFRQ08", "SQI10", "TOTPOW08",
+            "EMGLOW01", "BURST", "DB13U01", "ASYM09"
+        ]
+
+    # Limpieza de valores centinela
     df_spa = limpiar_spa_para_dsa(df_spa)
 
-    # lista con las columnas de variables procesadas cada segundo y la columna de tiempo
     cols = ["Time"] + [c for c in columnas if c in df_spa.columns]
 
-    # creación de un dF auxiliar que contiene solo la serie temporal de la DSA
+    df_spa_sel = df_spa[cols].copy()
+
+    # Asegurar formato datetime y eliminar espacios invisibles
+    df_spa_sel["Time"] = pd.to_datetime(
+        df_spa_sel["Time"].astype(str).str.strip(),
+        errors="coerce"
+    )
+
+    df_spa_sel = df_spa_sel.dropna(subset=["Time"])
+
+    # ------------------------------------------------------------
+    # Resolver tiempos duplicados
+    # ------------------------------------------------------------
+
+    n_duplicados = df_spa_sel["Time"].duplicated().sum()
+
+    if n_duplicados > 0:
+        print(
+            f"Aviso: se han encontrado {n_duplicados} tiempos duplicados en el .spa. "
+            f"Estrategia usada: {resolver_duplicados}."
+        )
+
+        if resolver_duplicados == "last":
+            df_spa_sel = (
+                df_spa_sel
+                .sort_values("Time")
+                .drop_duplicates(subset="Time", keep="last")
+                .reset_index(drop=True)
+            )
+
+        elif resolver_duplicados == "first":
+            df_spa_sel = (
+                df_spa_sel
+                .sort_values("Time")
+                .drop_duplicates(subset="Time", keep="first")
+                .reset_index(drop=True)
+            )
+
+        elif resolver_duplicados == "mean":
+            # Promedia variables numéricas por segundo.
+            # Útil si quieres una representación suavizada de variables procesadas.
+            df_spa_sel = (
+                df_spa_sel
+                .groupby("Time", as_index=False)
+                .mean(numeric_only=True)
+            )
+
+        else:
+            raise ValueError(
+                "resolver_duplicados debe ser 'last', 'first' o 'mean'."
+            )
+
+    # ------------------------------------------------------------
+    # DataFrame auxiliar con los tiempos de la DSA
+    # ------------------------------------------------------------
+
     df_aux = pd.DataFrame({"Time": tiempo}).reset_index(drop=True)
+
+    df_aux["Time"] = pd.to_datetime(
+        df_aux["Time"].astype(str).str.strip(),
+        errors="coerce"
+    )
+
+    # Merge seguro: muchos tiempos de la DSA pueden apuntar a una tabla spa
+    # donde cada Time aparece como máximo una vez.
     df_merge = df_aux.merge(
-        df_spa[cols],   
+        df_spa_sel,
         on="Time",
-        how="left"
+        how="left",
+        validate="many_to_one"
     )
 
     return df_merge

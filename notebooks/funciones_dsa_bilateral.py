@@ -195,38 +195,227 @@ def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq", verbose=True):
 
 
 
-def obtener_inicio_spa(df_spa, columna_time="Time"):
+def preparar_timeline_spa(
+    df_spa,
+    columna_time="Time",
+    resolver_duplicados="last",
+    verbose=True
+):
     """
-    Obtiene la primera fecha/hora válida de la columna Time del .spa.
+    Crea la línea temporal de referencia a partir del archivo .spa.
 
-    Se aplica strip() para eliminar espacios invisibles al inicio o al final,
-    ya que los campos del .spa pueden tener longitud fija y venir rellenados.
+    Esta timeline será la referencia común para:
+    - raw .r2a/.r4a
+    - DSA reconstruida
+    - .f_a, si existe
+
+    Devuelve:
+    - timeline_spa: Serie temporal sin duplicados.
     """
 
-    tiempos_raw = df_spa[columna_time].astype(str).str.strip()
-
-    tiempos_spa = pd.to_datetime(
-        tiempos_raw,
-        dayfirst=False,
+    tiempos = pd.to_datetime(
+        df_spa[columna_time].astype(str).str.strip(),
         errors="coerce"
     )
 
-    # Segundo intento por si el formato viniera en día/mes/año
-    if tiempos_spa.isna().mean() > 0.5:
-        tiempos_spa = pd.to_datetime(
-            tiempos_raw,
-            dayfirst=True,
-            errors="coerce"
+    df_time = pd.DataFrame({"Time": tiempos})
+    df_time = df_time.dropna(subset=["Time"])
+
+    if len(df_time) == 0:
+        raise ValueError("No se encontraron tiempos válidos en el .spa.")
+
+    n_duplicados = df_time["Time"].duplicated().sum()
+
+    if n_duplicados > 0:
+        if verbose:
+            print(
+                f"Aviso: el .spa contiene {n_duplicados} tiempos duplicados. "
+                f"Estrategia usada: {resolver_duplicados}."
+            )
+
+        if resolver_duplicados == "last":
+            df_time = (
+                df_time
+                .sort_values("Time")
+                .drop_duplicates(subset="Time", keep="last")
+                .reset_index(drop=True)
+            )
+
+        elif resolver_duplicados == "first":
+            df_time = (
+                df_time
+                .sort_values("Time")
+                .drop_duplicates(subset="Time", keep="first")
+                .reset_index(drop=True)
+            )
+
+        else:
+            raise ValueError("resolver_duplicados debe ser 'last' o 'first'.")
+
+    else:
+        df_time = df_time.reset_index(drop=True)
+
+    timeline_spa = df_time["Time"].reset_index(drop=True)
+
+    if verbose:
+        print("=== Timeline .spa ===")
+        print("Inicio .spa:", timeline_spa.iloc[0])
+        print("Fin .spa:", timeline_spa.iloc[-1])
+        print("N segundos .spa:", len(timeline_spa))
+
+    return timeline_spa
+
+
+
+def alinear_raw_a_timeline_spa(
+    df_raw,
+    ruta_ta,
+    timeline_spa,
+    fs=128,
+    verbose=True
+):
+    """
+    Alinea el EEG crudo al tamaño y tiempo del .spa.
+
+    Regla:
+    - La timeline del .spa manda.
+    - Si el raw empieza antes que el .spa: se recorta el inicio.
+    - Si el raw empieza después que el .spa: se añaden NaN al inicio.
+    - Si el raw acaba antes que el .spa: se añaden NaN al final.
+    - Si el raw acaba después que el .spa: se recorta el final.
+
+    Devuelve:
+    - df_raw_alineado
+    - info_alineacion
+    """
+
+    inicio_raw = leer_inicio_ta(ruta_ta)
+
+    timeline_spa = pd.to_datetime(
+        pd.Series(timeline_spa).astype(str).str.strip(),
+        errors="coerce"
+    ).dropna().reset_index(drop=True)
+
+    if len(timeline_spa) == 0:
+        raise ValueError("timeline_spa no contiene tiempos válidos.")
+
+    inicio_spa = timeline_spa.iloc[0]
+    fin_spa = timeline_spa.iloc[-1]
+
+    desfase_s = (inicio_spa - inicio_raw).total_seconds()
+
+    n_segundos_spa = len(timeline_spa)
+    muestras_objetivo = int(n_segundos_spa * fs)
+
+    df_raw = df_raw.copy().reset_index(drop=True)
+    columnas_raw = df_raw.columns.tolist()
+
+    # ------------------------------------------------------------
+    # Caso A: raw empieza antes o justo al inicio del spa
+    # ------------------------------------------------------------
+    if desfase_s >= 0:
+        muestras_recorte_inicio = int(round(desfase_s * fs))
+
+        inicio = muestras_recorte_inicio
+        fin = inicio + muestras_objetivo
+
+        df_raw_alineado = df_raw.iloc[inicio:fin].copy().reset_index(drop=True)
+
+        muestras_nan_inicio = 0
+        accion_inicio = "recorte_inicio" if muestras_recorte_inicio > 0 else "sin_recorte_inicio"
+
+    # ------------------------------------------------------------
+    # Caso B: raw empieza después del spa
+    # ------------------------------------------------------------
+    else:
+        muestras_nan_inicio = int(round(abs(desfase_s) * fs))
+
+        df_nan_inicio = pd.DataFrame(
+            np.nan,
+            index=np.arange(muestras_nan_inicio),
+            columns=columnas_raw
         )
 
-    tiempos_spa = tiempos_spa.dropna()
-
-    if len(tiempos_spa) == 0:
-        raise ValueError(
-            f"No se encontró ninguna fecha/hora válida en la columna {columna_time} del .spa."
+        df_raw_expandido = pd.concat(
+            [df_nan_inicio, df_raw],
+            ignore_index=True
         )
 
-    return tiempos_spa.iloc[0]
+        df_raw_alineado = (
+            df_raw_expandido
+            .iloc[:muestras_objetivo]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        muestras_recorte_inicio = 0
+        accion_inicio = "relleno_nan_inicio"
+
+    # ------------------------------------------------------------
+    # Ajuste final
+    # ------------------------------------------------------------
+    if len(df_raw_alineado) < muestras_objetivo:
+        muestras_nan_final = muestras_objetivo - len(df_raw_alineado)
+
+        df_nan_final = pd.DataFrame(
+            np.nan,
+            index=np.arange(muestras_nan_final),
+            columns=columnas_raw
+        )
+
+        df_raw_alineado = pd.concat(
+            [df_raw_alineado, df_nan_final],
+            ignore_index=True
+        )
+
+        muestras_recorte_final = 0
+
+    elif len(df_raw_alineado) > muestras_objetivo:
+        muestras_recorte_final = len(df_raw_alineado) - muestras_objetivo
+        df_raw_alineado = df_raw_alineado.iloc[:muestras_objetivo].reset_index(drop=True)
+        muestras_nan_final = 0
+
+    else:
+        muestras_nan_final = 0
+        muestras_recorte_final = 0
+
+    # Reconstruir tiempo_s
+    if "tiempo_s" in df_raw_alineado.columns:
+        df_raw_alineado["tiempo_s"] = np.arange(len(df_raw_alineado)) / fs
+
+    info = {
+        "inicio_raw_ta": inicio_raw,
+        "inicio_spa": inicio_spa,
+        "fin_spa": fin_spa,
+        "desfase_spa_menos_raw_s": desfase_s,
+        "n_segundos_spa": n_segundos_spa,
+        "muestras_objetivo": muestras_objetivo,
+        "accion_inicio": accion_inicio,
+        "muestras_recorte_inicio": muestras_recorte_inicio,
+        "muestras_nan_inicio": muestras_nan_inicio,
+        "muestras_recorte_final": muestras_recorte_final,
+        "muestras_nan_final": muestras_nan_final,
+        "fs": fs
+    }
+
+    if verbose:
+        print("=== Alineación raw a timeline .spa ===")
+        print("Inicio raw (.t_a):", inicio_raw)
+        print("Inicio .spa:", inicio_spa)
+        print("Fin .spa:", fin_spa)
+        print("Desfase spa - raw:", desfase_s, "s")
+        print("Acción inicio:", accion_inicio)
+        print("Segundos objetivo .spa:", n_segundos_spa)
+        print("Muestras objetivo:", muestras_objetivo)
+        print("Muestras raw originales:", len(df_raw))
+        print("Muestras recortadas inicio:", muestras_recorte_inicio)
+        print("Muestras NaN inicio:", muestras_nan_inicio)
+        print("Muestras recortadas final:", muestras_recorte_final)
+        print("Muestras NaN final:", muestras_nan_final)
+        print("Muestras raw alineado:", len(df_raw_alineado))
+        print("Duración raw alineado:", len(df_raw_alineado) / fs, "s")
+
+    return df_raw_alineado, info
 
 
 
@@ -236,127 +425,50 @@ def recortar_raw_segun_ta_y_spa(
     df_spa,
     columna_time="Time",
     fs=128,
+    resolver_duplicados="last",
     verbose=True
 ):
     """
-    Alinea el EEG crudo con el archivo .spa usando el .t_a.
+    Alinea el EEG crudo con la línea temporal del .spa usando el .t_a.
 
-    Casos:
-    - Si el raw empieza antes que el .spa:
-        se recortan muestras iniciales del raw.
-    - Si el .spa empieza antes que el raw:
-        se añaden muestras NaN al inicio del raw, porque esos segundos
-        no existen en el archivo crudo.
+    Regla principal:
+    - El .spa manda en tamaño y línea temporal.
+    - El raw se recorta o se rellena con NaN para ajustarse al .spa.
+    - Si el raw empieza antes que el .spa, se recorta el inicio.
+    - Si el raw empieza después que el .spa, se añaden NaN al inicio.
+    - Si el raw acaba antes que el .spa, se añaden NaN al final.
+    - Si el raw acaba después que el .spa, se recorta el final.
 
     Devuelve:
-    - df_raw_alineado: raw con duración igual al .spa.
+    - df_raw_alineado
+    - timeline_spa
+    - info_alineacion
     """
 
-    inicio_raw = leer_inicio_ta(ruta_ta)
-    inicio_spa = obtener_inicio_spa(df_spa, columna_time=columna_time)
-
-    desfase_s = (inicio_spa - inicio_raw).total_seconds()
-
-    n_segundos_spa = len(df_spa)
-    muestras_objetivo = int(n_segundos_spa * fs)
-
-    df_raw = df_raw.copy().reset_index(drop=True)
-
-    # Guardar columnas originales
-    columnas_raw = df_raw.columns.tolist()
-
     # ------------------------------------------------------------
-    # Caso 1: el raw empieza antes que el .spa
-    # ------------------------------------------------------------
-    if desfase_s >= 0:
-
-        muestras_recorte_inicio = int(round(desfase_s * fs))
-
-        inicio = muestras_recorte_inicio
-        fin = inicio + muestras_objetivo
-
-        df_raw_alineado = df_raw.iloc[inicio:fin].copy().reset_index(drop=True)
-
-        accion = "recorte_inicio"
-        muestras_nan_inicio = 0
-        muestras_recortadas_inicio = muestras_recorte_inicio
-
-    # ------------------------------------------------------------
-    # Caso 2: el .spa empieza antes que el raw
-    # ------------------------------------------------------------
-    else:
-
-        segundos_faltantes_inicio = abs(desfase_s)
-        muestras_nan_inicio = int(round(segundos_faltantes_inicio * fs))
-
-        # Crear bloque NaN inicial con las mismas columnas
-        df_nan_inicio = pd.DataFrame(
-            np.nan,
-            index=np.arange(muestras_nan_inicio),
-            columns=columnas_raw
-        )
-
-        # Concatenar NaN inicial + raw real
-        df_raw_expandido = pd.concat(
-            [df_nan_inicio, df_raw],
-            ignore_index=True
-        )
-
-        # Recortar a la duración del .spa
-        df_raw_alineado = df_raw_expandido.iloc[:muestras_objetivo].copy().reset_index(drop=True)
-
-        accion = "relleno_nan_inicio"
-        muestras_recortadas_inicio = 0
-
-    # ------------------------------------------------------------
-    # Si aun así falta señal al final, rellenar con NaN
+    # 1. Crear timeline del .spa
     # ------------------------------------------------------------
 
-    if len(df_raw_alineado) < muestras_objetivo:
-
-        muestras_faltantes_final = muestras_objetivo - len(df_raw_alineado)
-
-        df_nan_final = pd.DataFrame(
-            np.nan,
-            index=np.arange(muestras_faltantes_final),
-            columns=columnas_raw
-        )
-
-        df_raw_alineado = pd.concat(
-            [df_raw_alineado, df_nan_final],
-            ignore_index=True
-        )
-
-    else:
-        muestras_faltantes_final = 0
+    timeline_spa = preparar_timeline_spa(
+        df_spa=df_spa,
+        columna_time=columna_time,
+        resolver_duplicados=resolver_duplicados,
+        verbose=verbose
+    )
 
     # ------------------------------------------------------------
-    # Reconstruir tiempo_s si existe o si quieres tenerlo actualizado
+    # 2. Alinear raw a esa timeline
     # ------------------------------------------------------------
 
-    if "tiempo_s" in df_raw_alineado.columns:
-        df_raw_alineado["tiempo_s"] = np.arange(len(df_raw_alineado)) / fs
+    df_raw_alineado, info_alineacion = alinear_raw_a_timeline_spa(
+        df_raw=df_raw,
+        ruta_ta=ruta_ta,
+        timeline_spa=timeline_spa,
+        fs=fs,
+        verbose=verbose
+    )
 
-    # ------------------------------------------------------------
-    # Resumen
-    # ------------------------------------------------------------
-
-    if verbose:
-        print("=== Alineación temporal raw vs spa ===")
-        print("Inicio raw (.t_a):", inicio_raw)
-        print("Inicio .spa:", inicio_spa)
-        print("Desfase spa - raw:", desfase_s, "s")
-        print("Acción aplicada:", accion)
-        print("Filas .spa:", n_segundos_spa)
-        print("Muestras objetivo:", muestras_objetivo)
-        print("Muestras raw originales:", len(df_raw))
-        print("Muestras recortadas al inicio:", muestras_recortadas_inicio)
-        print("Muestras NaN añadidas al inicio:", muestras_nan_inicio)
-        print("Muestras NaN añadidas al final:", muestras_faltantes_final)
-        print("Muestras raw alineado:", len(df_raw_alineado))
-        print("Duración raw alineado:", len(df_raw_alineado) / fs, "s")
-
-    return df_raw_alineado
+    return df_raw_alineado, timeline_spa, info_alineacion
 
 
 # -------------------------------------------------------------------------------------------------------
