@@ -523,28 +523,27 @@ def figura_dsa_y_variables_alineadas(tiempo, dsa, df_spa, umbral_sqi=14, vmin=No
 def plot_dsa_bilateral_con_sef_mef(
     tiempo,
     frecuencias,
-    matriz_ch1,
-    matriz_ch3,
+    matriz_izq,
+    matriz_der,
     norm,
     cmap,
     df_merge_izq=None,
     df_merge_der=None,
     mask_izq=None,
     mask_der=None,
-    titulo_ch1="DSA bilateral - Canal 1",
-    titulo_ch3="DSA bilateral - Canal 3",
+    titulo_izq="DSA bilateral - Hemisferio izquierdo",
+    titulo_der="DSA bilateral - Hemisferio derecho",
+    titulo_general="DSA bilateral",
     etiqueta_colorbar="Potencia espectral (dB)",
     mostrar_sef=True,
     mostrar_mef=True,
     mostrar=True
 ):
     """
-    Dibuja dos DSA bilaterales:
-    - canal/lado izquierdo
-    - canal/lado derecho
-
-    Ambas se representan con la misma escala de color.
+    Dibuja dos DSA bilaterales (izquierda y derecha) con la misma escala de color.
     """
+
+    import matplotlib.patheffects as pe
 
     frecuencias = np.asarray(frecuencias, dtype=float)
     y0 = np.min(frecuencias)
@@ -562,34 +561,41 @@ def plot_dsa_bilateral_con_sef_mef(
     im1 = axes[0].pcolormesh(
         tiempo,
         frecuencias,
-        matriz_ch1.T,
+        matriz_izq.T,
         shading="auto",
         cmap=cmap,
         norm=norm
     )
 
-    axes[0].set_title(titulo_ch1)
+    axes[0].set_title(titulo_izq)
     axes[0].set_ylabel("Frecuencia (Hz)")
     axes[0].set_ylim(y0, y1)
 
     im2 = axes[1].pcolormesh(
         tiempo,
         frecuencias,
-        matriz_ch3.T,
+        matriz_der.T,
         shading="auto",
         cmap=cmap,
         norm=norm
     )
 
-    axes[1].set_title(titulo_ch3)
+    axes[1].set_title(titulo_der)
     axes[1].set_ylabel("Frecuencia (Hz)")
     axes[1].set_xlabel("Tiempo")
     axes[1].set_ylim(y0, y1)
 
     for ax in axes:
         for f in [4, 8, 13]:
-            ax.axhline(f, color="gray", linestyle="--", linewidth=1, alpha=0.7)
+            ax.axhline(
+                f,
+                color="gray",
+                linestyle="--",
+                linewidth=1,
+                alpha=0.7
+            )
 
+    # IZQUIERDA
     if df_merge_izq is not None:
         if mostrar_sef and "SEF08" in df_merge_izq.columns:
             sef_izq = df_merge_izq["SEF08"].copy()
@@ -598,7 +604,17 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_izq is not None:
                 sef_izq.loc[np.asarray(mask_izq)] = np.nan
 
-            axes[0].plot(tiempo, sef_izq, color="white", linewidth=1.5, label="SEF")
+            axes[0].plot(
+                tiempo,
+                sef_izq,
+                color="white",
+                linewidth=1.8,
+                label="SEF",
+                path_effects=[
+                    pe.Stroke(linewidth=3, foreground="black"),
+                    pe.Normal()
+                ]
+            )
 
         if mostrar_mef and "MEDFRQ08" in df_merge_izq.columns:
             mef_izq = df_merge_izq["MEDFRQ08"].copy()
@@ -607,8 +623,15 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_izq is not None:
                 mef_izq.loc[np.asarray(mask_izq)] = np.nan
 
-            axes[0].plot(tiempo, mef_izq, color="purple", linewidth=1.5, label="MEF")
+            axes[0].plot(
+                tiempo,
+                mef_izq,
+                color="purple",
+                linewidth=1.8,
+                label="MEF"
+            )
 
+    # DERECHA
     if df_merge_der is not None:
         if mostrar_sef and "SEF08" in df_merge_der.columns:
             sef_der = df_merge_der["SEF08"].copy()
@@ -617,7 +640,17 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_der is not None:
                 sef_der.loc[np.asarray(mask_der)] = np.nan
 
-            axes[1].plot(tiempo, sef_der, color="white", linewidth=1.5, label="SEF")
+            axes[1].plot(
+                tiempo,
+                sef_der,
+                color="white",
+                linewidth=1.8,
+                label="SEF",
+                path_effects=[
+                    pe.Stroke(linewidth=3, foreground="black"),
+                    pe.Normal()
+                ]
+            )
 
         if mostrar_mef and "MEDFRQ08" in df_merge_der.columns:
             mef_der = df_merge_der["MEDFRQ08"].copy()
@@ -626,7 +659,13 @@ def plot_dsa_bilateral_con_sef_mef(
             if mask_der is not None:
                 mef_der.loc[np.asarray(mask_der)] = np.nan
 
-            axes[1].plot(tiempo, mef_der, color="purple", linewidth=1.5, label="MEF")
+            axes[1].plot(
+                tiempo,
+                mef_der,
+                color="purple",
+                linewidth=1.8,
+                label="MEF"
+            )
 
     for ax in axes:
         handles, labels = ax.get_legend_handles_labels()
@@ -644,10 +683,9 @@ def plot_dsa_bilateral_con_sef_mef(
         fraction=0.025,
         pad=0.02
     )
-
     cbar.set_label(etiqueta_colorbar)
 
-    fig.suptitle("DSA bilateral reconstruida desde EEG crudo .r4a", fontsize=14)
+    fig.suptitle(titulo_general, fontsize=14)
 
     if mostrar:
         plt.show()

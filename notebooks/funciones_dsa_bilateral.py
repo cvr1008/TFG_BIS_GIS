@@ -24,7 +24,7 @@ def leer_r4a(archivo_r4a, escala_uv,
     - escala: 0.0511 µV/step
     """
 
-    datos = np.fromfile(ruta_archivo, dtype="<i2")
+    datos = np.fromfile(archivo_r4a, dtype="<i2")
 
     # Asegurar que el número de valores sea múltiplo de 4
     resto = len(datos) % 4
@@ -122,7 +122,7 @@ def limpiar_spa_bilateral(df_spa):
     return df_out
 
 
-def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq"):
+def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq", verbose=True):
     """
     Extrae un lado del .spa bilateral y lo convierte a nombres estándar.
     """
@@ -146,7 +146,8 @@ def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq"):
             df[var] = df_spa_bilat[col_lado]
         else:
             df[var] = np.nan
-            print(f"Advertencia: no se encontró {col_lado}")
+            if verbose:
+                print(f"Advertencia: no se encontró {col_lado}")
 
     if "ASYM09" in df_spa_bilat.columns:
         df["ASYM09"] = df_spa_bilat["ASYM09"]
@@ -155,16 +156,34 @@ def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq"):
 
     return df
 
-
 # -------------------------------------------------------------------------------------------------------
 
-def preparar_escala_color_dsa_bilateral(dsa_plot_1, dsa_plot_2, gamma=0.55):
+def preparar_escala_color_dsa_bilateral(
+    dsa_plot_1,
+    dsa_plot_2,
+    vmin=None,
+    vmax=None,
+    gamma=0.55,
+    percentil_min=2,
+    percentil_max=99.5
+):
     """
     Prepara una escala de color común para dos matrices DSA bilaterales.
+
+    Si vmin y vmax se pasan manualmente, usa esos valores.
+    Si no, calcula vmin/vmax con percentiles conjuntos de ambas matrices.
+
+    Devuelve:
+    - matriz_1
+    - matriz_2
+    - vmin
+    - vmax
+    - norm
+    - cmap
     """
 
-    matriz_1 = dsa_plot_1.values
-    matriz_2 = dsa_plot_2.values
+    matriz_1 = dsa_plot_1.to_numpy(dtype=float)
+    matriz_2 = dsa_plot_2.to_numpy(dtype=float)
 
     vals_1 = matriz_1[np.isfinite(matriz_1)]
     vals_2 = matriz_2[np.isfinite(matriz_2)]
@@ -172,12 +191,28 @@ def preparar_escala_color_dsa_bilateral(dsa_plot_1, dsa_plot_2, gamma=0.55):
     vals = np.concatenate([vals_1, vals_2])
 
     if len(vals) == 0:
-        raise ValueError("No hay valores válidos en ninguna de las dos DSA bilaterales.")
+        raise ValueError(
+            "No hay valores válidos en ninguna de las dos DSA bilaterales."
+        )
 
-    vmin = np.nanpercentile(vals, 2)
-    vmax = np.nanpercentile(vals, 99.5)
+    if vmin is None:
+        vmin = np.nanpercentile(vals, percentil_min)
 
-    norm = PowerNorm(gamma=gamma, vmin=vmin, vmax=vmax)
+    if vmax is None:
+        vmax = np.nanpercentile(vals, percentil_max)
+
+    norm = PowerNorm(
+        gamma=gamma,
+        vmin=vmin,
+        vmax=vmax
+    )
+
     cmap = crear_cmap_bis()
+
+    # Importante si la función crear_cmap_bis no lo hace ya
+    try:
+        cmap.set_bad("white")
+    except Exception:
+        pass
 
     return matriz_1, matriz_2, vmin, vmax, norm, cmap
