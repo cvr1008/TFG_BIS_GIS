@@ -64,6 +64,42 @@ def leer_r4a(archivo_r4a, escala_uv,
 
 
 
+def leer_inicio_ta(ruta_ta):
+    """
+    Lee el archivo .t_a y devuelve la fecha/hora de inicio real
+    del archivo de ondas crudas.
+
+    El .t_a suele contener una única línea tipo:
+        04/03/2010 17:47:21
+    """
+
+    with open(ruta_ta, "r", encoding="latin1") as f:
+        linea = f.readline().strip()
+
+    inicio_raw = pd.to_datetime(
+        linea,
+        dayfirst=False,
+        errors="coerce"
+    )
+
+    if pd.isna(inicio_raw):
+        # Segundo intento por si viniera en formato europeo
+        inicio_raw = pd.to_datetime(
+            linea,
+            dayfirst=True,
+            errors="coerce"
+        )
+
+    if pd.isna(inicio_raw):
+        raise ValueError(
+            f"No se pudo interpretar la fecha/hora del archivo .t_a: {linea}"
+        )
+
+    return inicio_raw
+
+
+# -------------------------------------------- archivo spa -------------------------------------------------
+
 def limpiar_spa_bilateral(df_spa):
     """
     Limpia y estandariza el .spa para modo bilateral.
@@ -87,6 +123,7 @@ def limpiar_spa_bilateral(df_spa):
 
     df_out = pd.DataFrame()
     df_out["Time"] = df["Time"]
+    df_out["SpSmooth"] = df["SpSmooth"]
 
     for col in columnas_izq:
         col_out = f"{col}_izq"
@@ -155,6 +192,146 @@ def extraer_lado_spa_bilateral(df_spa_bilat, lado="izq", verbose=True):
     df["modo_spa"] = f"bilateral_{lado}"
 
     return df
+
+
+
+def obtener_inicio_spa(df_spa, columna_time="Time"):
+    """
+    Obtiene la primera fecha/hora válida de la columna Time del .spa.
+
+    Se aplica strip() para eliminar espacios invisibles al inicio o al final,
+    ya que los campos del .spa pueden tener longitud fija y venir rellenados.
+    """
+
+    tiempos_raw = df_spa[columna_time].astype(str).str.strip()
+
+    tiempos_spa = pd.to_datetime(
+        tiempos_raw,
+        dayfirst=False,
+        errors="coerce"
+    )
+
+    # Segundo intento por si el formato viniera en día/mes/año
+    if tiempos_spa.isna().mean() > 0.5:
+        tiempos_spa = pd.to_datetime(
+            tiempos_raw,
+            dayfirst=True,
+            errors="coerce"
+        )
+
+    tiempos_spa = tiempos_spa.dropna()
+
+    if len(tiempos_spa) == 0:
+        raise ValueError(
+            f"No se encontró ninguna fecha/hora válida en la columna {columna_time} del .spa."
+        )
+
+    return tiempos_spa.iloc[0]
+
+
+
+def recortar_raw_segun_ta_y_spa(
+    df_raw,
+    ruta_ta,
+    df_spa,
+    columna_time="Time",
+    fs=128,
+    verbose=True
+):
+    """
+    Recorta el EEG crudo para alinearlo con el archivo .spa.
+
+    Lógica:
+    1. El .t_a contiene la hora real de inicio del raw.
+    2. El primer Time del .spa indica el primer instante con variables procesadas.
+    3. La diferencia entre ambos tiempos indica cuántos segundos sobran
+       al inicio del raw.
+    4. Tras recortar el inicio, se conserva una duración equivalente
+       al número de filas del .spa.
+
+    Parámetros
+    ----------
+    df_raw : DataFrame
+        Señal cruda leída desde .r2a o .r4a.
+        Filas = muestras.
+        Columnas = canales.
+
+    ruta_ta : str o Path
+        Ruta al archivo .t_a.
+
+    df_spa : DataFrame
+        Archivo .spa procesado o limpio, con columna Time.
+
+    columna_time : str
+        Nombre de la columna temporal del .spa.
+
+    fs : int
+        Frecuencia de muestreo del raw. Para BIS exportado: 128 Hz.
+
+    verbose : bool
+        Si True, imprime resumen del recorte.
+
+    Devuelve
+    --------
+    df_raw_recortado : DataFrame
+        Raw recortado y reiniciado en índice 0.
+    """
+
+    inicio_raw = leer_inicio_ta(ruta_ta)
+    inicio_spa = obtener_inicio_spa(df_spa, columna_time=columna_time)
+
+    desfase_s = (inicio_spa - inicio_raw).total_seconds()
+
+    if desfase_s < 0:
+        raise ValueError(
+            "El .spa empieza antes que el raw. Revisa las fechas.\n"
+            f"inicio_raw (.t_a): {inicio_raw}\n"
+            f"inicio_spa (.spa): {inicio_spa}\n"
+            f"desfase_s: {desfase_s}"
+        )
+
+    muestras_recorte_inicio = int(round(desfase_s * fs))
+
+    # Asumimos una fila del .spa por segundo
+    n_segundos_spa = len(df_spa)
+    muestras_objetivo = int(n_segundos_spa * fs)
+
+    inicio = muestras_recorte_inicio
+    fin = inicio + muestras_objetivo
+
+    if inicio >= len(df_raw):
+        raise ValueError(
+            "El recorte inicial supera la longitud del raw.\n"
+            f"muestras_recorte_inicio: {muestras_recorte_inicio}\n"
+            f"longitud_raw: {len(df_raw)}"
+        )
+
+    df_raw_recortado = df_raw.iloc[inicio:fin].reset_index(drop=True)
+
+    if verbose:
+        print("=== Recorte temporal raw vs spa ===")
+        print("Inicio raw (.t_a):", inicio_raw)
+        print("Inicio .spa:", inicio_spa)
+        print("Desfase inicial:", desfase_s, "s")
+        print("Muestras recortadas al inicio:", muestras_recorte_inicio)
+        print("Filas .spa:", n_segundos_spa)
+        print("Muestras objetivo:", muestras_objetivo)
+        print("Muestras raw antes:", len(df_raw))
+        print("Muestras raw después:", len(df_raw_recortado))
+
+        if len(df_raw_recortado) < muestras_objetivo:
+            print(
+                "Aviso: el raw recortado tiene menos muestras de las esperadas. "
+                "Puede faltar señal al final del archivo."
+            )
+
+        muestras_sobrantes_final = len(df_raw) - fin
+        print("Muestras sobrantes al final:", max(muestras_sobrantes_final, 0))
+        print("Segundos sobrantes al final:", max(muestras_sobrantes_final, 0) / fs)
+
+    return df_raw_recortado
+
+
 
 # -------------------------------------------------------------------------------------------------------
 
