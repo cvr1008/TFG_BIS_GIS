@@ -248,7 +248,7 @@ def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None, resolver_duplicados="l
 
 
 
-def preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9):
+def preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9, incluir_filas_nan=True):
     
     """
     La máscara marca como no válidas las filas que cumplen alguna de estas condiciones:
