@@ -251,26 +251,58 @@ def alinear_spa_con_tiempo(tiempo, df_spa, columnas=None, resolver_duplicados="l
 def preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9):
     
     """
-    Parámetros:
-     - tiempo:
-     - dsa:
-     - df_merge:
-     - umbral_sqi=15:
-     - umbral_ceros=0.9:
+    La máscara marca como no válidas las filas que cumplen alguna de estas condiciones:
+    - Mala calidad o valores no válidos según las variables del .spa.
+    - Fila con más del umbral indicado de ceros.
+    - Salto temporal mayor de 1 segundo.
+    - Fila completamente NaN en la DSA original, si incluir_filas_nan=True.
+
     
+    Parámetros:
+     - tiempo: serie temporal asociada a la DSA.
+     - dsa: matriz espectral, filas=tiempo y columnas=frecuencia.
+     - df_merge: dataframe con variables .spa alineadas temporalmente.
+     - umbral_sqi: valor mínimo aceptado de SQI.
+     - umbral_ceros: proporción máxima de ceros permitida por fila.
+     - incluir_filas_nan: si True, las filas completamente NaN se incluyen en la máscara.
+
     Devuelve:
-     - dsa_plot:
-     - mask_total:
+     - dsa_plot: DSA con filas no válidas sustituidas por NaN.
+     - mask_total: máscara booleana final.
     """
     
     # copiar la matriz de densidad espectral para modificarla. Se copia y convierte a float
     # van a entrar los NaN y hace falta float
     dsa_plot = dsa.copy().astype(float)
 
+    # Asegurar tiempo como Series datetime y con índice limpio
+    tiempo = pd.to_datetime(
+        pd.Series(tiempo).reset_index(drop=True),
+        errors="coerce"
+    )
+
+    # Asegurar df_merge con índice limpio
+    df_merge = df_merge.copy().reset_index(drop=True)
+
+    # Comprobación básica de longitudes
+    n = len(dsa_plot)
+
+    if len(tiempo) != n:
+        raise ValueError(
+            f"Longitud incompatible: tiempo tiene {len(tiempo)} filas "
+            f"y dsa tiene {n} filas."
+        )
+
+    if len(df_merge) != n:
+        raise ValueError(
+            f"Longitud incompatible: df_merge tiene {len(df_merge)} filas "
+            f"y dsa tiene {n} filas."
+        )
     
     # metemos el dF de unión con el tiempo de la dsa y los campos del spa
     # marca las filas que cumplen los requisitos como no válidas
-    mask_no_valida = construir_mascara_no_valida(df_merge, umbral_sqi=umbral_sqi)
+    mask_no_valida = construir_mascara_no_valida(df_merge, umbral_sqi=umbral_sqi).reset_index(drop=True)
+
 
     """ 
     compara cada celda con el 0 y del true/false (1 y 0) se hace media por filas
@@ -293,15 +325,18 @@ def preparar_dsa_con_mask(tiempo, dsa, df_merge, umbral_sqi=15, umbral_ceros=0.9
     delta_t = tiempo.diff().dt.total_seconds()
     mask_saltos = delta_t.gt(1).fillna(False)
     
-    """
-    unir las tres condiciones con un OR lógico
-    una fila no es válida si :
-     - mala calidad/valor no válido según .spa
-     - casi todo ceros
-     - salto temporal
-    """
     
-    mask_total = mask_no_valida | mask_ceros | mask_saltos
+    # Máscara por filas completamente NaN en la DSA
+    if incluir_filas_nan:
+        mask_filas_nan = dsa_plot.isna().all(axis=1)
+    else:
+        mask_filas_nan = pd.Series(False, index=dsa_plot.index)
+    
+    
+    # Unir todas las condiciones
+    mask_total = (mask_no_valida | mask_ceros | mask_saltos | mask_filas_nan)
+
+    mask_total = pd.Series(mask_total.values, index=dsa_plot.index)
 
     
     # en las filas marcadas como no válidas se sustituyen los valores por NaN (que saldrán en blanco)
