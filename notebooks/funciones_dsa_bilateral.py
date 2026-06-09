@@ -267,6 +267,88 @@ def preparar_timeline_spa(
 
 
 
+def ajustar_dsa_a_timeline_spa(
+    tiempo_dsa,
+    dsa,
+    timeline_spa,
+    nombre="DSA",
+    verbose=True
+):
+    """
+    Ajusta una matriz DSA a la timeline oficial del .spa.
+
+    Regla:
+    - Si tiempo_dsa y timeline_spa coinciden, no modifica nada.
+    - Si la DSA empieza antes que el .spa, se recorta.
+    - Si la DSA empieza después que el .spa, se rellenan filas con NaN.
+    - Si la DSA termina antes que el .spa, se rellenan filas con NaN.
+    - Si la DSA termina después que el .spa, se recorta.
+
+    Devuelve:
+    - dsa_ajustada: DataFrame con la misma longitud que timeline_spa.
+    """
+
+    tiempo_dsa = pd.to_datetime(
+        pd.Series(tiempo_dsa).astype(str).str.strip(),
+        errors="coerce"
+    ).reset_index(drop=True)
+
+    timeline_spa = pd.to_datetime(
+        pd.Series(timeline_spa).astype(str).str.strip(),
+        errors="coerce"
+    ).reset_index(drop=True)
+
+    dsa = dsa.copy().reset_index(drop=True)
+
+    # Asegurar que tiempo_dsa y dsa tengan la misma longitud
+    n = min(len(tiempo_dsa), len(dsa))
+
+    if len(tiempo_dsa) != len(dsa):
+        if verbose:
+            print(
+                f"Aviso {nombre}: tiempo y DSA tienen longitudes distintas. "
+                f"tiempo={len(tiempo_dsa)}, dsa={len(dsa)}. Se recorta a {n}."
+            )
+
+        tiempo_dsa = tiempo_dsa.iloc[:n].reset_index(drop=True)
+        dsa = dsa.iloc[:n, :].reset_index(drop=True)
+
+    # Caso ideal: misma longitud y mismos tiempos
+    if len(tiempo_dsa) == len(timeline_spa) and (tiempo_dsa.values == timeline_spa.values).all():
+        if verbose:
+            print(f"{nombre}: ya coincide con la timeline del .spa. No se modifica.")
+
+        return dsa
+
+    # Reindexado por tiempo
+    dsa.index = tiempo_dsa
+
+    # Si hubiese tiempos duplicados en la DSA, conservar el último
+    if dsa.index.duplicated().sum() > 0:
+        if verbose:
+            print(f"Aviso {nombre}: hay tiempos duplicados. Se conserva el último.")
+        dsa = dsa[~dsa.index.duplicated(keep="last")]
+
+    dsa_ajustada = dsa.reindex(timeline_spa)
+
+    dsa_ajustada = dsa_ajustada.reset_index(drop=True)
+    dsa_ajustada.columns = dsa.columns
+
+    if verbose:
+        print(f"=== Ajuste {nombre} a timeline .spa ===")
+        print("Inicio DSA original:", tiempo_dsa.iloc[0])
+        print("Fin DSA original:", tiempo_dsa.iloc[-1])
+        print("Inicio .spa:", timeline_spa.iloc[0])
+        print("Fin .spa:", timeline_spa.iloc[-1])
+        print("Filas DSA original:", len(dsa))
+        print("Filas timeline .spa:", len(timeline_spa))
+        print("Filas DSA ajustada:", len(dsa_ajustada))
+        print("Filas completamente NaN:", dsa_ajustada.isna().all(axis=1).sum())
+
+    return dsa_ajustada
+
+
+
 def alinear_raw_a_timeline_spa(
     df_raw,
     ruta_ta,
