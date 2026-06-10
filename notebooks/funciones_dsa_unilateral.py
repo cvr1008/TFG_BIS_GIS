@@ -57,6 +57,7 @@ def limpiar_spa_unilateral(df_spa):
     df = df.reset_index(drop=True)
 
     mapeo = {
+        "SpSmooth": "SpSmooth",
         "SEF08": "SEF08_3",
         "MEDFRQ08": "MEDFRQ08_3",
         "SQI10": "SQI10_3",
