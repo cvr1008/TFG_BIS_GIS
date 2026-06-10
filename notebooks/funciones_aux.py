@@ -446,7 +446,63 @@ def procesar_spa(ruta_spa):
             errors="coerce"
         )
 
-    return df        
+    return df
+
+
+
+def extraer_spsmooth_segundos(df_spa, columna="SpSmooth", verbose=True):
+    """
+    Extrae el valor más frecuente de SpSmooth del archivo .spa
+    y lo traduce a segundos de suavizado espectral.
+
+    Equivalencias:
+    0 -> 0 s
+    1 -> 5 s
+    2 -> 10 s
+    3 -> 30 s
+    4 -> 60 s
+
+    Devuelve:
+    - valor_spsmooth: código entero de SpSmooth más frecuente
+    - suavizado_spsmooth: suavizado equivalente en segundos
+    - distribucion: recuento de valores encontrados
+    """
+
+    mapa_spsmooth = {
+        0: 0,
+        1: 5,
+        2: 10,
+        3: 30,
+        4: 60
+    }
+
+    if columna not in df_spa.columns:
+        raise KeyError(
+            f"No se encontró la columna '{columna}' en el DataFrame .spa."
+        )
+
+    spsmooth_valores = pd.to_numeric(
+        df_spa[columna],
+        errors="coerce"
+    ).dropna()
+
+    if len(spsmooth_valores) == 0:
+        raise ValueError(
+            f"La columna '{columna}' no contiene valores numéricos válidos."
+        )
+
+    distribucion = spsmooth_valores.value_counts().sort_index()
+
+    valor_spsmooth = int(spsmooth_valores.mode().iloc[0])
+    suavizado_spsmooth = mapa_spsmooth.get(valor_spsmooth, np.nan)
+
+    if verbose:
+        print("SpSmooth codificado más frecuente:", valor_spsmooth)
+        print("Suavizado espectral equivalente:", suavizado_spsmooth, "s")
+        print("\nDistribución de valores SpSmooth:")
+        display(distribucion)
+
+    return valor_spsmooth, suavizado_spsmooth, distribucion
                    
     
     
