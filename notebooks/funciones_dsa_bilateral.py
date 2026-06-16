@@ -124,6 +124,7 @@ def limpiar_spa_bilateral(df_spa):
     df_out = pd.DataFrame()
     df_out["Time"] = df["Time"]
     df_out["SpSmooth"] = df["SpSmooth"]
+    df_out["LoFilter"] = df["LoFilter"]
 
     for col in columnas_izq:
         col_out = f"{col}_izq"
