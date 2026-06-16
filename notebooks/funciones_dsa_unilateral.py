@@ -58,6 +58,7 @@ def limpiar_spa_unilateral(df_spa):
 
     mapeo = {
         "SpSmooth": "SpSmooth",
+        "LoFilter": "LoFilter",
         "SEF08": "SEF08_3",
         "MEDFRQ08": "MEDFRQ08_3",
         "SQI10": "SQI10_3",
