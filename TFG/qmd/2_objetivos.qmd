@@ -3,27 +3,42 @@
 \capitulo{2}{Objetivos}
 ```
 
-En este apartado se definen los objetivos del Trabajo Fin de Grado, diferenciando entre el objetivo general, los objetivos específicos y los objetivos formativos asociados al desarrollo del proyecto.
-
 **Objetivo general** 
 
-Desarrollar una prueba de concepto para la integración y visualización conjunta de datos procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA, con el fin de facilitar su análisis retrospectivo en el contexto de la unidad de cuidados intensivos.
+Desarrollar una prueba de concepto para la integración y visualización simultánea de datos procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA, con el fin de facilitar su análisis retrospectivo en el contexto de la unidad de cuidados intensivos.
 
 
 **Objetivos específicos** 
 
-1.	Definir un procedimiento de extracción y organización de datos procedentes del monitor BIS y del sistema ICCA para un mismo intervalo temporal. 
-2.	Implementar una estrategia de normalización temporal que permita integrar señales BIS y variables clínicas, de modo que cada instante temporal incluya los parámetros del BIS y la información clínica asociada.
-3.	Desarrollar un visualizador como prueba de concepto que permita representar conjuntamente la matriz de densidad espectral (DSA), el índice BIS y variables clínicas seleccionadas, facilitando el análisis retrospectivo.
-4.	Explorar la detección de cambios relevantes mediante el análisis de ventanas temporales y reglas simples, como ampliación opcional del sistema de visualización. 
+1.	Caracterizar y organizar la información contenida en las diferentes
+exportaciones del monitor BIS y del sistema ICCA, identificando pacientes,
+episodios clínicos, sesiones de monitorización e intervalos temporales.
+2. Recuperar la matriz de densidad espectral proporcionada por el monitor BIS
+y permitir su reconstrucción a partir de la señal EEG cruda cuando el
+archivo espectral no exista o no contenga información válida.
+3.	Establecer una representación temporal común para la DSA y las variables
+procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral
+de borde, la frecuencia mediana y, en los registros bilaterales, la
+asimetría entre hemisferios.
+4. Integrar las variables clínicas del sistema ICCA correspondientes al
+intervalo temporal de cada sesión BIS, respetando su resolución y el
+instante real en el que fueron registradas.
+5.	Desarrollar un visualizador interactivo que permita consultar registros BIS
+unilaterales y bilaterales, seleccionar diferentes intervalos temporales y
+representar conjuntamente la DSA, los parámetros procesados del BIS y la
+información clínica disponible.
+
 
 
 **Objetivos de aprendizaje** 
 
 Además de los objetivos técnicos del proyecto, este trabajo persigue una serie de objetivos formativos relacionados con las competencias propias del Grado en Ingeniería de la Salud. Entre ellos destacan:
 
- - Comprender el funcionamiento básico del monitor BIS y la naturaleza de las señales asociadas a la monitorización neurofisiológica.
+ - Comprender el funcionamiento básico del monitor BIS y la naturaleza de las
+señales asociadas a la monitorización neurofisiológica.
  - Profundizar en el tratamiento, organización y análisis de datos biomédicos heterogéneos.
+ - Comprender las diferencias entre señales continuas, variables periódicas,
+observaciones clínicas puntuales y eventos.
  - Aplicar estrategias de sincronización temporal y estructuración de datos clínicos procedentes de distintas fuentes.
  - Desarrollar una prueba de concepto orientada a una necesidad real del entorno clínico.
  - Fortalecer la capacidad de documentación técnica, planificación y desarrollo de proyectos en el ámbito de la ingeniería de la salud.
@@ -31,16 +46,26 @@ Además de los objetivos técnicos del proyecto, este trabajo persigue una serie
 
 **Objetivos marcados por los requisitos del software/hardware/análisis** 
 
-Este apartado se completará a medida que se definan de forma más precisa los requisitos funcionales y técnicos de la prueba de concepto.
+Las características de los sistemas BIS e ICCA, junto con las condiciones del
+entorno clínico, imponen una serie de objetivos adicionales al desarrollo.
+
+ - Admitir registros BIS unilaterales y bilaterales, así como sesiones de corta y larga duración.
+ - Detectar automáticamente los archivos necesarios de cada exportación BIS y comprobar su disponibilidad antes de iniciar la visualización.
+ - Permitir que un paciente contenga múltiples episodios, varias sesiones BIS y uno o varios archivos ICCA.
+ - Evitar la prolongación injustificada de observaciones clínicas cuando no exista información suficiente o esta sea de mala calidad.
 
 
 **Requisitos funcionales y técnicos de la prueba de concepto**
 
- - Permitir la carga de datos BIS y variables clínicas para un mismo periodo temporal.
-
- - Integrar información con distinta resolución temporal: la DSA, el índice BIS y variables clínicas seleccionadas del sistema ICCA.
-
- - Facilitar la exploración retrospectiva mediante navegación temporal.
- 
- - Permitir, de forma opcional, el análisis de cambios relevantes en ventanas temporales.
+ - Permitir la organización de varios registros BIS e ICCA dentro de una misma
+carpeta de paciente.
+ - Detectar el tipo de registro a partir de los archivos de onda cruda y
+determinar si la monitorización es unilateral o bilateral.
+ - Utilizar la matriz espectral original cuando esté disponible y permitir la
+reconstrucción desde la señal EEG cruda cuando resulte necesario.
+ - Mostrar la DSA y los parámetros BIS dentro de un intervalo temporal común.
+ - Permitir la navegación mediante sesiones, tramos horarios y ventanas de
+diferente duración.
+ - Incorporar variables clínicas ICCA de distinta resolución temporal sin
+alterar el significado temporal de las mediciones.
 
