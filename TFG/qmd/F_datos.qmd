@@ -3,59 +3,58 @@
 %%  APÉNDICE F – Descripción de datos
 %% ══════════════════════════════════════════════════════
 ```
-
 \apendice{Descripción de adquisición y tratamiento de datos}
 
 
 # Descripción formal de los datos
 
-Se describirá el tipo de datos utilizados, su formato, origen, volumen y características principales.
-Tablas, imágenes, señales, secuencias de ADN…
-    
+Los datos considerados en el proyecto proceden de dos sistemas independientes: el monitor de profundidad anestésica BIS y el sistema de información clínica ICCA. Ambos generan información con diferente estructura y resolución temporal, por lo que su integración requiere identificar correctamente los registros y establecer una referencia temporal común.
+
+
+## Datos procedentes del monitor BIS
+
+Cada exportación BIS está formada por varios archivos que comparten un mismo nombre base. Los principales archivos utilizados son:
+
+| Extensión | Contenido |
+|:---|:---|
+| `.spa` | Variables procesadas por el monitor y marcas temporales. |
+| `.f_a` | Matriz espectral calculada por el monitor. |
+| `.r2a` | Señal EEG cruda de una monitorización unilateral. |
+| `.r4a` | Señal EEG cruda de una monitorización bilateral. |
+| `.h_a` | Cabecera con los parámetros necesarios para interpretar el EEG crudo. |
+| `.t_a` | Información temporal asociada al comienzo de la señal cruda. |
+
+
+### Archivo espectral (.fa)
+El archivo .f_a contiene la matriz de densidad espectral calculada por el monitor. Cada instante contiene 60 valores espectrales correspondientes a frecuencias comprendidas entre 0,5 y 30 Hz, con una separación de 0,5 Hz.
+
+
+### Archivo de variables procesadas (.spa)
+El archivo .spa contiene información procesada asociada a cada instante de la monitorización y se utiliza como referencia temporal de la sesión.
+
+
+### Archivos de ondas crudas (.r2a y .r4a)   
+Los archivos .r2a y .r4a contienen las muestras de EEG crudo. La modalidad unilateral contiene dos canales, mientras que la bilateral contiene cuatro.
+La frecuencia de muestreo y los parámetros necesarios para convertir los valores registrados a unidades físicas se obtienen del archivo de cabecera.
+
+
+# Registros empleados durante el desarrollo
+
+
+
+Estos registros permiten comprobar el funcionamiento con sesiones
+unilaterales y bilaterales, así como evaluar el tratamiento de sesiones de larga duración.
+
+
 # Descripción clínica de los datos.
 
 Descripción y explicaciones clinicas del significado o interpretación de los datos.
 
+## Variables procedentes del monitor BIS
+La matriz de densidad espectral representa la evolución temporal de la potencia del EEG para cada frecuencia. El eje horizontal representa el tiempo, el eje vertical la frecuencia y el color la intensidad espectral.
+El índice BIS es un valor adimensional comprendido entre 0 y 100 que resume determinadas características del electroencefalograma. Su interpretación debe realizarse junto con la calidad de señal, el resto de parámetros procesados y el contexto clínico.
+La frecuencia espectral de borde o SEF representa la frecuencia por debajo de la cual se concentra un porcentaje determinado de la potencia espectral. La frecuencia mediana o MEF divide el espectro en dos regiones con la misma potencia acumulada.
+En la monitorización bilateral, la asimetría representa la distribución relativa de la actividad electroencefalográfica entre ambos hemisferios.
 
-A continuación se muestra un **ejemplo de análisis exploratorio con R**
-que produce tanto código visible como tabla y figura en el PDF:
 
-```{r datos-summary}
-#| label: tbl-resumen-datos
-#| tbl-cap: "Resumen estadístico del conjunto de datos mtcars"
-
-library(knitr)
-library(dplyr)
-
-mtcars |>
-  select(mpg, cyl, hp, wt) |>
-  summarise(across(everything(),
-    list(media = mean, sd = sd, min = min, max = max),
-    .names = "{.col}_{.fn}"
-  )) |>
-  tidyr::pivot_longer(everything(),
-    names_to  = c("variable", "estadístico"),
-    names_sep = "_"
-  ) |>
-  tidyr::pivot_wider(names_from = estadístico, values_from = value) |>
-  mutate(across(where(is.numeric), \(x) round(x, 2))) |>
-  kable(booktabs = TRUE, format = "latex",
-        col.names = c("Variable", "Media", "SD", "Mín", "Máx"))
-```
-
-```{r datos-figura}
-#| label: fig-correlacion
-#| fig-cap: "Relación entre peso del vehículo y consumo (mpg) en mtcars"
-
-library(ggplot2)
-
-ggplot(mtcars, aes(x = wt, y = mpg)) +
-  geom_point(aes(color = factor(cyl)), size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "grey40") +
-  labs(
-    x     = "Peso (1000 lbs)",
-    y     = "Consumo (mpg)",
-    color = "Cilindros"
-  ) +
-  theme_minimal(base_size = 11)
-```
+## Variables procedentes del sistema ICCA

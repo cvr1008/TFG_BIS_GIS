@@ -10,23 +10,12 @@ Desarrollar una prueba de concepto para la integración y visualización simult�
 
 **Objetivos específicos** 
 
-1.	Caracterizar y organizar la información contenida en las diferentes
-exportaciones del monitor BIS y del sistema ICCA, identificando pacientes,
-episodios clínicos, sesiones de monitorización e intervalos temporales.
-2. Recuperar la matriz de densidad espectral proporcionada por el monitor BIS
-y permitir su reconstrucción a partir de la señal EEG cruda cuando el
-archivo espectral no exista o no contenga información válida.
-3.	Establecer una representación temporal común para la DSA y las variables
-procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral
-de borde, la frecuencia mediana y, en los registros bilaterales, la
-asimetría entre hemisferios.
-4. Integrar las variables clínicas del sistema ICCA correspondientes al
-intervalo temporal de cada sesión BIS, respetando su resolución y el
-instante real en el que fueron registradas.
-5.	Desarrollar un visualizador interactivo que permita consultar registros BIS
-unilaterales y bilaterales, seleccionar diferentes intervalos temporales y
-representar conjuntamente la DSA, los parámetros procesados del BIS y la
-información clínica disponible.
+1.	Caracterizar y organizar la información contenida en las diferentes exportaciones del monitor BIS y del sistema ICCA, identificando pacientes, episodios clínicos, sesiones de monitorización e intervalos temporales.
+2. Desarrollar una herramienta que permita organizar por paciente múltiples registros BIS e ICCA atendiendo a sus intervalos temporales.
+3. Recuperar la matriz de densidad espectral proporcionada por el monitor BIS y permitir su reconstrucción a partir de la señal EEG cruda cuando el archivo espectral no exista o no contenga información válida.
+4.	Establecer una representación temporal común para la DSA y las variables procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios.
+5. Integrar las variables clínicas del sistema ICCA correspondientes al intervalo temporal de cada sesión BIS, respetando su resolución y el instante real en el que fueron registradas.
+6.	Desarrollar un visualizador interactivo que permita consultar registros BIS unilaterales y bilaterales, seleccionar diferentes intervalos temporales y representar conjuntamente la DSA, los parámetros procesados del BIS y la información clínica disponible.
 
 
 
@@ -34,11 +23,9 @@ información clínica disponible.
 
 Además de los objetivos técnicos del proyecto, este trabajo persigue una serie de objetivos formativos relacionados con las competencias propias del Grado en Ingeniería de la Salud. Entre ellos destacan:
 
- - Comprender el funcionamiento básico del monitor BIS y la naturaleza de las
-señales asociadas a la monitorización neurofisiológica.
+ - Comprender el funcionamiento básico del monitor BIS y la naturaleza de las señales asociadas a la monitorización neurofisiológica.
  - Profundizar en el tratamiento, organización y análisis de datos biomédicos heterogéneos.
- - Comprender las diferencias entre señales continuas, variables periódicas,
-observaciones clínicas puntuales y eventos.
+ - Comprender las diferencias entre señales continuas, variables periódicas, observaciones clínicas puntuales y eventos.
  - Aplicar estrategias de sincronización temporal y estructuración de datos clínicos procedentes de distintas fuentes.
  - Desarrollar una prueba de concepto orientada a una necesidad real del entorno clínico.
  - Fortalecer la capacidad de documentación técnica, planificación y desarrollo de proyectos en el ámbito de la ingeniería de la salud.
@@ -46,26 +33,21 @@ observaciones clínicas puntuales y eventos.
 
 **Objetivos marcados por los requisitos del software/hardware/análisis** 
 
-Las características de los sistemas BIS e ICCA, junto con las condiciones del
-entorno clínico, imponen una serie de objetivos adicionales al desarrollo.
+Las características de los sistemas BIS e ICCA, junto con las condiciones del entorno clínico, imponen una serie de objetivos adicionales al desarrollo.
 
  - Admitir registros BIS unilaterales y bilaterales, así como sesiones de corta y larga duración.
  - Detectar automáticamente los archivos necesarios de cada exportación BIS y comprobar su disponibilidad antes de iniciar la visualización.
  - Permitir que un paciente contenga múltiples episodios, varias sesiones BIS y uno o varios archivos ICCA.
- - Evitar la prolongación injustificada de observaciones clínicas cuando no exista información suficiente o esta sea de mala calidad.
+ - Evitar la prolongación injustificada de observaciones clínicas cuando no exista información suficiente.
+ - Mantener separados los archivos originales y los datos auxiliares generados durante la organización, sincronización y visualización.
 
 
 **Requisitos funcionales y técnicos de la prueba de concepto**
 
- - Permitir la organización de varios registros BIS e ICCA dentro de una misma
-carpeta de paciente.
- - Detectar el tipo de registro a partir de los archivos de onda cruda y
-determinar si la monitorización es unilateral o bilateral.
- - Utilizar la matriz espectral original cuando esté disponible y permitir la
-reconstrucción desde la señal EEG cruda cuando resulte necesario.
- - Mostrar la DSA y los parámetros BIS dentro de un intervalo temporal común.
- - Permitir la navegación mediante sesiones, tramos horarios y ventanas de
-diferente duración.
- - Incorporar variables clínicas ICCA de distinta resolución temporal sin
-alterar el significado temporal de las mediciones.
+ - Permitir la organización por paciente de diferentes registros de BIS e ICCA en función del intervalo temporal.
+ - Detectar el tipo de registro a partir de los archivos de onda cruda y determinar si la monitorización es unilateral o bilateral.
+ - Utilizar la matriz espectral original cuando esté disponible y permitir la reconstrucción desde la señal EEG cruda cuando resulte necesario.
+ - Mostrar la DSA y los parámetros procesados del BIS dentro de un intervalo temporal común.
+ - Permitir la navegación por las sesiones, mediante tramos horarios y ventanas de diferente duración.
+ - Incorporar variables clínicas ICCA de distinta resolución temporal sin alterar el significado temporal de las mediciones.
 
