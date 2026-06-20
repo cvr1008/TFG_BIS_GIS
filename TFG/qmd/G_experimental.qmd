@@ -9,11 +9,226 @@
 
 # Cuaderno de trabajo
 
-Se enumerarán los experimentos realizados durante el proyecto, incluyendo tanto los resultados satisfactorios como aquellos que no hayan sido exitosos.
+Este apéndice recoge los experimentos realizados para seleccionar y validar el
+procedimiento de reconstrucción de la matriz de densidad espectral (DSA) a
+partir del EEG crudo. La matriz almacenada en el archivo `.f_a`, una vez
+convertida a sus unidades de representación, se utilizó como referencia.
+
+El objetivo no fue optimizar un procedimiento distinto para cada registro,
+sino seleccionar una configuración única que pudiera aplicarse a registros
+unilaterales y bilaterales sin ajustar sus parámetros en función del resultado.
+
+## Registros empleados
+
+La evaluación se realizó sobre tres registros BIS. Los registros bilaterales
+aportaron dos matrices independientes, una por hemisferio, por lo que se
+compararon cinco matrices en total.
+
+| Registro | Modalidad | Duración analizada | Matrices evaluadas |
+|:---|:---|---:|---:|
+| `L03041035` | Unilateral | 2119 s | 1 |
+| `L05141322` | Bilateral | 2712 s | 2 |
+| `L04301923` | Bilateral | 7200 s | 2 |
+
+En `L04301923`, cuyo archivo completo contiene aproximadamente 17 horas, se
+analizaron las dos primeras horas para mantener un coste computacional
+razonable durante la comparación de técnicas.
+
+## Experimentos realizados
+
+Se llevaron a cabo los siguientes experimentos:
+
+1. Comparación de la estimación espectral mediante Welch y la transformada
+   wavelet continua (CWT) de Morlet.
+2. Comprobación de la equivalencia entre Welch y `spectrogram` cuando ambos se
+   configuran con la misma ventana, solapamiento, detrend y escalado.
+3. Comparación entre una media móvil causal (`rolling`) y una media
+   exponencial causal (`ewm`).
+4. Evaluación de desplazamientos temporales comprendidos entre 0 y 30 s.
+5. Comparación de la máscara de calidad base con una máscara ampliada,
+   denominada ARTF2, construida a partir de indicadores adicionales de
+   artefacto del monitor.
+6. Evaluación mediante correlación de Pearson, MAE, RMSE y sesgo.
+
+Los experimentos no satisfactorios se conservaron como parte del estudio,
+puesto que permiten justificar la selección final y sus limitaciones.
+
 
 # Configuración y parametrización de las técnicas
-Se detallarán los parámetros utilizados en los experimentos y la justificación de su elección.
+
+## Configuración común
+
+Para que la comparación fuese válida, las técnicas compartieron la misma
+señal de entrada, preprocesamiento, resolución temporal y conversión de
+potencia.
+
+| Parámetro | Configuración |
+|:---|:---|
+| Canal unilateral | Canal 1 |
+| Canales bilaterales | Canal 1 para el hemisferio izquierdo y canal 3 para el derecho |
+| Frecuencia de muestreo | Extraída de la cabecera; 128 Hz en los registros evaluados |
+| Filtrado | Pasa-altos causal de primer orden con el corte indicado por `LoFilter` |
+| Ventana espectral | Ventana Hann de 2 s |
+| Avance temporal | 1 s |
+| Rango de frecuencias | 0,5--30 Hz |
+| Resolución espectral | Bins de 0,5 Hz |
+| Magnitud | Densidad espectral de potencia en \(\mu V^2/Hz\) |
+| Referencia temporal | Centro de la ventana |
+| Suavizado | Duración indicada por `SpSmooth`; 30 s en los registros evaluados |
+| Desplazamientos probados | 0--30 s |
+| Escala de visualización | Lineal entre 49 y 94 dB |
+
+El registro unilateral se reconstruyó a partir del canal 1. En los registros
+bilaterales, el mismo procedimiento se aplicó de manera independiente a los
+canales 1 y 3, de acuerdo con los dos conjuntos espectrales exportados por el
+monitor.
+
+## Conversión y comparación de potencia
+
+La potencia reconstruida y la matriz de referencia se expresaron en la misma
+escala física antes de calcular las métricas. El archivo `.f_a` almacena los
+valores espectrales con un factor de escala de 100, por lo que sus valores se
+dividieron entre 100. La PSD reconstruida se integró en bins de 0,5 Hz y se
+convirtió a decibelios empleando la referencia del monitor.
+
+Las métricas principales se calcularon directamente en dB, sin normalizar
+cada matriz mediante z-score. La normalización independiente habría eliminado
+las diferencias de nivel medio y contraste, haciendo que MAE y RMSE dejasen de
+representar errores de potencia en dB.
+
+La correlación de Pearson se utilizó para estudiar la semejanza del patrón
+espectral. MAE y RMSE cuantificaron la diferencia absoluta en la escala física,
+mientras que el sesgo permitió detectar si la reconstrucción quedaba
+sistemáticamente por encima o por debajo de la referencia.
+
+## Máscara de calidad y suavizado
+
+La máscara base identifica los segundos sin información válida mediante los
+criterios disponibles en la señal cruda y el archivo `.spa`, entre ellos una
+calidad de señal insuficiente, ausencia de potencia total, discontinuidades,
+pérdidas de muestras y filas completamente vacías.
+
+La máscara se calculó antes del suavizado. Los segundos inválidos se
+sustituyeron por `NaN`, de manera que no participasen en la media móvil. Para
+cada frecuencia, `rolling` calculó el promedio únicamente con las
+observaciones válidas de los segundos anteriores. Después del suavizado y del
+desplazamiento temporal, la máscara se aplicó nuevamente para conservar las
+bandas blancas en los instantes correspondientes.
+
+La máscara ARTF2 añadió indicadores internos de artefacto procedentes del
+archivo `.ara`. Se evaluó como alternativa, pero no se asumió que todos estos
+indicadores implicasen necesariamente la pérdida completa de la DSA de ese
+segundo.
+
 
 # Detalle de resultados
-Se presentarán los resultados obtenidos mediante tablas, figuras y métricas relevantes.
 
+## Equivalencia entre Welch y `spectrogram`
+
+Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo
+detrend y el mismo escalado de PSD, Welch y `spectrogram` produjeron resultados
+numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD
+como en dB y en las referencias temporales.
+
+Por tanto, `spectrogram` no constituyó una metodología espectral distinta en
+estas condiciones, sino otra interfaz para organizar los mismos periodogramas
+modificados. Se mantuvo la denominación Welch por describir con mayor precisión
+el estimador utilizado.
+
+## Comparación de métodos espectrales
+
+La mejor configuración global de CWT según Pearson utilizó una wavelet Morlet
+con ancho de banda \(B=6\). Incluso en esa configuración, los errores absolutos
+fueron superiores a los de Welch.
+
+| Método | Suavizado | Máscara | Pearson medio | MAE (dB) | RMSE (dB) |
+|:---|:---|:---|---:|---:|---:|
+| Welch | `rolling` | Base | **0,9149** | **1,816** | **2,581** |
+| CWT Morlet, \(B=6\) | `rolling` | Base | 0,9077 | 3,227 | 3,833 |
+| CWT Morlet, \(B=12\) | `rolling` | Base | 0,9070 | 3,095 | 3,730 |
+
+La CWT constituye una representación tiempo-frecuencia válida y puede ser
+ventajosa para estudiar transitorios o fenómenos multiescala. Sin embargo, no
+mejoró la reproducción del archivo `.f_a`, que era el objetivo de este
+experimento, y añadió una mayor complejidad de parametrización y cálculo. Por
+este motivo no se seleccionó para la reconstrucción final.
+
+## Comparación de suavizados
+
+| Método espectral | Suavizado | Máscara | Pearson medio | MAE (dB) | RMSE (dB) |
+|:---|:---|:---|---:|---:|---:|
+| Welch | `rolling` | Base | **0,9149** | **1,816** | 2,581 |
+| Welch | `ewm` | Base | 0,9088 | 1,844 | **2,567** |
+
+La media exponencial presentó un RMSE medio ligeramente menor, con una
+diferencia de 0,014 dB. Sin embargo, `rolling` obtuvo mayor Pearson y menor MAE,
+y reprodujo mejor el comportamiento global de los registros evaluados. Debido
+a que la mejora aislada de RMSE con `ewm` fue mínima, se seleccionó la media
+móvil causal como solución única.
+
+## Influencia de la máscara
+
+| Máscara | Pearson medio | MAE (dB) | RMSE (dB) | Información enmascarada |
+|:---|---:|---:|---:|---:|
+| Base | **0,9149** | **1,816** | 2,581 | **2,9 %** |
+| ARTF2 | 0,9096 | 1,819 | **2,531** | 33,6 % |
+
+ARTF2 redujo ligeramente el RMSE, pero eliminó aproximadamente un tercio de la
+información sin mejorar de forma consistente Pearson ni MAE. El efecto fue
+especialmente acusado en `L03041035`, donde enmascaró el 70,1 % del registro,
+frente al 7,6 % de la máscara base, y redujo Pearson de 0,724 a 0,683.
+
+La magnitud de esta pérdida de información no quedó justificada por la mejora
+de las métricas. En consecuencia, ARTF2 se descartó como máscara obligatoria.
+Sus indicadores pueden conservarse para análisis de sensibilidad o como
+información adicional sobre la calidad del registro.
+
+## Resultados de la configuración seleccionada
+
+La siguiente tabla muestra los resultados de Welch, `rolling` y máscara base
+para cada matriz evaluada. El desplazamiento se seleccionó dentro del intervalo
+de 0 a 30 s.
+
+| Registro | Lado | Shift (s) | Pearson | MAE (dB) | RMSE (dB) | Enmascarado |
+|:---|:---|---:|---:|---:|---:|---:|
+| `L03041035` | Unilateral | 10 | 0,7238 | 3,720 | 5,033 | 7,6 % |
+| `L05141322` | Izquierdo | 6 | 0,9388 | 1,600 | 2,308 | 5,1 % |
+| `L05141322` | Derecho | 6 | 0,9455 | 1,746 | 2,387 | 1,0 % |
+| `L04301923` | Izquierdo | 6 | 0,9836 | 0,994 | 1,577 | 0,4 % |
+| `L04301923` | Derecho | 6 | 0,9830 | 1,022 | 1,598 | 0,4 % |
+| **Promedio** |  |  | **0,9149** | **1,816** | **2,581** | **2,9 %** |
+
+El registro unilateral presentó resultados inferiores a los bilaterales y una
+mayor proporción de segundos con calidad insuficiente. Esto refuerza la
+necesidad de ampliar la validación unilateral y evita interpretar el promedio
+global como una estimación definitiva del rendimiento en nuevos pacientes.
+
+## Selección metodológica
+
+A partir de los experimentos se seleccionó la siguiente configuración:
+
+- estimación espectral mediante Welch;
+- canal 1 en registros unilaterales;
+- canales 1 y 3 en registros bilaterales;
+- media móvil causal con la duración indicada por `SpSmooth`;
+- máscara base aplicada antes del suavizado y nuevamente al final;
+- desplazamiento de 10 s en unilateral y 6 s en bilateral;
+- cálculo de Pearson, MAE, RMSE y sesgo sin normalización z-score;
+- representación lineal común entre 49 y 94 dB.
+
+Esta configuración ofreció el mejor equilibrio entre correspondencia con la
+DSA exportada, error en escala física, conservación de información y
+simplicidad metodológica.
+
+## Limitaciones y validación pendiente
+
+La selección se obtuvo a partir de tres registros y cinco matrices. Aunque los
+resultados bilaterales fueron consistentes, solo se dispuso de un registro
+unilateral con archivo `.f_a` válido. Por ello, la configuración debe
+considerarse seleccionada pero todavía sujeta a validación externa.
+
+Los nuevos registros unilaterales se evaluarán manteniendo todos los parámetros
+fijos. Se calcularán las métricas por registro y se resumirán mediante media,
+mediana, desviación típica, rango y porcentaje enmascarado. Esta fase permitirá
+comprobar la capacidad de generalización sin escoger una metodología diferente
+para cada sesión.
