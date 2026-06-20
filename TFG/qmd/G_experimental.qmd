@@ -5,6 +5,7 @@
 ```
 
 \apendice{Estudio experimental}
+\label{ap:estudio-experimental}
 
 
 # Cuaderno de trabajo

@@ -5,11 +5,7 @@
 
 # Conceptos teóricos básicos
 
-En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. En primer lugar, se describe el entorno asistencial en el que se enmarca el proyecto, la unidad de cuidados intensivos, así como la importancia de la monitorización continua del paciente crítico. 
-
-A continuación, se introducen los principales elementos relacionados con la monitorización neurofisiológica mediante el monitor BIS, la señal electroencefalográfica y su representación espectral. 
-
-Finalmente, se presenta el sistema IntelliSpace Cuidados Críticos y Anestesia (ICCA) como fuente de variables clínicas y se justifica la necesidad de integrar temporalmente ambas fuentes de información.
+En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. 
 
 
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
@@ -115,6 +111,8 @@ Estas limitaciones refuerzan la conveniencia de complementar el valor del BIS co
 
 
 ## Integración temporal de datos clínicos y neurofisiológicos
+
+
 
 
 
