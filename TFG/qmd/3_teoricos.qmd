@@ -72,7 +72,7 @@ Por ello, la distribución de la potencia entre bandas constituye una herramient
 En el entorno de la unidad de cuidados intensivos, este tipo de monitorización adquiere especial interés en situaciones en las que las escalas clínicas pierden utilidad o resultan insuficientes, como ocurre en pacientes con sedación profunda o sometidos a bloqueo neuromuscular. En estos casos, la monitorización instrumental puede ayudar a detectar situaciones de sobresedación o infrasedación y contribuir a un ajuste más preciso del tratamiento sedante [@TapiaMoreno2020].
 
 
-### Índice BIS
+### Monitor e índice BIS
 
 El índice BIS es un parámetro numérico procesado derivado del análisis del EEG frontal. Se expresa en una escala entre 0 y 100, en la que los valores más altos se asocian a un mayor nivel de consciencia y los valores más bajos a una mayor depresión de la actividad cerebral. En términos generales, un valor cercano a 100 corresponde a un paciente despierto, mientras que valores muy bajos se relacionan con una supresión marcada de la actividad eléctrica cerebral [@TapiaMoreno2020].
 
