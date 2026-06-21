@@ -10,18 +10,19 @@ En esta sección se presentan los conceptos fundamentales necesarios para compre
 
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
 
-La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
+La unidad de cuidados intensivos (UCI) es un área hospitalaria especializada en la atención de pacientes con alteraciones graves o riesgo vital, que requieren vigilancia estrecha, monitorización continua y, con frecuencia, soporte de una o varias funciones orgánicas.
+En este entorno se registran de forma continua numerosos parámetros fisiológicos. Asimismo, la administración de fármacos analgésicos y sedantes es frecuente para controlar el dolor y la ansiedad, reducir el estrés fisiológico y facilitar medidas terapéuticas como la ventilación mecánica.
 
-En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor.
 
 ### Monitorización del nivel de sedación
 
-El control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
+El control del nivel de sedación resulta fundamental, ya que tanto una sedación insuficiente como una sedación excesiva pueden afectar negativamente a la evolución clínica. La sobresedación se ha asociado con una prolongación de la ventilación mecánica, retraso del despertar, mayor riesgo de complicaciones y aumento de la estancia en la UCI [@chamorro2008]. Por ello, es necesario ajustar la administración de sedantes a las necesidades del paciente y evaluar periódicamente su nivel de sedación.
 
 
 ##  Electroencefalograma (EEG) y ondas
 
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
+
 
 ### Amplitud, frecuencia, potencia, densidad espectral y decibelios.
 
@@ -30,19 +31,15 @@ En el ámbito del procesamiento de señales, la actividad electroencefalográfic
  - Amplitud: magnitud de la variación de la señal respecto a un valor de referencia. En el EEG se expresa habitualmente en microvoltios (µV).
  - Frecuencia: número de ciclos que se producen por segundo. Se expresa en hercios (Hz).
  - Potencia: en el contexto del procesamiento de señales, se utiliza para cuantificar la magnitud de las oscilaciones del EEG y se calcula a partir del cuadrado de su amplitud (µV²). Esto sucede, porque al trabajar con señales débiles, se suele simplificar la ecuación de la Ley de Ohm (P=V²/R) asumiendo una resistencia estándar (generalmente \(R = 1\,\Omega\)).Para representar la DSA, la potencia de cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con la referencia de 0,0001 µV RMS indicada por el fabricante.
- - Densidad espectral de potencia: indica cómo se distribuye la potencia de la señal entre las distintas frecuencias. Se expresa en µV²/Hz, es decir, potencia por unidad de frecuencia. Al integrar esta densidad dentro de un intervalo de frecuencias se obtiene la potencia contenida en esa banda, expresada en µV².
+ - Densidad espectral de potencia: indica cómo se distribuye la potencia de la señal entre las distintas frecuencias, expresada en µV²/Hz. Al integrar esta densidad dentro de un intervalo de frecuencias se obtiene la potencia contenida en esa banda, expresada en µV².
+ - Decibelio (dB): unidad logarítmica utilizada para representar dinámicamente estas magnitudes. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS indicada por el fabricante (resultando en $10^{-8}$ µV²).
  
- A partir de estas magnitudes, la señal puede analizarse en términos de ondas o patrones oscilatorios, entendidos como cambios repetitivos en la diferencia de potencial (voltaje) registrada a lo largo del tiempo [@Kane2017].
-
-Además del análisis temporal, el EEG puede estudiarse en función de la potencia de la señal en distintas bandas, clasificadas según las frecuencias en las que oscila cada onda,  lo que resulta especialmente útil para resumir e interpretar la señal desde un punto de vista espectral [@Kane2017].
-
-En la práctica, la interpretación de un EEG requiere conocer previamente las características normales de la actividad cerebral según la edad del paciente y su estado clínico. También es necesario identificar posibles artefactos y variantes no patológicas, con el fin de evitar errores de interpretación. El registro electroencefalográfico puede variar de forma notable en función del estado funcional del cerebro, la edad, la apertura ocular, la estimulación visual, la administración de fármacos o el ciclo sueño-vigilia [@Er2006].
+Estas magnitudes permiten analizar el EEG tanto en el dominio temporal como en el frecuencial. En este último, la señal se descompone en bandas según la frecuencia de sus oscilaciones [@Kane2017].
 
 
 ### Tipos de ondas del EEG
 
-Desde el punto de vista frecuencial, la señal electroencefalográfica puede descomponerse en distintos tipos de ondas en función de frecuencia a la que oscilan. Cada una de ellas se asocia a un rango determinado de hercios (Hz). Esta clasificación permite describir de forma más estructurada la actividad cerebral registrada y facilita su interpretación clínica y espectral. De forma habitual, se distinguen las bandas recogidas en la Tabla @tbl:bandas-eeg [@Er2006].
-
+Desde el punto de vista frecuencial, la señal EEG puede descomponerse en distintas bandas, definidas según el rango de frecuencias en el que se encuentran sus oscilaciones. Las principales bandas se recogen en la Tabla @tbl-bandas-eeg [@Er2006].
 
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
@@ -54,16 +51,13 @@ Desde el punto de vista frecuencial, la señal electroencefalográfica puede des
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
-
-El predominio de unas bandas de frecuencia u otras puede variar en función del estado funcional del cerebro, la edad del paciente, la administración de determinados fármacos o la profundidad de la sedación. Asimismo, determinados hallazgos, como la actividad epileptiforme, la presencia de ondas lentas focales o generalizadas, las alteraciones marcadas de la amplitud o la asimetría del ritmo de fondo, pueden orientar hacia un EEG patológico. Por este motivo, el análisis del EEG debe realizarse siempre considerando el contexto clínico y las condiciones en las que se ha obtenido el registro [@Er2006].
-
-En este sentido, la interpretación clínica del EEG no depende únicamente de observar una forma de onda aislada, sino de integrar distintas características de la señal, como su amplitud, frecuencia, distribución espacial y evolución temporal. Aunque la inspección visual continúa siendo relevante, el análisis asistido por software facilita la detección y cuantificación de cambios en bandas de frecuencia específicas, permitiendo describir la actividad cerebral de forma más objetiva [@Tatum2016].
+El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
 
 
-Por ello, la distribución de la potencia entre bandas constituye una herramienta útil para el análisis del EEG y sirve de base para representaciones espectrales como la matriz de densidad espectral, que permiten visualizar de forma conjunta la evolución temporal y frecuencial de la señal.
 
 
-## Monitor BIS y monitorización del nivel de sedación
+
+## Monitor BIS
 
 
 
