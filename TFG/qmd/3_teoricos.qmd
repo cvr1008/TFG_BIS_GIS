@@ -73,66 +73,8 @@ El monitor BIS™ es un sistema avanzado de neuromonitorización diseñado para 
 En el ámbito de la anestesia y los cuidados críticos, el rango objetivo de sedación profunda se sitúa habitualmente entre 40 y 60 [@EscuderoAugusto2005]. Mantener el índice dentro de este margen resulta fundamental para evitar tanto la infrasedación (que incrementa el riesgo de agitación, desadaptación a la ventilación mecánica y despertar intraoperatorio) como la sobresedación (índices consistentemente inferiores a 40), la cual se asocia con un mayor riesgo de depresión respiratoria, hipoxia e inestabilidad hemodinámica [@PuenteBarbas2016].
 
 
-
 ### Matriz de densidad espectral (DSA)
+La matriz de densidad espectral o Density Spectral Array (DSA) es la representación tipo espectrograma empleada por el monitor BIS para mostrar la evolución de la potencia espectral del EEG [@OchoaSolana2025]. Su interpretación se basa en los principios descritos anteriormente: permite reconocer el predominio y la evolución de las distintas bandas de frecuencia a partir del mapa de colores.
 
-La matriz de densidad espectral o DSA (Density Spectral Array) es una representación espectral del EEG que facilita la interpretación visual de la actividad cerebral a lo largo del tiempo. Puede entenderse como un espectrograma en el que el eje horizontal representa el tiempo, el eje vertical la frecuencia y la potencia de la señal se codifica mediante un mapa de color.
-
-En este tipo de representación, los colores cálidos suelen indicar una mayor potencia de la señal, mientras que los colores fríos corresponden a potencias menores. De esta manera, la DSA resume simultáneamente la dimensión temporal, la distribución en frecuencia y la potencia relativa de la actividad electroencefalográfica.
-
-Su utilidad clínica radica en que permite reconocer patrones asociados a distintos estados de sedación y a la acción de diferentes fármacos anestésicos o sedantes. En lugar de reducir toda la información a un único número, la DSA muestra la evolución dinámica del contenido espectral del EEG, lo que facilita la identificación de tendencias, cambios bruscos y firmas electroencefalográficas características de determinados sedantes. Cada sedante puede generar patrones espectrales característicos, de modo que la distribución relativa de la potencia en bandas lentas, theta, alfa o beta puede cambiar según el fármaco administrado y la profundidad de la sedación.
-
-En el caso del propofol, por ejemplo, la transición hacia la inconsciencia se ha relacionado con un aumento de la potencia de baja frecuencia, la desaparición de las oscilaciones alfa occipitales coherentes y la aparición de actividad alfa frontal coherente. Estos cambios ponen de manifiesto que la representación espectral aporta información relevante sobre el estado cerebral que no siempre queda recogida de forma suficiente en un índice procesado único.
-
-
-### Variables complementarias: tasa de supresión y calidad de señal
-
-
-
-### Limitaciones del monitor BIS y artefactos
-
-A pesar de su utilidad, el monitor BIS presenta limitaciones importantes derivadas tanto del procesamiento simplificado de la señal como de la presencia de artefactos. Una de las principales fuentes de error es la actividad electromiográfica (EMG) de la musculatura frontal del paciente [@chamorro2008]. Dado que el EMG puede generar señales en un espectro de frecuencias elevado, este ruido puede solaparse con el EEG y provocar una sobreestimación artificial del valor numérico del BIS.
-
-Además, distintos factores pueden condicionar la interpretación del BIS, entre ellos la edad del paciente, el tipo de fármaco administrado y la calidad de la señal registrada. Por este motivo, el valor del BIS no debe evaluarse de forma aislada, sino integrarse junto con otras variables clínicas y, cuando sea posible, con representaciones complementarias de la señal como la DSA [@TapiaMoreno2020]. 
-
-Estas limitaciones refuerzan la conveniencia de complementar el valor del BIS con otras representaciones del EEG y con la información clínica del paciente.
-
-
-## Sistema ICCA y registro de variables clínicas
-
-
-
-
-## Integración temporal de datos clínicos y neurofisiológicos
-
-
-
-
-
-# Estado del arte y trabajos relacionados
-
-
-## Dashboards clínicos y visualización de datos en UCI
-
-
-## Integración de datos multimodales y heterogéneos en cuidados críticos
-
-
-## Análisis retrospectivo de datos de monitorización
-
-
-## Visualización de datos neurofisiológicos y espectrales
-
-
-## Limitaciones actuales y justificación del trabajo propuesto
-
-
-
-
-
-
-* 5464684
-* 3213213
-- 3515151
-- 3222
+Desde el punto de vista clínico, la DSA facilita la identificación de patrones o «firmas espectrales» asociados a determinados fármacos y estados de consciencia [@LpezCastruita2023]. Por ejemplo, durante la anestesia general con propofol puede observarse actividad lenta entre 0,5 y 1 Hz junto con una concentración de potencia alfa frontal, aproximadamente entre 9 y 12 Hz [@LpezCastruita2023]. No obstante, estos patrones deben interpretarse junto con la situación clínica y el resto de los parámetros disponibles.
 
