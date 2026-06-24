@@ -4,14 +4,13 @@
 ```
 
 # Conceptos teóricos básicos
-
 En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. 
 
 
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
+La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
 
-La unidad de cuidados intensivos (UCI) es un área hospitalaria especializada en la atención de pacientes con alteraciones graves o riesgo vital, que requieren vigilancia estrecha, monitorización continua y, con frecuencia, soporte de una o varias funciones orgánicas.
-En este entorno se registran de forma continua numerosos parámetros fisiológicos. Asimismo, la administración de fármacos analgésicos y sedantes es frecuente para controlar el dolor y la ansiedad, reducir el estrés fisiológico y facilitar medidas terapéuticas como la ventilación mecánica.
+En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor.
 
 
 ### Monitorización del nivel de sedación
