@@ -33,7 +33,6 @@ En el ámbito del procesamiento de señales, la actividad electroencefalográfic
 
 
 ### Electroencefalografía cuantitativa (qEEG)
-
 La qEEG, hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
 
 En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
@@ -78,6 +77,7 @@ La matriz de densidad espectral o Density Spectral Array (DSA) es la representac
 
 Desde el punto de vista clínico, la DSA facilita la identificación de patrones o «firmas espectrales» asociados a determinados fármacos y estados de consciencia [@LpezCastruita2023]. Por ejemplo, durante la anestesia general con propofol puede observarse actividad lenta entre 0,5 y 1 Hz junto con una concentración de potencia alfa frontal, aproximadamente entre 9 y 12 Hz [@LpezCastruita2023]. No obstante, estos patrones deben interpretarse junto con la situación clínica y el resto de los parámetros disponibles.
 
+
 ### SEF y MF
 Para complementar la información de la DSA, el monitor calcula parámetros que resumen la distribución de la potencia en el dominio frecuencial [@OchoaSolana2025]:
 - **Frecuencia del Borde Espectral (SEF, Spectral Edge Frequency):** Representada habitualmente como la SEF95, indica la frecuencia por debajo de la cual se encuentra el 95\,\% de la potencia total del EEG [@OchoaSolana2025]. En la DSA se dibuja como una línea blanca. 
@@ -85,10 +85,12 @@ Para complementar la información de la DSA, el monitor calcula parámetros que 
 - **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50\,\% por encima y 50\,\% por debajo), trazándose en el espectrograma como una línea púrpura.
 Ambos parámetros permiten resumir el desplazamiento del contenido espectral del EEG, la disminución de los mismos refleja un predominio de frecuencias más lentas, aunque su interpretación depende del fármaco administrado, la profundidad de la sedación y la situación clínica del paciente [@OchoaSolana2025].
 
+
 ### Electromiograma (EMG)
 El indicador electromiográfico (EMG) del monitor BIS refleja la potencia registrada en la banda de 70 a 110 Hz. Esta banda contiene principalmente actividad muscular frontal, aunque también puede incluir otras interferencias de alta frecuencia [@SaboyaSnchez2009].
 
 Clínicamente, un aumento de la actividad muscular interfiere con la captura de la señal EEG pura y provoca una elevación artificial del número BIS, sugiriendo un nivel de consciencia mayor al real [@SaboyaSnchez2009]. Esta sobreestimación desaparece al administrar fármacos bloqueantes neuromusculares (BNM), por tanto, la ausencia de señal EMG en el monitor otorga una mayor fiabilidad a los índices de profundidad anestésica mostrados [@SaboyaSnchez2009].
+
 
 ### Supresión de ráfagas (SR)
 El patrón de brote-supresión (burst-suppression) refleja un estado de depresión cortical profunda, caracterizado por ráfagas de actividad eléctrica de alto voltaje seguidas de periodos de supresión del EEG o silencio isoeléctrico casi absoluto [@OchoaSolana2025]. Este patrón surge en contextos de anestesia profunda, hipotermia o daño cerebral severo [@OchoaSolana2025].
@@ -96,6 +98,7 @@ El patrón de brote-supresión (burst-suppression) refleja un estado de depresi�
 El monitor sintetiza este fenómeno mediante la Tasa de Supresión o Suppression Ratio (SR), que expresa el porcentaje de tiempo, dentro de una ventana temporal reciente (de unos 63 segundos), en el que la señal EEG se considera suprimida. 
 
 Una SR elevada indica una presencia  relevante de periodos de supresión y, por tanto, debe interpretarse como un posible marcador de depresión cortical intensa. En el contexto de este trabajo, este parámetro resulta útil para complementar la interpretación del índice BIS y de la DSA, especialmente en registros con sedación profunda o alteraciones neurológicas [@OchoaSolana2025].
+
 
 ### Calidad de la señal (SQI) y artefactos
 El Índice de Calidad de la Señal o Signal Quality Index (SQI) evalúa la fiabilidad del registro electroencefalográfico. De forma general, expresa el porcentaje de señal que el algoritmo considera válida para el cálculo de los parámetros mostrados, teniendo en cuenta la presencia de artefactos, ruido o problemas de adquisición [@SaboyaSnchez2009]. 
@@ -107,13 +110,45 @@ En el contexto de este trabajo, el SQI resulta especialmente relevante porque pe
 
 ## Sistema IntelliSpace Critical Care & Anesthesia (ICCA) y registro de variables clínicas
 
-ICCA es un sistema de información clínica empleado en entornos de cuidados críticos y anestesia para centralizar la información generada durante la atención del paciente. Este tipo de sistemas permite reunir en un mismo entorno datos procedentes de monitores, dispositivos médicos y registros manuales realizados por el personal sanitario. En una UCI, esta información resulta especialmente relevante a la hora de interpretar la evolución del paciente de forma continua. Estas variables registradas permiten reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos.
+ICCA es un sistema de información clínica desarrollado por Phillips empleado en entornos de cuidados críticos y anestesia para centralizar la información generada durante la atención del paciente. Este tipo de sistemas permite reunir en un mismo entorno datos procedentes de monitores, dispositivos médicos y registros manuales realizados por el personal sanitario. En una UCI, esta información resulta especialmente relevante a la hora de interpretar la evolución del paciente de forma continua. Estas variables registradas permiten reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos.
 
 De forma general, las variables clínicas procedentes de este tipo de sistemas pueden agruparse en:
  * Constantes vitales: frecuencia cardiaca, presión arterial.
  * Parámetros respiratorios y ventilatorios: fracción inspirada de oxígeno, modo ventilatorio.
  * Tratamientos farmacológicos: sedantes, analgésicos, relajantes neuromusculares.
  * Resultados analíticos: hemograma, glucemia.
- * Registros de evolución clínica: eventos clínicos o anotaciones realizadas por el personal sanitario.
 
 En el contexto de este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente, lo que resulta especialmente relevante para diseñar herramientas de visualización orientadas al seguimiento del paciente crítico.
+
+
+### Transformada de Fourier y análisis frecuencial
+
+El análisis frecuencial de una señal se basa en descomponer su evolución temporal en componentes sinusoidales caracterizadas por su frecuencia, amplitud y fase. La transformada de Fourier permite pasar del dominio temporal, donde se observa la evolución de la amplitud en el tiempo, al dominio frecuencial, donde se estudia qué frecuencias están presentes en la señal y con qué peso relativo [@OppenheimSchafer2014].
+
+En señales digitales, como el EEG registrado por el monitor BIS, no se dispone de una función continua sino de una secuencia finita de muestras. Por ello se emplea la transformada discreta de Fourier (DFT), que calcula un conjunto finito de coeficientes frecuenciales a partir de una ventana de señal. Cada coeficiente es un número complejo cuya magnitud se relaciona con la amplitud de una determinada componente frecuencial, mientras que su ángulo representa la fase [@OppenheimSchafer2014].
+
+En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG durante anestesia, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectro de potencia o el espectrograma [@Sawa2022].
+
+
+
+# Estado del arte y trabajos relacionados
+
+## Reconstrucción y visualización de DSA en monitorización EEG/BIS
+La qEEG se ha utilizado en cuidados críticos para transformar registros EEG prolongados en representaciones más compactas e interpretables. Hwang et al. revisan distintas aplicaciones del qEEG en UCI adulta y destacan el uso de representaciones como la CDSA (Color Density Spectral Array) o la aEEG para facilitar la revisión visual de registros extensos, reduciendo la necesidad de analizar de forma continua el EEG crudo [@Hwang2022]. Estas herramientas permiten identificar cambios en el contenido espectral de la señal y resumir la evolución de la actividad cerebral en el tiempo.
+
+En el ámbito de la anestesia, también se han desarrollado trabajos orientados a analizar el EEG mediante espectros y espectrogramas generados computacionalmente. Por ejemplo, Sawa et al. presentan una aproximación basada en Python para calcular y visualizar el espectro de potencia y el espectrograma del EEG durante anestesia general, mostrando cómo el procesamiento digital permite representar la evolución frecuencial de la señal de forma interpretable [@Sawa2022]. Este tipo de trabajos resulta cercano al presente TFG, ya que la reconstrucción de la DSA requiere transformar señales EEG en representaciones tiempo-frecuencia.
+
+No obstante, gran parte de estos trabajos se centran en el análisis general del EEG o en la interpretación clínica del qEEG, pero no en la reconstrucción práctica de la DSA a partir de archivos exportados por un monitor BIS. En este contexto, el presente trabajo aporta una aplicación orientada a reconstruir, visualizar y explorar registros BIS, incluyendo la DSA, parámetros derivados y diferencias entre registros unilaterales y bilaterales.
+
+
+## Dashboards interactivos e integración de datos clínicos en UCI
+
+De forma paralela, distintos trabajos han abordado la necesidad de integrar y visualizar grandes volúmenes de información clínica en UCI. Las revisiones sobre dashboards clínicos señalan que los profesionales deben interpretar simultáneamente constantes vitales, parámetros ventilatorios, tratamientos, analíticas, alarmas y observaciones clínicas, lo que puede aumentar la carga cognitiva y dificultar la identificación rápida de cambios relevantes [@Khairat2018; @Wright2019].
+
+En este contexto, se han propuesto herramientas visuales orientadas a reorganizar la información del paciente crítico. MIVA 2.0, por ejemplo, se diseñó como un dashboard centrado en el usuario para facilitar la revisión rápida de tendencias fisiológicas [@Faiola2015]. Por su parte, el i-Dashboard integró información procedente de ICCA, HIS, LIS y PACS para apoyar las rondas multidisciplinares en UCI, reduciendo el tiempo dedicado a recopilar datos y mejorando la comunicación clínica [@Lai2022].
+
+También existen sistemas más orientados a la adquisición y análisis de datos multimodales. INSMA permite recoger ondas fisiológicas, alarmas y variables numéricas procedentes de monitores Philips IntelliVue, además de revisar datos históricos en ventanas temporales seleccionadas [@Sun2020]. Otros trabajos han planteado infraestructuras de almacenamiento de datos de alta frecuencia para facilitar el análisis retrospectivo de señales de UCI [@Noteboom2024].
+
+
+
+Estos antecedentes muestran el interés creciente por integrar señales fisiológicas y variables clínicas en herramientas visuales. Sin embargo, la mayoría de las soluciones revisadas se centran en dashboards generales de UCI, adquisición multimodal o análisis retrospectivo amplio, sin abordar de forma específica la visualización conjunta de registros BIS/DSA con variables clínicas complementarias. Por ello, el presente trabajo se sitúa en la intersección entre la reconstrucción de neuromonitorización BIS y el diseño de herramientas visuales para el análisis retrospectivo contextualizado del paciente crítico.
