@@ -39,6 +39,15 @@ La qEEG, hace referencia al conjunto de técnicas que permiten analizar la seña
 En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
 
 
+### Espectro y espectrograma
+El EEG puede analizarse tanto en el dominio temporal como en el frecuencial [@Kane2017]. Mientras que en el dominio temporal se observa cómo varía la amplitud de la señal a lo largo del tiempo, el análisis frecuencial permite identificar cómo se distribuye su potencia entre las distintas frecuencias y bandas.
+
+El espectro de potencia representa la potencia contenida en cada frecuencia durante un intervalo determinado. Permite reconocer qué componentes frecuenciales predominan, pero no muestra cómo cambian a lo largo del registro.
+
+El espectrograma amplía este análisis calculando sucesivos espectros sobre intervalos temporales consecutivos. El resultado es una representación tiempo-frecuencia en la que un eje muestra el tiempo, otro la frecuencia y el color indica la potencia de la señal. De esta forma, permite observar la evolución del contenido espectral del EEG e identificar cambios en el predominio de determinadas bandas.
+
+En este trabajo, esta representación constituye la base de la matriz de densidad espectral empleada por el monitor BIS. Su procedimiento concreto de cálculo y reconstrucción se describe en el capítulo de metodología.
+
 
 ### Tipos de ondas del EEG
 
