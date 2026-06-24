@@ -85,4 +85,35 @@ Para complementar la información de la DSA, el monitor calcula parámetros que 
 - **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50\,\% por encima y 50\,\% por debajo), trazándose en el espectrograma como una línea púrpura.
 Ambos parámetros permiten resumir el desplazamiento del contenido espectral del EEG, la disminución de los mismos refleja un predominio de frecuencias más lentas, aunque su interpretación depende del fármaco administrado, la profundidad de la sedación y la situación clínica del paciente [@OchoaSolana2025].
 
+### Electromiograma (EMG)
+El indicador electromiográfico (EMG) del monitor BIS refleja la potencia registrada en la banda de 70 a 110 Hz. Esta banda contiene principalmente actividad muscular frontal, aunque también puede incluir otras interferencias de alta frecuencia [@SaboyaSnchez2009].
 
+Clínicamente, un aumento de la actividad muscular interfiere con la captura de la señal EEG pura y provoca una elevación artificial del número BIS, sugiriendo un nivel de consciencia mayor al real [@SaboyaSnchez2009]. Esta sobreestimación desaparece al administrar fármacos bloqueantes neuromusculares (BNM), por tanto, la ausencia de señal EMG en el monitor otorga una mayor fiabilidad a los índices de profundidad anestésica mostrados [@SaboyaSnchez2009].
+
+### Supresión de ráfagas (SR)
+El patrón de brote-supresión (burst-suppression) refleja un estado de depresión cortical profunda, caracterizado por ráfagas de actividad eléctrica de alto voltaje seguidas de periodos de supresión del EEG o silencio isoeléctrico casi absoluto [@OchoaSolana2025]. Este patrón surge en contextos de anestesia profunda, hipotermia o daño cerebral severo [@OchoaSolana2025].
+
+El monitor sintetiza este fenómeno mediante la Tasa de Supresión o Suppression Ratio (SR), que expresa el porcentaje de tiempo, dentro de una ventana temporal reciente (de unos 63 segundos), en el que la señal EEG se considera suprimida. 
+
+Una SR elevada indica una presencia  relevante de periodos de supresión y, por tanto, debe interpretarse como un posible marcador de depresión cortical intensa. En el contexto de este trabajo, este parámetro resulta útil para complementar la interpretación del índice BIS y de la DSA, especialmente en registros con sedación profunda o alteraciones neurológicas [@OchoaSolana2025].
+
+### Calidad de la señal (SQI) y artefactos
+El Índice de Calidad de la Señal o Signal Quality Index (SQI) evalúa la fiabilidad del registro electroencefalográfico. De forma general, expresa el porcentaje de señal que el algoritmo considera válida para el cálculo de los parámetros mostrados, teniendo en cuenta la presencia de artefactos, ruido o problemas de adquisición [@SaboyaSnchez2009]. 
+
+La calidad del EEG puede verse afectada por distintos factores, como un mal contacto de los electrodos, movimientos del paciente, interferencias eléctricas, actividad muscular o desplazamientos del sensor. Cuando el SQI disminuye, la interpretación del índice BIS y del resto de variables derivadas debe realizarse con cautela, ya que los valores mostrados pueden no reflejar adecuadamente la actividad cerebral real.
+
+En el contexto de este trabajo, el SQI resulta especialmente relevante porque permite valorar la fiabilidad de los tramos analizados y detectar periodos en los que las señales reconstruidas o visualizadas pueden estar condicionadas por problemas de adquisición.
+
+
+## Sistema IntelliSpace Critical Care & Anesthesia (ICCA) y registro de variables clínicas
+
+ICCA es un sistema de información clínica empleado en entornos de cuidados críticos y anestesia para centralizar la información generada durante la atención del paciente. Este tipo de sistemas permite reunir en un mismo entorno datos procedentes de monitores, dispositivos médicos y registros manuales realizados por el personal sanitario. En una UCI, esta información resulta especialmente relevante a la hora de interpretar la evolución del paciente de forma continua. Estas variables registradas permiten reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos.
+
+De forma general, las variables clínicas procedentes de este tipo de sistemas pueden agruparse en:
+ * Constantes vitales: frecuencia cardiaca, presión arterial.
+ * Parámetros respiratorios y ventilatorios: fracción inspirada de oxígeno, modo ventilatorio.
+ * Tratamientos farmacológicos: sedantes, analgésicos, relajantes neuromusculares.
+ * Resultados analíticos: hemograma, glucemia.
+ * Registros de evolución clínica: eventos clínicos o anotaciones realizadas por el personal sanitario.
+
+En el contexto de este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente, lo que resulta especialmente relevante para diseñar herramientas de visualización orientadas al seguimiento del paciente crítico.
