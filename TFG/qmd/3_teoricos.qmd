@@ -14,12 +14,11 @@ En este entorno, la inestabilidad fisiológica de los pacientes exige una monito
 
 
 ### Monitorización del nivel de sedación
+El control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
-El control del nivel de sedación resulta fundamental, ya que tanto una sedación insuficiente como una sedación excesiva pueden afectar negativamente a la evolución clínica. La sobresedación se ha asociado con una prolongación de la ventilación mecánica, retraso del despertar, mayor riesgo de complicaciones y aumento de la estancia en la UCI [@chamorro2008]. Por ello, es necesario ajustar la administración de sedantes a las necesidades del paciente y evaluar periódicamente su nivel de sedación.
 
 
 ##  Electroencefalograma (EEG) y ondas
-
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
 
