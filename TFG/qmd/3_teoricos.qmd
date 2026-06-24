@@ -23,16 +23,12 @@ El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica
 
 
 ### Amplitud, frecuencia, potencia, densidad espectral y decibelios.
-
 En el ámbito del procesamiento de señales, la actividad electroencefalográfica se describe mediante los siguientes conceptos [@Kane2017]: 
  - Ciclo: oscilación completa de una onda, desde un punto inicial hasta que vuelve a alcanzar el mismo estado tras pasar por un máximo (cresta) y un mínimo (valle).
  - Amplitud: magnitud de la variación de la señal respecto a un valor de referencia. En el EEG se expresa habitualmente en microvoltios (µV).
  - Frecuencia: número de ciclos que se producen por segundo. Se expresa en hercios (Hz).
- - Potencia: en el contexto del procesamiento de señales, se utiliza para cuantificar la magnitud de las oscilaciones del EEG y se calcula a partir del cuadrado de su amplitud (µV²). Esto sucede, porque al trabajar con señales débiles, se suele simplificar la ecuación de la Ley de Ohm (P=V²/R) asumiendo una resistencia estándar (generalmente \(R = 1\,\Omega\)).Para representar la DSA, la potencia de cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con la referencia de 0,0001 µV RMS indicada por el fabricante.
- - Densidad espectral de potencia: indica cómo se distribuye la potencia de la señal entre las distintas frecuencias, expresada en µV²/Hz. Al integrar esta densidad dentro de un intervalo de frecuencias se obtiene la potencia contenida en esa banda, expresada en µV².
- - Decibelio (dB): unidad logarítmica utilizada para representar dinámicamente estas magnitudes. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS indicada por el fabricante (resultando en $10^{-8}$ µV²).
- 
-Estas magnitudes permiten analizar el EEG tanto en el dominio temporal como en el frecuencial. En este último, la señal se descompone en bandas según la frecuencia de sus oscilaciones [@Kane2017].
+ - Potencia de la señal: magnitud empleada en procesamiento de señales para cuantificar el valor cuadrático medio de sus oscilaciones. Como la amplitud del EEG se expresa en microvoltios, la potencia de señal se expresa en microvoltios al cuadrado ($\mu\mathrm{V}^2$) [@OppenheimSchafer2014].^[Esta magnitud describe matemáticamente la señal y no debe confundirse con la potencia eléctrica físicamente transferida o consumida, que se expresaría en vatios.]
+
 
 
 ### Tipos de ondas del EEG
