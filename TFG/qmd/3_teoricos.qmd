@@ -50,8 +50,7 @@ En este trabajo, esta representación constituye la base de la matriz de densida
 
 
 ### Tipos de ondas del EEG
-
-Desde el punto de vista frecuencial, la señal EEG puede descomponerse en distintas bandas, definidas según el rango de frecuencias en el que se encuentran sus oscilaciones. Las principales bandas se recogen en la Tabla @tbl-bandas-eeg [@Er2006].
+Para sistematizar la interpretación clínica de este contenido espectral, las oscilaciones del EEG se clasifican habitualmente en distintas bandas estandarizadas según el rango de frecuencias en el que oscilan las ondas que las componen. Las principales bandas y su significado fisiológico general se recogen en la Tabla @tbl-bandas-eeg [@Er2006].
 
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
@@ -63,27 +62,16 @@ Desde el punto de vista frecuencial, la señal EEG puede descomponerse en distin
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
-El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
+El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
 
 
+## Monitor BIS 
 
+### Monitor e Índice Biespectral (BIS)
+El monitor BIS™ es un sistema avanzado de neuromonitorización diseñado para evaluar de forma continua el estado hipnótico del cerebro mediante la adquisición y el procesamiento de señales electroencefalográficas frontales [@CovidienBISadvanced; @OchoaSolana2025]. Mediante algoritmos que analizan la frecuencia, la potencia y la sincronización de fase del EEG, el sistema genera un índice numérico adimensional comprendido entre 0 y 100, el BIS [@OchoaSolana2025]. Un valor de 100 indica un estado de vigilia completa, mientras que un valor de 0 representa ausencia total de actividad eléctrica cerebral [@EscuderoAugusto2005]. 
 
+En el ámbito de la anestesia y los cuidados críticos, el rango objetivo de sedación profunda se sitúa habitualmente entre 40 y 60 [@EscuderoAugusto2005]. Mantener el índice dentro de este margen resulta fundamental para evitar tanto la infrasedación (que incrementa el riesgo de agitación, desadaptación a la ventilación mecánica y despertar intraoperatorio) como la sobresedación (índices consistentemente inferiores a 40), la cual se asocia con un mayor riesgo de depresión respiratoria, hipoxia e inestabilidad hemodinámica [@PuenteBarbas2016].
 
-## Monitor BIS
-
-
-
-
-En el entorno de la unidad de cuidados intensivos, este tipo de monitorización adquiere especial interés en situaciones en las que las escalas clínicas pierden utilidad o resultan insuficientes, como ocurre en pacientes con sedación profunda o sometidos a bloqueo neuromuscular. En estos casos, la monitorización instrumental puede ayudar a detectar situaciones de sobresedación o infrasedación y contribuir a un ajuste más preciso del tratamiento sedante [@TapiaMoreno2020].
-
-
-### Monitor e índice BIS
-
-El índice BIS es un parámetro numérico procesado derivado del análisis del EEG frontal. Se expresa en una escala entre 0 y 100, en la que los valores más altos se asocian a un mayor nivel de consciencia y los valores más bajos a una mayor depresión de la actividad cerebral. En términos generales, un valor cercano a 100 corresponde a un paciente despierto, mientras que valores muy bajos se relacionan con una supresión marcada de la actividad eléctrica cerebral [@TapiaMoreno2020].
-
-En la práctica clínica habitual, el mantenimiento de valores de BIS entre 40 y 60 se ha asociado a un nivel de sedación profunda adecuado. Por el contrario, alcanzar valores de BIS inferiores a 40 no suele aportar un beneficio clínico adicional y puede indicar un estado de sobresedación de riesgo [@chamorro2008].
-
-No obstante, el índice BIS representa una simplificación de la señal electroencefalográfica original. Por ello, su interpretación debe realizarse siempre en contexto clínico y, cuando sea posible, complementarse con otras formas de representación de la señal, como la matriz de densidad espectral.
 
 
 ### Matriz de densidad espectral (DSA)
