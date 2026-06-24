@@ -28,6 +28,15 @@ En el ámbito del procesamiento de señales, la actividad electroencefalográfic
  - Amplitud: magnitud de la variación de la señal respecto a un valor de referencia. En el EEG se expresa habitualmente en microvoltios (µV).
  - Frecuencia: número de ciclos que se producen por segundo. Se expresa en hercios (Hz).
  - Potencia de la señal: magnitud empleada en procesamiento de señales para cuantificar el valor cuadrático medio de sus oscilaciones. Como la amplitud del EEG se expresa en microvoltios, la potencia de señal se expresa en microvoltios al cuadrado ($\mu\mathrm{V}^2$) [@OppenheimSchafer2014].^[Esta magnitud describe matemáticamente la señal y no debe confundirse con la potencia eléctrica físicamente transferida o consumida, que se expresaría en vatios.]
+ - Densidad espectral de potencia: indica cómo se distribuye la potencia de la señal entre las distintas frecuencias, expresada en µV²/Hz. Al integrar esta densidad dentro de un intervalo de frecuencias se obtiene la potencia contenida en esa banda, expresada en µV².
+ - Decibelios (dB): escala logarítmica que expresa la potencia respecto a un valor de referencia. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS indicada por el fabricante (resultando en $10^{-8}$ µV²).
+
+
+### Electroencefalografía cuantitativa (qEEG)
+
+La qEEG, hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
+
+En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
 
 
 
