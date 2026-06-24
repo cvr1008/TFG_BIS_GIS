@@ -78,3 +78,11 @@ La matriz de densidad espectral o Density Spectral Array (DSA) es la representac
 
 Desde el punto de vista clínico, la DSA facilita la identificación de patrones o «firmas espectrales» asociados a determinados fármacos y estados de consciencia [@LpezCastruita2023]. Por ejemplo, durante la anestesia general con propofol puede observarse actividad lenta entre 0,5 y 1 Hz junto con una concentración de potencia alfa frontal, aproximadamente entre 9 y 12 Hz [@LpezCastruita2023]. No obstante, estos patrones deben interpretarse junto con la situación clínica y el resto de los parámetros disponibles.
 
+### SEF y MF
+Para complementar la información de la DSA, el monitor calcula parámetros que resumen la distribución de la potencia en el dominio frecuencial [@OchoaSolana2025]:
+- **Frecuencia del Borde Espectral (SEF, Spectral Edge Frequency):** Representada habitualmente como la SEF95, indica la frecuencia por debajo de la cual se encuentra el 95\,\% de la potencia total del EEG [@OchoaSolana2025]. En la DSA se dibuja como una línea blanca. 
+
+- **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50\,\% por encima y 50\,\% por debajo), trazándose en el espectrograma como una línea púrpura.
+Ambos parámetros permiten resumir el desplazamiento del contenido espectral del EEG, la disminución de los mismos refleja un predominio de frecuencias más lentas, aunque su interpretación depende del fármaco administrado, la profundidad de la sedación y la situación clínica del paciente [@OchoaSolana2025].
+
+
