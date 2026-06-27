@@ -10,7 +10,7 @@ En esta sección se presentan los conceptos fundamentales necesarios para compre
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
 La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
 
-En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor.
+En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor. En consecuencia, el control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
 
 ### Monitorización del nivel de sedación
@@ -32,12 +32,6 @@ En el ámbito del procesamiento de señales, la actividad electroencefalográfic
  - Decibelios (dB): escala logarítmica que expresa la potencia respecto a un valor de referencia. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS indicada por el fabricante (resultando en $10^{-8}$ µV²).
 
 
-### Electroencefalografía cuantitativa (qEEG)
-La qEEG, hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
-
-En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
-
-
 ### Espectro y espectrograma
 El EEG puede analizarse tanto en el dominio temporal como en el frecuencial [@Kane2017]. Mientras que en el dominio temporal se observa cómo varía la amplitud de la señal a lo largo del tiempo, el análisis frecuencial permite identificar cómo se distribuye su potencia entre las distintas frecuencias y bandas.
 
@@ -48,20 +42,37 @@ El espectrograma amplía este análisis calculando sucesivos espectros sobre int
 En este trabajo, esta representación constituye la base de la matriz de densidad espectral empleada por el monitor BIS. Su procedimiento concreto de cálculo y reconstrucción se describe en el capítulo de metodología.
 
 
+#### Transformada de Fourier y análisis frecuencial
+
+El análisis frecuencial de una señal se basa en descomponer su evolución temporal en componentes sinusoidales caracterizadas por su frecuencia, amplitud y fase. La transformada de Fourier permite pasar del dominio temporal, donde se observa la evolución de la amplitud en el tiempo, al dominio frecuencial, donde se estudia qué frecuencias están presentes en la señal y con qué peso relativo [@OppenheimSchafer2014].
+
+En señales digitales, como el EEG registrado por el monitor BIS, no se dispone de una función continua sino de una secuencia finita de muestras. Por ello se emplea la transformada discreta de Fourier (DFT), que calcula un conjunto finito de coeficientes frecuenciales a partir de una ventana de señal. Cada coeficiente es un número complejo cuya magnitud se relaciona con la amplitud de una determinada componente frecuencial, mientras que su ángulo representa la fase [@OppenheimSchafer2014].
+
+En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG durante anestesia, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectrograma [@Sawa2022].
+
+
+
 ### Tipos de ondas del EEG
 Para sistematizar la interpretación clínica de este contenido espectral, las oscilaciones del EEG se clasifican habitualmente en distintas bandas estandarizadas según el rango de frecuencias en el que oscilan las ondas que las componen. Las principales bandas y su significado fisiológico general se recogen en la Tabla @tbl-bandas-eeg [@Er2006].
 
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
 | Gamma | >30 | Actividad rápida |
-| Beta | 13–30 | Estado de alerta o activación |
-| Alfa | 8–13 | Vigilia relajada, escasa actividad mental |
+| Beta | 12–30 | Estado de alerta o activación |
+| Alfa | 8–12 | Vigilia relajada, escasa actividad mental |
 | Theta | 4–8 | Somnolencia o menor nivel de alerta |
-| Delta | 0.5–4 | Sueño profundo o sedación intensa |
+| Delta | 1–4 | Sueño profundo o sedación intensa |
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
 El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
+
+
+### Electroencefalografía cuantitativa (qEEG)
+La qEEG, hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
+
+En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
+
 
 
 ## Monitor BIS 
@@ -120,14 +131,6 @@ De forma general, las variables clínicas procedentes de este tipo de sistemas p
 
 En el contexto de este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente, lo que resulta especialmente relevante para diseñar herramientas de visualización orientadas al seguimiento del paciente crítico.
 
-
-### Transformada de Fourier y análisis frecuencial
-
-El análisis frecuencial de una señal se basa en descomponer su evolución temporal en componentes sinusoidales caracterizadas por su frecuencia, amplitud y fase. La transformada de Fourier permite pasar del dominio temporal, donde se observa la evolución de la amplitud en el tiempo, al dominio frecuencial, donde se estudia qué frecuencias están presentes en la señal y con qué peso relativo [@OppenheimSchafer2014].
-
-En señales digitales, como el EEG registrado por el monitor BIS, no se dispone de una función continua sino de una secuencia finita de muestras. Por ello se emplea la transformada discreta de Fourier (DFT), que calcula un conjunto finito de coeficientes frecuenciales a partir de una ventana de señal. Cada coeficiente es un número complejo cuya magnitud se relaciona con la amplitud de una determinada componente frecuencial, mientras que su ángulo representa la fase [@OppenheimSchafer2014].
-
-En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG durante anestesia, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectro de potencia o el espectrograma [@Sawa2022].
 
 
 
