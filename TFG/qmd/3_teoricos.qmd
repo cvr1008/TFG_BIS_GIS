@@ -54,10 +54,10 @@ Para sistematizar la interpretación clínica de este contenido espectral, las o
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
 | Gamma | >30 | Actividad rápida |
-| Beta | 12–30 | Estado de alerta o activación |
-| Alfa | 8–12 | Vigilia relajada, escasa actividad mental |
+| Beta | 13–30 | Estado de alerta o activación |
+| Alfa | 8–13 | Vigilia relajada, escasa actividad mental |
 | Theta | 4–8 | Somnolencia o menor nivel de alerta |
-| Delta | 1–4 | Sueño profundo o sedación intensa |
+| Delta | 0.5–4 | Sueño profundo o sedación intensa |
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
