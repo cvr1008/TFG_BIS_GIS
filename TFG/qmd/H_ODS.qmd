@@ -6,7 +6,7 @@
 
 \apendice{Anexo de sostenibilización curricular}
 
-\section{Introducción}
+# Introducción
 Este anexo incluirá una reflexión personal del alumnado sobre los aspectos de la sostenibilidad que se abordan en el trabajo.
 Se pueden incluir tantas subsecciones como sean necesarias con la intención de explicar las competencias de sostenibilidad adquiridas durante el alumnado y aplicadas al Trabajo de Fin de Grado.
 

@@ -10,10 +10,10 @@
 Si procede.
 
 
-\section{Diagrama de casos de uso}
+# Diagrama de casos de uso
 Se presentará un diagrama de casos de uso que represente las funcionalidades principales del sistema y los actores que interactúan con él.
 
-\section{Explicación casos de uso.}
+# Explicación casos de uso.
 
 Se puede describir mediante el uso de tablas o mediante lenguaje natural.    
 
@@ -46,5 +46,5 @@ Una muestra de cómo podría ser una tabla de casos de uso:
 	\caption{CU-1 Nombre del caso de uso.}
 \end{table}
 
-\section{Prototipos de interfaz o interacción con el proyecto.}
+# Prototipos de interfaz o interacción con el proyecto.
 Se incluirán bocetos, prototipos o capturas de pantalla que muestren la interacción del usuario con el sistema desarrollado.

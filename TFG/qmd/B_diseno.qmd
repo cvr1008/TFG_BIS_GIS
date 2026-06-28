@@ -9,13 +9,13 @@
 
 Si procede.
 
-\section{Planos}
+# Planos
 
 Si procede
 
 En este apartado se incluirán los planos técnicos del sistema si procede, tales como esquemas de hardware, distribución de dispositivos, flujos físicos o cualquier otro elemento relevante para la comprensión del diseño.
 
-\section{Diseño arquitectónico}
+# Diseño arquitectónico
 
 Si procede.
 
