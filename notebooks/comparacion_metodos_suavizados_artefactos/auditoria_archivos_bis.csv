@@ -1,4 +1,0 @@
-registro,modo,segundos_analizados,canales_header,fs,pendiente,offset_calibracion,raw_bytes,raw_bytes_declarados,alarmas_totales,alarmas_ICS_medio,alarmas_ICS_bajo,alarmas_electrodos,impedancias_marcador,impedancias_NOISE,impedancias_mayores_15k,impedancia_max_ohm,tamano_raw_coincide
-L03041035,unilateral,2119,2,128,0.05000000074505806,-3234.0,1085248,1085248,73,42,13,18,63,22,16,262000,True
-L05141322,bilateral,2712,4,128,0.05000000074505806,-3234.0,2777600,2777600,17,12,1,4,40,4,0,3000,True
-L04301923,bilateral,7200,4,128,0.05000000074505806,-3234.0,62351360,62351360,198,17,9,172,944,90,0,10000,True

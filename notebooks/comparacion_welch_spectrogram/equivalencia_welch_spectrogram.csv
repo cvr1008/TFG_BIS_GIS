@@ -1,6 +1,0 @@
-registro,modo,lado,SpSmooth_s,LoFilter_codigo,LoFilter_Hz,max_abs_diff_PSD,max_abs_diff_dB,max_abs_diff_tiempo_s,ventanas_raw_invalidas
-L03041035,unilateral,unilateral,30,3,2.5,0.0,0.0,0.0,0
-L05141322,bilateral,izquierda,30,3,2.5,0.0,0.0,0.0,0
-L05141322,bilateral,derecha,30,3,2.5,0.0,0.0,0.0,0
-L04301923,bilateral,izquierda,30,3,2.5,0.0,0.0,0.0,0
-L04301923,bilateral,derecha,30,3,2.5,0.0,0.0,0.0,0
