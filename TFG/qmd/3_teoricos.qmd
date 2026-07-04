@@ -42,7 +42,7 @@ El espectrograma amplía este análisis calculando sucesivos espectros sobre int
 En este trabajo, esta representación constituye la base de la matriz de densidad espectral empleada por el monitor BIS. Su procedimiento concreto de cálculo y reconstrucción se describe en el capítulo de metodología.
 
 
-#### Transformada de Fourier y análisis frecuencial
+#### Transformada de Fourier y análisis frecuencial ----------------tiempo/frecuencia
 
 El análisis frecuencial de una señal se basa en descomponer su evolución temporal en componentes sinusoidales caracterizadas por su frecuencia, amplitud y fase. La transformada de Fourier permite pasar del dominio temporal, donde se observa la evolución de la amplitud en el tiempo, al dominio frecuencial, donde se estudia qué frecuencias están presentes en la señal y con qué peso relativo [@OppenheimSchafer2014].
 
