@@ -18,10 +18,33 @@ Se obtuvo una estructura de almacenamiento organizada por paciente y sesión BIS
 
 La organización generada permite mantener separados los datos originales y los archivos derivados. Esta separación facilita la trazabilidad de los datos, evita modificar las exportaciones iniciales y permite repetir el procesamiento si se actualizan los criterios de integración o visualización.
 
+![Portal de entrada organizador-visualizador](img/capturas_portal/captura_menu_portal.png){#fig-portal width=95%}
+
+
+![Organizador - Pantalla de inicio](img/capturas_app_organizador/cap_inicio_organizador.png){#fig-inicio-organizador width=95%}
+
+![Organizador - Crear paciente](img/capturas_app_organizador/cap_crear_paciente.png){#fig-organizador-crear-pac width=95%}
+
+![Organizador - Revisión de asignaciones](img/capturas_app_organizador/cap_revision_paciente.png){#fig-organizador-crear-pac width=95%}
+
+![Organizador - Editar asignaciones](img/capturas_app_organizador/cap_editar_paciente.png){#fig-organizador-editar-pac width=95%}
+
+![Organizador - Contenido de carpeta de paciente](img/capturas_app_organizador/cap_analisis_contenido_sesion.png){#fig-organizador-contenido-pac width=95%}
+
+
 
 ## Recuperación y reconstrucción de la DSA
 
 La aplicación permite utilizar directamente la DSA exportada por el monitor cuando el archivo `.f_a` está disponible y contiene información válida. En los casos en los que este archivo no existe o aparece vacío, se reconstruye la matriz espectral a partir de la señal EEG cruda almacenada en `.r2a` o `.r4a`.
+
+![Visualizador - Pantalla de inicio](img/capturas_app_visualizador/visual_inicio.png){#fig-visualizador-inicio width=95%}
+
+![Visualizador - Selección de paciente y sesión](img/capturas_app_visualizador/visual_paciente_seleccionado.png){#fig-visualizador-seleccionar-pac width=95%}
+
+![Visualizador - DSA unilateral reconstruida](img/capturas_app_visualizador/visual_DSA_reconstruida_unilateral.png){#fig-visualizador-dsa-rec-unilat width=95%}
+
+![Visualizador - DSA unilateral desde archivo espectral (.fa)](img/capturas_app_visualizador/visual_DSA_fa_unilateral.png){#fig-visualizador-dsa-fa-unilat width=95%}
+
 
 
 
@@ -44,6 +67,14 @@ Las variables clínicas procedentes de ICCA se incorporaron al flujo de visualiz
 La integración permitió representar variables de distinta naturaleza temporal dentro del intervalo de cada sesión BIS. Las constantes vitales se trataron como series temporales, los análisis como mediciones puntuales y las perfusiones como cambios de dosis activa a lo largo del tiempo.
 
 Este resultado permite contextualizar la evolución del BIS y de la DSA con información clínica relevante, como cambios hemodinámicos, alteraciones analíticas o administración de sedantes, analgésicos, relajantes neuromusculares y fármacos vasoactivos.
+
+![Visualizador - Constantes ICCA](img/capturas_app_visualizador/visual_variables_clinicas.png){#fig-visualizador-cte-icca width=95%}
+
+![Visualizador - Análisis ICCA](img/capturas_app_visualizador/visual_tarjetas_analisis.png){#fig-visualizador-analisis-icca width=95%}
+
+![Visualizador - Perfusiones ICCA](img/capturas_app_visualizador/visual_perfusiones_2.png){#fig-visualizador-perfusiones-icca width=95%}
+
+
 
 
 ## Visualizador interactivo desarrollado
