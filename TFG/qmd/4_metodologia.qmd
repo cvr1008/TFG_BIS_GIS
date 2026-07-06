@@ -3,4 +3,22 @@
 \capitulo{4}{Metodología}
 ```
 
+## Descripción de los datos
+
+### Enfoque general del proyecto
+
+El proyecto se plantea como una prueba de concepto orientada a la integración temporal y visualización conjunta de información procedente del monitor BIS y de variables clínicas registradas en ICCA. El objetivo no es desarrollar un producto clínico final ni sustituir la interpretación médica, sino estudiar la viabilidad de organizar, sincronizar y representar ambas fuentes de información para facilitar el análisis retrospectivo de pacientes críticos.
+
+Para ello se diseñaron dos flujos de trabajo complementarios. El primero permite organizar los datos disponibles por paciente y por sesión BIS, asociando a cada registro neurofisiológico la información clínica correspondiente. El segundo permite visualizar de forma conjunta la matriz de densidad espectral, las variables procesadas del monitor BIS y las variables clínicas seleccionadas procedentes de ICCA. 
+
+
+### Fuentes de datos utilizadas
+
+Los datos del monitor BIS proceden de las exportaciones generadas por los equipos BIS VISTA y BIS Advance. En este trabajo se emplean principalmente los archivos `.spa`, `.f_a`, `.r2a` o `.r4a`, `.h_a` y `.t_a`. 
+ - El archivo `.spa` contiene las variables procesadas por el monitor, como el índice BIS, SEF, MEF, SQI y otros parámetros de configuración. 
+ - El archivo `.f_a` contiene la matriz espectral calculada por el propio monitor. Este archivo no siempre está disponible, ya que el equipo BIS VISTA lo exporta vacío.
+ - Los archivos `.r2a` y `.r4a` almacenan el EEG crudo en registros unilaterales y bilaterales, respectivamente.
+ - `.h_a` y `.t_a` proporcionan la información necesaria para su interpretación y alineación temporal.
+
+De forma complementaria, las variables clínicas procedentes de ICCA se reciben en forma de plantillas Excel estructuradas. Estas plantillas agrupan la información en hojas diferenciadas: información general del paciente y del ingreso, constantes vitales, resultados analíticos y perfusiones o tratamientos administrados. El detalle completo de los archivos BIS, la estructura de la plantilla ICCA y el significado de las variables principales se recoge en el Anexo F.
 
