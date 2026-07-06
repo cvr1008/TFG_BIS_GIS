@@ -13,11 +13,6 @@ La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especi
 En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor. En consecuencia, el control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
 
-### Monitorización del nivel de sedación
-El control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
-
-
-
 ##  Electroencefalograma (EEG) y ondas
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
@@ -37,19 +32,30 @@ El EEG puede analizarse tanto en el dominio temporal como en el frecuencial [@Ka
 
 El espectro de potencia representa la potencia contenida en cada frecuencia durante un intervalo determinado. Permite reconocer qué componentes frecuenciales predominan, pero no muestra cómo cambian a lo largo del registro.
 
-El espectrograma amplía este análisis calculando sucesivos espectros sobre intervalos temporales consecutivos. El resultado es una representación tiempo-frecuencia en la que un eje muestra el tiempo, otro la frecuencia y el color indica la potencia de la señal. De esta forma, permite observar la evolución del contenido espectral del EEG e identificar cambios en el predominio de determinadas bandas.
+El espectrograma amplía este análisis calculando sucesivos espectros sobre intervalos temporales consecutivos. El resultado es una representación tiempo-frecuencia en la que un eje muestra el tiempo, otro la frecuencia y el color indica la potencia de la señal. De esta forma, permite observar la evolución del contenido espectral del EEG e identificar cambios en el predominio de determinadas bandas [@Ng2022].
 
 En este trabajo, esta representación constituye la base de la matriz de densidad espectral empleada por el monitor BIS. Su procedimiento concreto de cálculo y reconstrucción se describe en el capítulo de metodología.
 
+### Electroencefalografía cuantitativa (qEEG)
+La qEEG hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales [@Hwang2022]. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
 
-#### Transformada de Fourier y análisis frecuencial ----------------tiempo/frecuencia
+En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral [@Hwang2022; @Ng2022]. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
 
+
+#### Transformada de Fourier y análisis frecuencial 
 El análisis frecuencial de una señal se basa en descomponer su evolución temporal en componentes sinusoidales caracterizadas por su frecuencia, amplitud y fase. La transformada de Fourier permite pasar del dominio temporal, donde se observa la evolución de la amplitud en el tiempo, al dominio frecuencial, donde se estudia qué frecuencias están presentes en la señal y con qué peso relativo [@OppenheimSchafer2014].
 
 En señales digitales, como el EEG registrado por el monitor BIS, no se dispone de una función continua sino de una secuencia finita de muestras. Por ello se emplea la transformada discreta de Fourier (DFT), que calcula un conjunto finito de coeficientes frecuenciales a partir de una ventana de señal. Cada coeficiente es un número complejo cuya magnitud se relaciona con la amplitud de una determinada componente frecuencial, mientras que su ángulo representa la fase [@OppenheimSchafer2014].
 
 En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG durante anestesia, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectrograma [@Sawa2022].
 
+
+#### Estimación espectral mediante el método de Welch
+La aplicación directa de la DFT a una única ventana de señal permite obtener una estimación del contenido frecuencial, pero esta estimación puede ser sensible al ruido y a las características concretas del segmento analizado. Para obtener una estimación más estable de la densidad espectral de potencia se puede emplear el método de Welch [@Welch1967; @OppenheimSchafer2014].
+
+Este método consiste en dividir la señal en ventanas temporales más cortas, normalmente con cierto solapamiento entre ellas. A cada ventana se le aplica una función de ponderación, como una ventana de Hann, para reducir los efectos de borde. Posteriormente se calcula el espectro de potencia de cada segmento mediante la FFT y se promedian las estimaciones obtenidas.
+
+El resultado es una estimación de la densidad espectral de potencia menos variable que la obtenida a partir de un único periodograma. En el análisis de señales EEG, este enfoque resulta útil porque permite estudiar cómo se distribuye la potencia de la señal entre las distintas frecuencias. Cuando este procedimiento se aplica de forma sucesiva a lo largo del tiempo, permite construir representaciones tiempo-frecuencia como las empleadas en los espectrogramas y en la reconstrucción de la DSA.
 
 
 ### Tipos de ondas del EEG
@@ -68,17 +74,11 @@ Para sistematizar la interpretación clínica de este contenido espectral, las o
 El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
 
 
-### Electroencefalografía cuantitativa (qEEG)
-La qEEG, hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
-
-En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
-
-
 
 ## Monitor BIS 
 
 ### Monitor e Índice Biespectral (BIS)
-El monitor BIS™ es un sistema avanzado de neuromonitorización diseñado para evaluar de forma continua el estado hipnótico del cerebro mediante la adquisición y el procesamiento de señales electroencefalográficas frontales [@CovidienBISadvanced; @OchoaSolana2025]. Mediante algoritmos que analizan la frecuencia, la potencia y la sincronización de fase del EEG, el sistema genera un índice numérico adimensional comprendido entre 0 y 100, el BIS [@OchoaSolana2025]. Un valor de 100 indica un estado de vigilia completa, mientras que un valor de 0 representa ausencia total de actividad eléctrica cerebral [@EscuderoAugusto2005]. 
+El monitor BIS™ es un sistema avanzado de neuromonitorización diseñado para evaluar de forma continua el estado hipnótico del cerebro mediante la adquisición y el procesamiento de señales electroencefalográficas frontales [@CovidienBISadvanced; @OchoaSolana2025]. Mediante algoritmos que analizan la frecuencia, la potencia y la sincronización de fase del EEG, el sistema genera un índice numérico adimensional comprendido entre 0 y 100, el BIS [@OchoaSolana2025]. Un valor de 100 indica un estado de vigilia completa, mientras que un valor de 0 representa ausencia total de actividad eléctrica cerebral [@CovidienBISadvanced]. 
 
 En el ámbito de la anestesia y los cuidados críticos, el rango objetivo de sedación profunda se sitúa habitualmente entre 40 y 60 [@EscuderoAugusto2005]. Mantener el índice dentro de este margen resulta fundamental para evitar tanto la infrasedación (que incrementa el riesgo de agitación, desadaptación a la ventilación mecánica y despertar intraoperatorio) como la sobresedación (índices consistentemente inferiores a 40), la cual se asocia con un mayor riesgo de depresión respiratoria, hipoxia e inestabilidad hemodinámica [@PuenteBarbas2016].
 
@@ -132,8 +132,6 @@ De forma general, las variables clínicas procedentes de este tipo de sistemas p
 En el contexto de este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente, lo que resulta especialmente relevante para diseñar herramientas de visualización orientadas al seguimiento del paciente crítico.
 
 
-
-
 # Estado del arte y trabajos relacionados
 
 ## Reconstrucción y visualización de DSA en monitorización EEG/BIS
@@ -151,7 +149,6 @@ De forma paralela, distintos trabajos han abordado la necesidad de integrar y vi
 En este contexto, se han propuesto herramientas visuales orientadas a reorganizar la información del paciente crítico. MIVA 2.0, por ejemplo, se diseñó como un dashboard centrado en el usuario para facilitar la revisión rápida de tendencias fisiológicas [@Faiola2015]. Por su parte, el i-Dashboard integró información procedente de ICCA, HIS, LIS y PACS para apoyar las rondas multidisciplinares en UCI, reduciendo el tiempo dedicado a recopilar datos y mejorando la comunicación clínica [@Lai2022].
 
 También existen sistemas más orientados a la adquisición y análisis de datos multimodales. INSMA permite recoger ondas fisiológicas, alarmas y variables numéricas procedentes de monitores Philips IntelliVue, además de revisar datos históricos en ventanas temporales seleccionadas [@Sun2020]. Otros trabajos han planteado infraestructuras de almacenamiento de datos de alta frecuencia para facilitar el análisis retrospectivo de señales de UCI [@Noteboom2024].
-
 
 
 Estos antecedentes muestran el interés creciente por integrar señales fisiológicas y variables clínicas en herramientas visuales. Sin embargo, la mayoría de las soluciones revisadas se centran en dashboards generales de UCI, adquisición multimodal o análisis retrospectivo amplio, sin abordar de forma específica la visualización conjunta de registros BIS/DSA con variables clínicas complementarias. Por ello, el presente trabajo se sitúa en la intersección entre la reconstrucción de neuromonitorización BIS y el diseño de herramientas visuales para el análisis retrospectivo contextualizado del paciente crítico.
