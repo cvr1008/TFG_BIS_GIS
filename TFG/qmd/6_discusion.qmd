@@ -3,67 +3,50 @@
 \capitulo{6}{Discusión}
 ```
 
-Se realizará un análisis crítico de los resultados, interpretando su significado y, cuando sea pertinente, comparándolos con los resultados de trabajos previos, obtenidos con la revisión del estado del arte; de forma que se destaquen las mejoras y aportes sobre el mismo.
+## Interpretación general de los resultados
 
+Los resultados obtenidos muestran que es viable desarrollar una prueba de concepto para organizar, reconstruir, integrar y visualizar de forma conjunta los datos procedentes del monitor BIS y las variables clínicas registradas en ICCA. El sistema desarrollado permite pasar de un conjunto de archivos heterogéneos, separados por fuente y con distinta estructura temporal, a una visualización orientada al análisis retrospectivo de sesiones de monitorización en pacientes críticos.
 
+Uno de los principales resultados del trabajo es la definición de un flujo completo de organización por paciente y por sesión BIS. Esta organización resulta especialmente importante porque los datos de neuromonitorización y los datos clínicos no se generan con la misma frecuencia ni siguen la misma estructura. Mientras que las variables del BIS se registran de forma continua o casi continua durante la sesión, las variables clínicas procedentes de ICCA pueden corresponder a mediciones periódicas, determinaciones puntuales o cambios de tratamiento. Por ello, el trabajo no se limita a representar datos, sino que establece una estructura temporal común que permite interpretar cada variable respetando su significado original.
 
+También se ha conseguido recuperar la matriz de densidad espectral cuando el archivo espectral exportado por el monitor está disponible y contiene información válida, así como reconstruirla a partir de la señal EEG cruda en aquellos casos en los que no se dispone de un archivo `.f_a` utilizable. Este resultado es relevante porque aumenta la robustez del sistema frente a exportaciones incompletas o diferentes configuraciones del monitor. Además, la distinción entre registros unilaterales y bilaterales permite adaptar la visualización a la información realmente registrada en cada caso, representando un único hemisferio o ambos hemisferios cuando procede.
 
-Revisión del estado del arte y fundamentos teóricos necesarios para
-comprender el trabajo. Se pueden incluir referencias bibliográficas con
-`[@bortolot2005]` tal como se haría en R Markdown [@bortolot2005].
+La integración de variables clínicas procedentes de ICCA aporta el contexto necesario para interpretar retrospectivamente los cambios observados en el BIS, la DSA y el resto de parámetros procesados. En este sentido, el visualizador no pretende sustituir la interpretación clínica, sino facilitar una consulta conjunta de información que normalmente se encuentra dispersa entre distintas fuentes.
 
-Se realizará una revisión crítica de los trabajos previos relevantes, tanto en el ámbito académico como en el industrial, relacionados con el problema abordado. 
-Se debe poner de manifiesto la contribución del TFG respecto a las soluciones existentes.
-Enumeración y resumen de todos los trabajos relacionados de interés.
+## Relación con trabajos previos
 
+Los resultados del trabajo se sitúan en la línea de los estudios que defienden el uso de herramientas de electroencefalografía cuantitativa para resumir y visualizar grandes volúmenes de información neurofisiológica. Representaciones como la DSA o el CDSA permiten condensar la evolución temporal y frecuencial del EEG en una imagen interpretable, evitando que el clínico tenga que revisar directamente largos tramos de señal cruda [@Hwang2022]. En este trabajo, esta idea se aplica al contexto del monitor BIS, utilizando la DSA como eje principal de la visualización.
 
-En esta sección y el resto de secciones de la memoria puede ser necesario incluir listas de items.
+Asimismo, el proyecto se relaciona con trabajos centrados en el desarrollo de paneles visuales para UCI, donde la gran cantidad de datos generados por monitores, sistemas de información clínica y dispositivos médicos puede producir sobrecarga de información. La literatura revisada señala que los dashboards clínicos pueden ayudar a organizar la información, mejorar la conciencia situacional y facilitar la identificación de tendencias relevantes [@Khairat2018; @Wright2019]. En esta misma dirección, el sistema desarrollado propone una visualización integrada de señales neurológicas, variables procesadas del BIS y datos clínicos de ICCA.
 
-\begin{itemize}
-    \item item1
-    \item item2
-    \item item3
-    \item item4
-\end{itemize}
+También existen trabajos que describen sistemas de integración de datos clínicos en UCI a partir de fuentes como ICCA, sistemas hospitalarios, laboratorios o monitores de cabecera [@Lai2022; @Sun2020]. Sin embargo, la aportación de este TFG se centra en un caso más específico: la organización y visualización retrospectiva de sesiones BIS junto con variables clínicas relevantes para contextualizar la neuromonitorización en pacientes críticos.
 
-Listas enumeradas.
+## Aspectos relevantes del desarrollo
 
-\begin{enumerate}
-    \item item1
-    \item item2
-    \item item3
-\end{enumerate}
+Uno de los aspectos más relevantes del proyecto ha sido la necesidad de trabajar con datos biomédicos heterogéneos y no siempre completos. Las exportaciones del monitor BIS pueden variar según el tipo de registro, la disponibilidad de archivos y la existencia o no de una DSA original válida. Esta situación obligó a contemplar distintos escenarios de procesamiento: uso directo de la DSA exportada, reconstrucción desde señal cruda, registros unilaterales y registros bilaterales.
 
-Figuras, como la figura \ref{fig:escudo} que aparece en la página \pageref{fig:escudo}. 
+Otro aspecto destacable es la separación entre los datos originales y los archivos auxiliares generados por la aplicación. Esta decisión permite mantener trazabilidad sobre las fuentes iniciales y, al mismo tiempo, generar estructuras intermedias más adecuadas para la visualización y el análisis. En un contexto biomédico, esta separación resulta importante para evitar modificar los datos originales y para facilitar futuras revisiones del procesamiento realizado.
 
-Puedes aprender más de las figuras en la dirección \url{https://es.overleaf.com/learn/latex/Inserting_Images}
+También ha sido especialmente relevante el tratamiento temporal de las variables clínicas. No todas las variables procedentes de ICCA pueden representarse del mismo modo: algunas corresponden a constantes vitales registradas de forma periódica, otras a resultados analíticos puntuales y otras a perfusiones o tratamientos que permanecen activos durante un intervalo. Por ello, la integración temporal se ha diseñado respetando la naturaleza de cada tipo de variable, en lugar de forzar todas las fuentes a una misma frecuencia de muestreo.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.6\textwidth]{img/Logo_GIS.png}
-    \caption{Pie de la figura de figura (debe incluir autoría y referencia)}
-    \label{fig:escudo}
-\end{figure}
+Finalmente, el desarrollo de dos aplicaciones diferenciadas, una orientada a la organización de pacientes y sesiones y otra a la visualización conjunta de los datos, permite separar dos necesidades distintas. La primera facilita preparar y estructurar la información, mientras que la segunda se centra en la consulta retrospectiva y en la exploración visual de los registros.
 
+## Limitaciones
 
-También se pueden insertar tablas como \ref{tab:my-table}, que ha sido generada con \url{https://www.tablesgenerator.com/}.
+La principal limitación del trabajo es que se trata de una prueba de concepto y no de una herramienta validada para uso clínico. Aunque el sistema permite organizar y visualizar datos reales o estructurados según fuentes clínicas, su finalidad es exploratoria y de apoyo al análisis retrospectivo. Por tanto, los resultados no deben interpretarse como una validación clínica del sistema ni como una herramienta de toma de decisiones asistenciales.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{ccc}
-\hline
-\textbf{a} & \textbf{b} & \textbf{c} \\
-\hline
-1 & 2 & 3 \\
-4 & 5 & 6 \\
-\hline
-\end{tabular}
-\caption{Pie de la tabla}
-\label{tab:my-table}
-\end{table}
+Otra limitación importante está relacionada con la reconstrucción de la DSA. Aunque se ha implementado un procedimiento técnico para estimar la matriz espectral a partir del EEG crudo, el algoritmo exacto empleado internamente por el monitor BIS es propietario. Por ello, la reconstrucción busca aproximar la representación espectral y hacerla comparable con la información exportada, pero no puede garantizar una reproducción idéntica del procesamiento interno del dispositivo.
 
-Es necesario que todas las figuras y tablas aparezcn referenciadas en el texto, como estos ejemplos.
+El trabajo también depende de la calidad y disponibilidad de los archivos exportados. La ausencia de determinados archivos, las pérdidas de señal, los periodos con baja calidad del registro o las discontinuidades temporales pueden afectar a la reconstrucción y visualización de los datos. Para reducir este problema, se han incorporado criterios de detección y enmascaramiento de tramos no válidos, aunque la interpretación final debe tener siempre en cuenta la calidad de la señal original.
 
-Todos los conceptos teóricos deben de estar correctamente referenciados en la bibliografía. Por ejemplo, aquí estoy citando la página de \LaTeX{} de Wikipedia \cite{wiki:latex}.
+En cuanto a los datos procedentes de ICCA, la aplicación parte de plantillas estructuradas proporcionadas por personal clínico autorizado. Por tanto, el trabajo no aborda la extracción directa desde la base de datos de ICCA, sino la integración posterior de los datos recibidos. Esto limita el alcance del sistema, ya que la disponibilidad de variables depende de la plantilla de exportación y de los criterios de selección definidos previamente.
 
-También puede ser necesario utilizar notas al pie \footnote{como por ejemplo esta}, para aclarar algunos conceptos.
+Por último, la validación realizada se centra en comprobar la coherencia técnica y funcional del sistema: organización correcta de sesiones, alineación temporal, reconstrucción de la DSA y visualización conjunta de variables BIS e ICCA. Sería necesario ampliar el número de registros analizados y realizar una evaluación con usuarios clínicos para valorar de forma sistemática la utilidad, claridad e interpretabilidad de la herramienta.
+
+## Alcance y utilidad de la prueba de concepto
+
+A pesar de estas limitaciones, el trabajo demuestra la utilidad de integrar en una misma interfaz información que habitualmente se encuentra separada. La visualización conjunta de DSA, BIS, variables espectrales y datos clínicos facilita revisar retrospectivamente qué ocurrió durante una sesión de monitorización y relacionar cambios en la actividad cerebral con el contexto clínico disponible.
+
+El sistema desarrollado puede servir como base para futuras mejoras, tanto desde el punto de vista técnico como clínico. Entre ellas se encuentran la incorporación de nuevas variables de ICCA, la ampliación de los criterios de calidad de señal, la comparación con más registros BIS, la mejora de la visualización de tratamientos y eventos, y la evaluación de la herramienta por parte de profesionales sanitarios.
+
+En conjunto, los resultados obtenidos cumplen los objetivos planteados inicialmente: organizar datos BIS e ICCA por paciente y sesión, recuperar o reconstruir la DSA, integrar variables con distinta resolución temporal y desarrollar un visualizador interactivo orientado al análisis retrospectivo del paciente crítico.

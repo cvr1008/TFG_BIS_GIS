@@ -125,7 +125,7 @@ ICCA es un sistema de información clínica desarrollado por Phillips empleado e
 
 De forma general, las variables clínicas procedentes de este tipo de sistemas pueden agruparse en:
  * Constantes vitales: frecuencia cardiaca, presión arterial.
- * Parámetros respiratorios y ventilatorios: fracción inspirada de oxígeno, modo ventilatorio.
+ * Parámetros respiratorios y ventilatorios: fracción inspirada de oxígeno, frecuencia respiratoria.
  * Tratamientos farmacológicos: sedantes, analgésicos, relajantes neuromusculares.
  * Resultados analíticos: hemograma, glucemia.
 

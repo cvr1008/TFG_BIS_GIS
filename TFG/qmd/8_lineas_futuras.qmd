@@ -2,5 +2,27 @@
 %% ── Capítulo 8: Líneas de trabajo futuras ───────────────────
 \capitulo{8}{Líneas de trabajo futuras}
 ```
+El trabajo desarrollado constituye una prueba de concepto orientada al análisis retrospectivo de datos BIS e ICCA. A partir de los resultados obtenidos, se identifican varias líneas de trabajo futuras que permitirían ampliar su alcance técnico y clínico.
+Validación con un mayor número de pacientes y sesiones.
+Una línea futura fundamental sería probar el sistema con un conjunto más amplio de registros BIS e ICCA. Esto permitiría comprobar su robustez ante diferentes duraciones de monitorización, calidad de señal, configuraciones del monitor, tipos de pacientes y situaciones clínicas. Además, permitiría valorar con mayor precisión la utilidad real de la visualización conjunta en el análisis retrospectivo.
 
-Este capítulo debería ser informe crítico indicando cómo se puede mejorar el proyecto, o cómo se puede continuar trabajando en la línea del proyecto realizado.
+Evaluación por parte de profesionales clínicos.
+Sería necesario realizar una evaluación con médicos intensivistas, anestesistas u otros profesionales implicados en la monitorización del paciente crítico. Esta evaluación permitiría conocer si la interfaz resulta clara, si las variables seleccionadas son útiles y si la forma de representar la información facilita realmente la interpretación clínica.
+
+Automatización de la extracción de datos desde ICCA.
+En este trabajo se parte de plantillas estructuradas proporcionadas por personal clínico autorizado. Como mejora futura, podría desarrollarse un sistema de extracción más automatizado desde ICCA, mediante consultas o informes definidos sobre su base de datos. Esto reduciría la dependencia de hojas Excel preparadas manualmente y permitiría seleccionar de forma más flexible pacientes, intervalos temporales y variables clínicas.
+
+Independencia respecto a exportaciones propietarias.
+Otra línea de trabajo sería reducir la dependencia de formatos específicos o propietarios del monitor BIS. Para ello, podrían estudiarse métodos de adquisición, conversión o estandarización de señales que permitiesen integrar datos procedentes de distintos dispositivos o fabricantes, siempre respetando las limitaciones técnicas, legales y de seguridad asociadas a datos clínicos.
+
+Extensión hacia monitorización en tiempo real.
+Aunque este trabajo se centra en el análisis retrospectivo, una evolución natural del sistema sería adaptar el flujo para su uso en tiempo real. Esto implicaría recibir datos BIS e ICCA de forma continua, actualizar la visualización durante la monitorización y definir mecanismos de seguridad adecuados. Esta línea requeriría una nueva evaluación técnica, clínica y ética, especialmente por tratarse de una herramienta potencialmente integrada en el entorno asistencial.
+
+Incorporación de detección automática de eventos.
+Con un número suficiente de pacientes y sesiones, el sistema podría ampliarse para detectar automáticamente eventos relevantes, como periodos de baja calidad de señal, cambios bruscos en el índice BIS, aparición de supresión de ráfagas, alteraciones en la DSA o modificaciones asociadas a tratamientos. Esta funcionalidad permitiría orientar la revisión retrospectiva hacia los tramos de mayor interés.
+
+Aplicación de modelos predictivos o técnicas de aprendizaje automático.
+A largo plazo, la integración de datos neurofisiológicos y clínicos podría servir como base para desarrollar modelos predictivos. Estos modelos podrían explorar relaciones entre patrones del BIS, variables clínicas, tratamientos administrados y evolución del paciente. No obstante, esta línea requeriría una base de datos amplia, correctamente anonimizada y validada, además de una evaluación rigurosa antes de plantear cualquier aplicación clínica.
+
+Mejora de la visualización e incorporación de nuevas variables.
+El visualizador podría ampliarse incorporando nuevas variables clínicas, eventos anotados, escalas de sedación, cambios terapéuticos o marcadores neurológicos adicionales. También podrían añadirse herramientas de filtrado, comparación entre sesiones, exportación de figuras e informes automáticos para facilitar su uso en investigación y revisión clínica.
