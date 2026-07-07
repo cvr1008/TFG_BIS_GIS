@@ -25,9 +25,8 @@ Todos los parámetros de la reconstrucción se centralizan en un único dicciona
 | `modo_welch` | densidad | Welch devuelve PSD en µV²/Hz |
 | `tiempo_referencia` | centro | La ventana se asigna a su instante central |
 | `umbral_sqi` | 15 | Límite mínimo de calidad de señal (`SQI10`) |
-| `umbral_ceros`$^*$ | 0,9 | Definido en el diccionario de parámetros, pero no consumido por la función de máscara actualmente en uso (ver nota tras la tabla) |
 | `aplicar_mascara_ceros_raw` | True | Activa la detección de pérdidas en el EEG crudo |
-| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si ≥50 % de sus muestras son cero |
+| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si el 50 % de sus muestras o más  son cero |
 | `excluir_invalidos_suavizado` | True | Los segundos inválidos se excluyen del promedio móvil |
 | `referencia_amplitud_uv_rms` | 0,0001 µV RMS | Referencia usada en la conversión logarítmica a dB |
 | `combinacion_unilateral` | canal 1 | Canal físico usado en unilateral |
@@ -39,17 +38,13 @@ Todos los parámetros de la reconstrucción se centralizan en un único dicciona
 
 : Parámetros generales de la reconstrucción, extraídos de `PARAMETROS_RECONSTRUCCION` {#tbl-parametros-reconstruccion}
 
-Nótese que `umbral_ceros` (90 %, aplicado sobre los *bins* espectrales ya calculados) y `umbral_ceros_raw` (50 %, aplicado sobre las muestras de la onda cruda) son dos criterios distintos y complementarios: el primero detecta espectros degenerados una vez calculados; el segundo detecta la pérdida de señal en origen, antes incluso de aplicar Welch (ver G.9).
-
-$^*$ *Nota:* `umbral_ceros` es un parámetro heredado de una versión anterior del módulo de reconstrucción. La función que efectivamente calcula la máscara de calidad en la implementación actual (`_calcular_mascaras_comunes`) no lo utiliza; el criterio equivalente que sí está activo es la detección de pérdida de señal en la onda cruda (`umbral_ceros_raw`, G.9). Se mantiene documentado aquí porque el parámetro sigue presente en el diccionario de configuración, aunque no tiene efecto sobre el resultado.
-
 ## G.3 Lectura de cabecera, tiempo inicial y onda cruda
 
 **Funciones:** `_extraer_parametros_eeg`, `_leer_raw_intercalado`, `_dar_forma_raw`, `_interpretar_inicio_ta`.
 
 La cabecera `.h_a` se lee como un binario y se interpretan cuatro campos mediante desplazamientos fijos de byte:
 
-| Parámetro | Offset (byte) | Tipo | Formato `struct` |
+| Parámetro | Desplazamiento (byte) | Tipo | Formato `struct` |
 |---|---:|---|---|
 | Número de canales | 178 | entero corto | `<h` |
 | Frecuencia de muestreo (fs) | 186 | entero | `<i` |
@@ -70,13 +65,13 @@ Antes del cálculo espectral, las muestras digitales se transforman a microvolti
 
 $$\text{EEG}_{\mu V} = \text{valor\_crudo} \cdot \text{pendiente} + \text{offset}$$
 
-Esta conversión se realiza ya alineada temporalmente con la timeline común: la función construye un array del tamaño exacto de la timeline objetivo, inicializado a `NaN`, y solo rellena con la conversión los instantes para los que existe muestra cruda real disponible. Así, cualquier tramo de la timeline sin cobertura de señal cruda queda automáticamente como ausencia de información, sin necesidad de una máscara adicional en este paso.
+Esta conversión se realiza ya alineada temporalmente con la timeline común: la función construye un array del tamaño exacto de la línea temporal objetivo, inicializado a `NaN`, y solo rellena con la conversión los instantes para los que existe muestra cruda real disponible. Así, cualquier tramo de la línea sin cobertura de señal cruda queda automáticamente como ausencia de información, sin necesidad de una máscara adicional en este paso.
 
 ## G.5 Filtro pasa-altos causal
 
 **Funciones:** `_extraer_filtro_lofilter`, `_filtrar_pasa_altos_causal`.
 
-El filtro pasa-altos se aplica antes del cálculo espectral con el objetivo de atenuar componentes de muy baja frecuencia y deriva de línea base. Se utiliza un filtro Butterworth causal de primer orden, implementado con `scipy.signal.butter` (`output="sos"`) y aplicado mediante `sosfilt`. Al ser causal, cada muestra de salida depende únicamente de muestras presentes y anteriores, respetando la dirección temporal de adquisición.
+El filtro pasa-altos se aplica antes del cálculo espectral con el objetivo de atenuar componentes de muy baja frecuencia y deriva de línea base. Se utiliza un filtro Butterworth causal de primer orden [@OppenheimSchafer2014], implementado con `scipy.signal.butter` (`output="sos"`) y aplicado mediante `sosfilt`. Al ser causal, cada muestra de salida depende únicamente de muestras presentes y anteriores, respetando la dirección temporal de adquisición.
 
 La frecuencia de corte se obtiene de la columna `LoFilter` del archivo `.spa`:
 
@@ -97,7 +92,7 @@ Un detalle metodológico relevante es el tratamiento de los huecos: la señal pu
 
 Para ilustrar el funcionamiento del filtro, se toma un caso concreto: frecuencia de muestreo $f_s = 128$ Hz, frecuencia de corte $f_c = 2,5$ Hz (código `LoFilter` 3) y orden 1.
 
-Para un filtro Butterworth pasa-altos digital de primer orden diseñado mediante transformación bilineal, los coeficientes pueden expresarse a partir de:
+Para un filtro Butterworth pasa-altos digital de primer orden diseñado mediante transformación bilineal [@OppenheimSchafer2014], los coeficientes pueden expresarse a partir de:
 
 $$K = \tan\left(\frac{\pi f_c}{f_s}\right)$$
 
@@ -135,6 +130,8 @@ Por ejemplo, la segunda muestra se obtiene como $y[1] = 0{,}9412\cdot(102-100) +
 
 **Funciones:** `_welch_por_bloques`, `_reconstruir_lado`.
 
+La estimación espectral se realiza mediante el método de Welch [@Welch1967], que promedia periodogramas modificados calculados sobre segmentos solapados de la señal para reducir la varianza de la estimación respecto a un periodograma único sobre toda la señal.
+
 | Parámetro | Justificación |
 |---|---|
 | Ventana de 2 s | Compromiso entre resolución temporal y frecuencial |
@@ -150,7 +147,7 @@ Por ejemplo, la segunda muestra se obtiene como $y[1] = 0{,}9412\cdot(102-100) +
 
 ### De la señal discreta a la resolución de 0,5 Hz
 
-El EEG no llega al ordenador como una señal continua, sino como una secuencia finita de muestras. Por eso el análisis frecuencial no puede usar la Transformada de Fourier continua, sino su versión para señales muestreadas y finitas, la Transformada Discreta de Fourier (DFT); la FFT (*Fast Fourier Transform*) no es una transformada distinta, sino el algoritmo con el que se calcula esa misma DFT de forma mucho más rápida, y es lo que usa internamente `scipy.signal.welch`.
+El EEG no llega al ordenador como una señal continua, sino como una secuencia finita de muestras. Por eso el análisis frecuencial no puede usar la Transformada de Fourier continua, sino su versión para señales muestreadas y finitas, la Transformada Discreta de Fourier (DFT) [@OppenheimSchafer2014]; la FFT (*Fast Fourier Transform*) no es una transformada distinta, sino el algoritmo con el que se calcula esa misma DFT de forma mucho más rápida, y es lo que usa internamente `scipy.signal.welch`.
 
 La resolución frecuencial que se obtiene de una ventana de $N$ muestras a una frecuencia de muestreo $f_s$ es:
 
@@ -173,7 +170,7 @@ Por último, que se use la FFT y no la DFT calculada de forma directa no es un d
 Para cada canal, la señal se procesa por segmentos de 2 segundos, a los que se aplican dos correcciones antes del cálculo espectral propiamente dicho:
 
 - **Eliminación de la media (`detrend="constant"`).** Cada segmento se centra en torno a cero, eliminando su nivel medio sin alterar sus oscilaciones. Si el fragmento tuviese un desplazamiento constante respecto a cero (una componente de continua), la FFT lo interpretaría como una gran cantidad de potencia concentrada en 0 Hz, una potencia artificial que no corresponde a actividad oscilatoria real y que podría contaminar la lectura de las frecuencias más bajas.
-- **Ventana Hann.** Suaviza progresivamente la amplitud del segmento hacia sus dos extremos. La FFT asume implícitamente que el fragmento analizado se repite de forma periódica; si el principio y el final del segmento no encajan entre sí, aparece un salto artificial en ese punto de unión. Ese salto, al descomponerse en frecuencias, se parece a componentes de alta frecuencia y añade potencia que no está realmente presente en el EEG. La ventana Hann atenúa los bordes para reducir ese salto y, con ello, la fuga espectral que provocaría.
+- **Ventana Hann.** Suaviza progresivamente la amplitud del segmento hacia sus dos extremos. La FFT asume implícitamente que el fragmento analizado se repite de forma periódica; si el principio y el final del segmento no encajan entre sí, aparece un salto artificial en ese punto de unión. Ese salto, al descomponerse en frecuencias, se parece a componentes de alta frecuencia y añade potencia que no está realmente presente en el EEG. La ventana Hann atenúa los bordes para reducir ese salto y, con ello, la fuga espectral que provocaría [@OppenheimSchafer2014].
 
 La implementación no llama a `scipy.signal.welch` sobre la señal completa con su parámetro de solapamiento interno. En su lugar, extrae manualmente segmentos de 256 muestras (2 s a 128 Hz) con un desplazamiento de 128 muestras (1 s) entre inicios consecutivos —lo que produce el solapamiento efectivo del 50 % entre ventanas—, y aplica `welch` de forma independiente a cada segmento ya extraído, con `noverlap=0` y `nfft = fs / paso_frecuencia`. El resultado equivale a un periodograma modificado (ventana Hann) por segmento, calculado con el avance deseado; esta equivalencia es la que se comprueba experimentalmente en la sección G.15.1 frente a `scipy.signal.spectrogram`.
 
@@ -204,7 +201,7 @@ $$\text{DSA}_{dB} = 10 \cdot \log_{10}\!\left(\frac{\text{potencia\_bin} + 10^{-
 
 El término $10^{-12}$ se añade únicamente para evitar problemas numéricos al calcular el logaritmo de valores nulos, y su magnitud es lo bastante pequeña como para no alterar de forma perceptible ninguna celda con señal real.
 
-La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS, mientras que lo que se compara en la fórmula es una potencia. Por ello la referencia debe elevarse al cuadrado, $(0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2$, antes de dividir; el resultado es equivalente a haber trabajado directamente con amplitudes y una expresión en $20 \log_{10}$. Esta referencia se mantiene constante en toda la aplicación para asegurar la comparabilidad entre registros y permitir la comparación con la DSA exportada por el monitor.
+La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS (*Root Mean Square*, valor eficaz o cuadrático medio de la señal) [CovidienExportData], mientras que lo que se compara en la fórmula es una potencia. Por ello la referencia debe elevarse al cuadrado, $(0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2$, antes de dividir; el resultado es equivalente a haber trabajado directamente con amplitudes y una expresión en $20 \log_{10}$. Esta referencia se mantiene constante en toda la aplicación para asegurar la comparabilidad entre registros y permitir la comparación con la DSA exportada por el monitor.
 
 Para la representación gráfica se emplea la escala lineal fija de 49 a 94 dB especificada por el fabricante (ver G.2). Los valores que quedan fuera de ese intervalo no se eliminan ni se invalidan: se saturan en los extremos de la escala cromática, de modo que una celda con una potencia superior a 94 dB se muestra igual que una de exactamente 94 dB, y análogamente en el extremo inferior.
 
@@ -223,7 +220,7 @@ Un segundo de la timeline común se considera no válido cuando se cumple alguno
 | Máscara | Criterio |
 |---|---|
 | Calidad `.spa` | `SQI10 < 15` o `TOTPOW08` ausente |
-| Pérdida de señal cruda | ≥50 % de las muestras del segundo, en el canal correspondiente, son exactamente cero |
+| Pérdida de señal cruda | $\geq$50 % de las muestras del segundo, en el canal correspondiente, son exactamente cero |
 | Segundo incompleto | La alineación no dispuso del conjunto completo de 128 muestras crudas para ese segundo (p. ej. en los bordes del registro) |
 | Discontinuidades | Segundo ausente en la timeline del `.spa` o, si existe, del `.f_a` |
 | Sin ventana Welch | No existe ninguna ventana de Welch cuyo instante central caiga en ese segundo (ocurre en el margen inicial que exige la ventana de 2 s) |
@@ -311,12 +308,12 @@ $$\text{sesgo} = \frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)$$
 
 ### G.15.1 Equivalencia entre Welch y `spectrogram`
 
-Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD como en dB y en las referencias temporales. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado.
+Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD como en dB y en las referencias temporales. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado, coherente con otros trabajos que también implementan el análisis espectral del EEG mediante Python mediante estas dos funciones equivalentes [@Sawa2022].
 
 ### G.15.2 Resultados de la validación por registro
 
 ::: {.callout-note}
-**Nota metodológica.** Las métricas de esta sección se obtuvieron con una versión anterior del módulo de reconstrucción, cuya máscara de calidad incluía el criterio espectral `umbral_ceros` (90 % de *bins* nulos) descrito en G.2. La implementación final sustituye ese criterio por la detección de pérdida de señal sobre la onda cruda (`umbral_ceros_raw`, 50 %, ver G.9), que actúa en una etapa anterior del proceso. Ambos criterios persiguen el mismo objetivo —detectar segundos sin información fiable—, pero al no ser idénticos, el porcentaje de segundos enmascarados y, en consecuencia, los valores exactos de Pearson, MAE y RMSE calculados sobre la implementación final podrían diferir ligeramente de los aquí presentados. Los resultados deben interpretarse como una validación orientativa de la estrategia de reconstrucción adoptada, no como una medición exacta y actualizada de la versión final del código. Repetir esta validación con el pipeline definitivo queda como tarea pendiente antes de la entrega, si el tiempo lo permite.
+**Nota metodológica.** Las métricas de esta sección se obtuvieron con una versión anterior del módulo de reconstrucción, cuya máscara de calidad incluía un criterio espectral adicional (segundo inválido si el 90 % o más de sus *bins* eran nulos), que ya no forma parte de la implementación final. La implementación final sustituye ese criterio por la detección de pérdida de señal sobre la onda cruda (`umbral_ceros_raw`, 50 %, ver G.9), que actúa en una etapa anterior del proceso. Ambos criterios persiguen el mismo objetivo —detectar segundos sin información fiable—, pero al no ser idénticos, el porcentaje de segundos enmascarados y, en consecuencia, los valores exactos de Pearson, MAE y RMSE calculados sobre la implementación final podrían diferir ligeramente de los aquí presentados. Los resultados deben interpretarse como una validación orientativa de la estrategia de reconstrucción adoptada, no como una medición exacta y actualizada de la versión final del código. Repetir esta validación con el pipeline definitivo queda como tarea pendiente antes de la entrega, si el tiempo lo permite.
 :::
 
 La evaluación se realizó sobre tres registros BIS. Los registros bilaterales aportaron dos matrices independientes, una por hemisferio, por lo que se compararon cinco matrices en total.

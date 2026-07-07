@@ -38,7 +38,7 @@ Para aproximar el sistema a un posible uso dentro de una intranet hospitalaria, 
 
 La máquina virtual de aplicación ejecuta las aplicaciones Dash y permite el acceso desde un navegador web. La máquina virtual de datos actúa como repositorio común de pacientes. La comunicación entre ambas se realiza mediante una carpeta compartida por red utilizando Samba/SMB.
 
-![Diseño de despliegue mediante máquinas virtuales. Fuente: elaboración propia, generada con apoyo de ChatGPT.](img/esquema_arquitectura_ubu.png){#fig-diseno-despliegue width=90%}
+![Diseño de despliegue mediante máquinas virtuales. Fuente: elaboración propia, generada con apoyo de ChatGPT.](img/esquema_arquitectura_hubu.png){#fig-diseno-despliegue width=90%}
 
 La @fig-diseno-despliegue muestra la separación entre la máquina virtual de aplicación y la máquina virtual de datos.
 
@@ -115,7 +115,7 @@ El visualizador incluye la lógica necesaria para:
 
 ### Justificación del diseño
 
-El diseño propuesto responde a las necesidades principales del proyecto: organizar sesiones BIS e información ICCA, permitir su consulta posterior y facilitar una posible adaptación a un entorno hospitalario.
+El diseño propuesto responde a las necesidades principales del proyecto y a las peticiones del personal clínico de la UCI: organizar sesiones BIS e información ICCA, permitir su consulta posterior y facilitar una posible adaptación a un entorno hospitalario.
 
 La separación entre organizador y visualizador evita mezclar tareas de preparación de datos con tareas de consulta. A su vez, el uso de una estructura fija de carpetas permite mantener los archivos originales y auxiliares asociados a cada paciente, sin necesidad de implantar una base de datos.
 

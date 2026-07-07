@@ -6,28 +6,78 @@
 
 \apendice{Plan de Proyecto}
 
-# Introducción
+## Introducción
 
-En este apartado se describe de forma breve el propósito general del proyecto, su contexto y el alcance del trabajo realizado, indicando qué problema se aborda y qué se pretende conseguir con el TFG.
+Este proyecto surge de la necesidad, detectada en la Unidad de Cuidados Intensivos del Hospital Universitario de Burgos (HUBU), de facilitar el análisis retrospectivo de pacientes críticos combinando dos fuentes de información que hasta ahora se consultaban por separado: la neuromonitorización del monitor BIS y las variables clínicas registradas en el sistema ICCA. Ambas fuentes tienen resoluciones temporales muy distintas y formatos propios, lo que dificulta relacionar la evolución del BIS y de la DSA con el contexto clínico del paciente en un mismo momento.
 
+El alcance del trabajo se limita deliberadamente a una prueba de concepto: no se pretende sustituir la interpretación clínica ni ofrecer un producto validado para uso asistencial, sino demostrar que es viable organizar, sincronizar y visualizar conjuntamente ambos tipos de datos. Para ello se han desarrollado tres piezas complementarias (un portal de acceso, una aplicación de organización de pacientes y sesiones, y un visualizador interactivo), apoyadas en un flujo de reconstrucción de la matriz de densidad espectral cuando el archivo espectral original no está disponible.
 
-# Metodología de ingeniería del software
-Si procede.
-Se debe describir la metodología seguida durante el desarrollo del proyecto. En caso de existir desarrollo software, se indicará la metodología utilizada (por ejemplo, cascada, ágil o experimental)
-En cada apartado de los apéndices (A hasta el G) se deberá indicar que tarea o fase de la metodología utilizada se está realizando, o bien en este nuevo apéndice deberá quedar reflejado con detalle las tareas y fases que se han ido realizando.
-Si el TFG no contiene  todo el ciclo de vida de la metodología utilizada, deberá indicarse las fases y tareas que han quedado pendientes.
-Si el TFG no está centrado el desarrollo software, pero puede servir para un posterior desarrollo software, se deberá indicar qué metodología de desarrollo se recomienda y argumentar los motivos.
+## Metodología de ingeniería del software
 
+El desarrollo no siguió una metodología formal predefinida (no se emplearon, por ejemplo, sprints de Scrum ni un ciclo en cascada completo), sino un enfoque incremental basado en prototipos, adoptado principalmente porque la disponibilidad real de los datos condicionó el orden de trabajo: los datos clínicos reales del HUBU no se obtuvieron hasta las últimas semanas del proyecto, por lo que fue necesario diseñar y validar buena parte del sistema con datos ficticios antes de disponer de los reales.
 
-# Planificación temporal
+El proceso seguido fue el siguiente:
 
-Se presentará la planificación temporal del proyecto, preferiblemente mediante un cronograma o diagrama de Gantt, donde se reflejen las principales tareas, fases y su duración aproximada.
+1. **Exploración inicial.** Se estudió la estructura de los archivos BIS (`.spa`, `.f_a`, `.r2a`/`.r4a`, `.h_a`, `.t_a`) mediante *notebooks* exploratorios, implementando funciones de lectura y decodificación como primer contacto con los datos.
+2. **Consolidación en módulos.** Las funciones exploratorias se reorganizaron en módulos reutilizables (`reconstruccion.py`, `lectura_spa.py`, `lectura_fa.py`, `alineacion_temporal.py`, entre otros), separando la lógica de procesamiento de la interfaz.
+3. **Desarrollo de las aplicaciones.** Sobre esos módulos se construyeron las tres aplicaciones Dash (portal, organizador y visualizador), cada una con su propio ciclo de prueba.
+4. **Ciclos de prueba y ajuste.** Cada iteración se comprobó con registros reales unilaterales y bilaterales, revisando visualmente las salidas y, cuando existía un archivo `.f_a` disponible, validando cuantitativamente la reconstrucción frente a él (Anexo G).
+5. **Adaptación a los datos reales.** La llegada progresiva de los archivos clínicos reales obligó a ajustar de nuevo las visualizaciones y algunos criterios de lectura, ya definidos inicialmente sobre datos ficticios.
+
+En cuanto a la trazabilidad y reproducibilidad, se mantuvieron siempre separados los archivos originales de los derivados generados por las aplicaciones, y los procesos de reconstrucción y organización son deterministas: repetirlos sobre los mismos archivos de entrada produce los mismos resultados.
+
+Dado que este apéndice recoge de forma centralizada las fases seguidas, no se ha considerado necesario anotar de nuevo la fase correspondiente en cada uno de los apéndices B a G.
+
+## Planificación temporal
+
+La planificación temporal del proyecto estuvo condicionada por la disponibilidad progresiva de los datos clínicos reales. Por este motivo, el desarrollo se organizó de forma incremental: primero se trabajó con datos ficticios y registros BIS disponibles para construir la arquitectura general del sistema, y posteriormente se adaptó el flujo a los datos reales procedentes del HUBU una vez obtenida la aprobación ética.
+
+![Planificación temporal real del proyecto.](img/planificacion_temporal.png){#fig-planificacion-temporal width=95%}
+
+En la Figura @fig-planificacion-temporal se recoge el cronograma real del proyecto, diferenciando las fases de desarrollo técnico, documentación, tramitación ética, entrega y preparación de la defensa.
 
 ## Planificación económica
 
+La planificación económica se plantea como una estimación del coste equivalente del proyecto, no como un coste facturado real. La mayor parte de herramientas utilizadas son de libre acceso o cuentan con licencia institucional, por lo que el coste principal corresponde al tiempo de desarrollo.
+
+| Concepto | Descripción | Coste estimado |
+|---|---|---:|
+| Personal | 300 horas de desarrollo, análisis, pruebas y documentación, estimadas a 15 €/h | 4.500 € |
+| Hardware | Amortización parcial del equipo clínico empleado durante el desarrollo | 125 € |
+| Software | Python, Dash, Plotly, Quarto, R, GitHub y librerías de análisis empleadas sin coste directo | 0 € |
+| Documentación y almacenamiento | Material de documentación, almacenamiento local y copias auxiliares | 30 € |
+| Otros costes indirectos | Electricidad, conexión a red y uso general del equipo | 50 € |
+| **Total estimado** |  | **4705 €** |
+
+: Estimación económica del proyecto {#tbl-planificacion-economica}
+
+## Viabilidad técnica
+
+La viabilidad técnica del proyecto se apoya en el uso de herramientas abiertas y ampliamente utilizadas en análisis de datos biomédicos y desarrollo de aplicaciones interactivas. El procesamiento de datos se realizó principalmente en Python, utilizando librerías para lectura, transformación, análisis numérico y visualización. La interfaz se desarrolló mediante Dash y Plotly, lo que permitió construir una aplicación web local sin necesidad de desplegar inicialmente el sistema en un servidor hospitalario.
+
+El proyecto también se diseñó separando la lógica de procesamiento de datos de la interfaz gráfica. Esta decisión facilita la reutilización de los módulos de lectura, alineación temporal, reconstrucción de DSA y visualización, y permite modificar partes concretas del sistema sin rehacer toda la aplicación.
+
+Para reducir problemas de compatibilidad entre equipos, versiones de Python y dependencias, el sistema puede ejecutarse en un entorno controlado, como un entorno virtual o una máquina virtual configurada con las librerías necesarias. Esta posibilidad resulta especialmente útil si en el futuro se desea reproducir el proyecto en otro equipo o trasladarlo a un entorno más cercano al hospitalario.
+
+## Gestión de riesgos
+
+Durante el desarrollo se identificaron varios riesgos técnicos y organizativos. La Tabla @tbl-riesgos resume los principales riesgos detectados y las medidas adoptadas para reducir su impacto.
+
+| Riesgo | Impacto | Medida adoptada |
+|---|---|---|
+| Retraso en la disponibilidad de datos reales | Dificultad para probar el flujo completo desde el inicio | Desarrollo inicial con datos ficticios y adaptación posterior |
+| Ausencia o invalidez del archivo `.f_a` | Imposibilidad de visualizar la DSA original | Implementación de reconstrucción desde EEG crudo |
+| Algoritmo BIS propietario | Imposibilidad de reproducir exactamente el procesamiento interno del monitor | Validación comparativa frente a `.f_a` cuando está disponible |
+| Heterogeneidad temporal entre BIS e ICCA | Dificultad para representar todas las variables en una línea temporal común | Diseño de una timeline basada en la sesión BIS y representación diferenciada por tipo de variable |
+| Restricciones éticas y de protección de datos | Limitación en el acceso y tratamiento de datos clínicos | Tramitación de aprobación ética y trabajo con datos bajo condiciones autorizadas |
+| Calidad variable de la señal BIS | Posible representación de tramos no interpretables | Incorporación de máscaras de calidad y detección de discontinuidades |
+
+: Riesgos principales del proyecto y medidas adoptadas {#tbl-riesgos}
+
 ## Viabilidad legal
 
-Si corresponde, incluir aquí el documento de aprovación por parte de la Comisión de Bioética.
+El proyecto se ha desarrollado con datos clínicos procedentes del Hospital Universitario de Burgos (HUBU). Su uso fue autorizado por el Comité de Bioética correspondiente, cuya aprobación fue concedida el 2 de julio de 2026, habilitando el tratamiento de información clínica retrospectiva bajo condiciones de confidencialidad, protección de datos y finalidad investigadora.
 
-Ojo \footnote{Los anexos deben de tener su propia bibliografía, eso es tan fácil como utilizar referencias igual que en la memoria \cite{bortolot2005}}
+El trabajo se limita a la organización, integración temporal y visualización retrospectiva de los datos recibidos. La extracción de las variables clínicas procedentes de ICCA fue realizada por personal autorizado, y la aplicación desarrollada no accede directamente a la base de datos hospitalaria ni modifica los datos originales.
 
+Esta aprobación ampara el desarrollo y la prueba de concepto descritos en este trabajo, pero no constituye una validación clínica de la herramienta ni autoriza su uso como apoyo a la toma de decisiones asistenciales. El sistema debe entenderse como una herramienta experimental orientada al análisis retrospectivo y a la exploración de datos.

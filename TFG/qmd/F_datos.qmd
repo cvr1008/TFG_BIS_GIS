@@ -16,7 +16,7 @@ Los nombres de archivos mostrados en este documento corresponden a códigos de r
 
 ## Aprobación ética y marco de uso de los datos
 
-Los datos empleados en este proyecto proceden de pacientes reales ingresados en la Unidad de Cuidados Intensivos del Hospital Universitario de Burgos (HUBU). Su uso con fines de investigación fue autorizado por el Comité de Bioética correspondiente, cuya aprobación fue concedida el 2 de julio de 2026.
+Los datos empleados en este proyecto proceden de pacientes reales ingresados en la Unidad de Cuidados Intensivos del Hospital Universitario de Burgos (HUBU). Su uso con fines de investigación fue autorizado por el Comité de Ética de la Investigación con medicamentos (CEIm) correspondiente, cuya aprobación (dictamen CEIm nº 3592) fue concedida el 2 de julio de 2026. En el Anexo J se incluyen tanto la solicitud como la resolución favorable.
 
 Esta aprobación habilita el tratamiento de información clínica retrospectiva bajo las condiciones de confidencialidad, protección de datos y finalidad investigadora establecidas por el propio comité. En consecuencia:
 
@@ -33,13 +33,15 @@ El tipo de sensor determina la modalidad del registro:
 - **Monitorización unilateral:** utiliza un sensor situado sobre un hemisferio y genera dos canales físicos de EEG. En las variables procesadas aparece,  además, un bloque combinado denominado `Ch 12`.
 - **Monitorización bilateral:** utiliza un sensor simétrico y un módulo BISx4, generando cuatro canales físicos. Los canales 1 y 2 corresponden al hemisferio izquierdo y los canales 3 y 4 al derecho.
 
-En unilateral se utiliza una matriz de cuatro electrodos. El electrodo 1 actúa como referencia positiva compartida, el electrodo 2 como tierra y los electrodos 3 y 4 como puntos de lectura. De esta disposición se obtienen el
+En unilateral se utiliza una matriz de cuatro electrodos. El electrodo 1 actúa como referencia positiva compartida, el electrodo 2 como tierra y los electrodos 3 y 4 como puntos de lectura [@CovidienBISadvanced]. De esta disposición se obtienen el
 canal 1, como diferencia entre los electrodos 1 y 3, y el canal 2, como diferencia entre los electrodos 1 y 4.
 
 ![Colocación del sensor empleado en monitorización unilateral. Elaboración propia a partir de la documentación técnica recopilada.](img/anexo_f_sensor_unilateral.png){#fig-sensor-unilateral width=65%}
 
 En bilateral, el sensor dispone de un electrodo central común (`C`), un electrodo de tierra (`G`) y cuatro electrodos de lectura: temporal izquierdo (`LT`), frontal izquierdo (`LE`), frontal derecho (`RE`) y temporal derecho
-(`RT`). Los canales 1 y 2 se obtienen en el lado izquierdo y los canales 3 y 4 en el derecho.
+(`RT`) [@CovidienBISadvanced]. Los canales 1 y 2 se obtienen en el lado izquierdo y los canales 3 y 4 en el derecho.
+
+De forma análoga al sensor unilateral, cada canal bilateral se obtiene como la diferencia de potencial entre el electrodo central `C` (positivo, compartido por los cuatro canales) y cada uno de los cuatro electrodos de lectura (negativos): el canal 1 corresponde a la diferencia entre `C` y `LT`, el canal 2 a la diferencia entre `C` y `LE`, el canal 3 a la diferencia entre `C` y `RT`, y el canal 4 a la diferencia entre `C` y `RE` [@CovidienExportData]. Los canales elegidos para la reconstrucción en este proyecto, el 1 y el 3, corresponden por tanto a los dos electrodos temporales (`LT` y `RT`), uno por hemisferio.
 
 ![Colocación del sensor empleado en monitorización bilateral. Elaboración propia a partir de la documentación técnica recopilada.](img/anexo_f_sensor_bilateral.png){#fig-sensor-bilateral width=55%}
 
@@ -59,7 +61,7 @@ Los archivos de un mismo registro comparten el nombre base. Por ejemplo,
 `L03041035.r2a`, `L03041035.h_a` y `L03041035.spa` pertenecen a la misma
 sesión. La aplicación busca estos archivos de forma recursiva, comprueba que
 exista una única exportación y determina automáticamente la modalidad a
-partir de la extensión del archivo de EEG.
+partir de la extensión del archivo de EEG. Las extensiones y el contenido de cada archivo de exportación siguen la convención documentada por el fabricante [@CovidienBISadvanced].
 
 | Extensión | Formato | Contenido principal | Uso en el proyecto |
 |---|---|---|---|
@@ -76,7 +78,7 @@ partir de la extensión del archivo de EEG.
 
 : Archivos encontrados en las exportaciones BIS analizadas {#tbl-archivos-bis}
 
-No todos los equipos o configuraciones producen archivos con contenido. En particular, se han encontrado registros en los que `.f_a` existe pero tiene un tamaño de cero bytes. Esta situación es relevante para el proyecto, porque justifica la reconstrucción de la DSA a partir del EEG crudo.
+No todos los equipos producen archivos `.f_a` con contenido. En concreto, el equipo BIS VISTA exporta sistemáticamente un archivo `.f_a` de cero bytes: no se trata de una incidencia ocasional de algunos registros, sino de un comportamiento propio de este modelo de monitor, a diferencia del BIS Advance, cuyas exportaciones sí contienen la matriz espectral. Esta circunstancia es relevante para el proyecto, porque justifica por sí sola la necesidad de reconstruir la DSA a partir del EEG crudo para todos los registros procedentes de BIS VISTA.
 
 ## Archivos de EEG crudo: `.r2a` y `.r4a`
 
@@ -404,7 +406,7 @@ Las variables clínicas se reciben en forma de una plantilla Excel estructurada,
 | Hoja | Contenido | Naturaleza temporal |
 |---|---|---|
 | `general` | Contexto del ingreso: identificador, fechas de ingreso y alta, edad, peso | Estática (una fila por paciente) |
-| `constantes_vitales` | Frecuencia cardiaca, presión arterial, SpO₂, temperatura, frecuencia respiratoria, PIC | Mediciones periódicas |
+| `constantes_vitales` | Frecuencia cardiaca, presión arterial, SpO$_2$, temperatura, frecuencia respiratoria, PIC | Mediciones periódicas |
 | `analisis` | Resultados analíticos: hemoglobina, iones, glucosa, gasometría | Observaciones puntuales |
 | `perfusiones` | Fármacos en perfusión continua y sus dosis | Cambios de dosis activa |
 
@@ -467,11 +469,11 @@ Para las constantes vitales, la aplicación genera un archivo derivado (en forma
 
 ### Auditoría e inferencia del tipo de gasometría
 
-Las determinaciones de gasometría (pO₂, pCO₂) requieren saber si la muestra es arterial o venosa para interpretarse correctamente, y esta información no siempre consta de forma explícita en ICCA. La aplicación resuelve esta situación mediante un procedimiento de auditoría que, para cada determinación, decide si puede incluirse en la visualización y con qué grado de confianza:
+Las determinaciones de gasometría (pO$_2$, pCO$_2$) requieren saber si la muestra es arterial o venosa para interpretarse correctamente, y esta información no siempre consta de forma explícita en ICCA. La aplicación resuelve esta situación mediante un procedimiento de auditoría que, para cada determinación, decide si puede incluirse en la visualización y con qué grado de confianza:
 
 - Si la plantilla ICCA indica explícitamente el tipo de gasometría, este se respeta y la determinación se incluye con origen "indicado".
-- Si no se indica explícitamente pero la determinación aparece aislada, sin su pareja pO₂/pCO₂ en el mismo instante, se excluye por considerarse incompleta.
-- Si pO₂ y pCO₂ aparecen juntas en el mismo instante y las marcas asociadas a la medición son coherentes entre sí, el tipo de muestra puede inferirse con confianza alta a partir de ese contexto.
+- Si no se indica explícitamente pero la determinación aparece aislada, sin su pareja pO$_2$/pCO$_2$ en el mismo instante, se excluye por considerarse incompleta.
+- Si pO$_2$ y pCO$_2$ aparecen juntas en el mismo instante y las marcas asociadas a la medición son coherentes entre sí, el tipo de muestra puede inferirse con confianza alta a partir de ese contexto.
 - Si los indicios disponibles resultan contradictorios o insuficientes para una inferencia fiable, la determinación se excluye.
 
 En todos los casos, la decisión (inclusión o exclusión, tipo final, origen de la información y motivo cuando se excluye) queda registrada en una auditoría propia, de forma que el criterio aplicado a cada dato pueda revisarse posteriormente. Esta estrategia es más matizada que un simple descarte ante cualquier ambigüedad: aprovecha el contexto disponible para recuperar determinaciones interpretables, y solo descarta aquellas en las que el tipo de muestra no puede establecerse con garantías suficientes.
