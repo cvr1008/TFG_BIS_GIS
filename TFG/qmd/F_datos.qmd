@@ -93,9 +93,9 @@ Las muestras están entrelazadas por instante temporal:
 - En `.r4a`, cada trama contiene una muestra de los canales 1, 2, 3 y 4.
   Por tanto, una trama ocupa 8 bytes.
 
-![Organización de las dos primeras tramas de un archivo `.r2a` real.](img/anexo_f_estructura_r2a.png){#fig-estructura-r2a width=100%}
+![Organización de las dos primeras tramas de un archivo `.r2a` real. Fuente: Elaboración propia con ChatGPT](img/anexo_f_estructura_r2a.png){#fig-estructura-r2a width=100%}
 
-![Organización de las dos primeras tramas de un archivo `.r4a` real.](img/anexo_f_estructura_r4a.png){#fig-estructura-r4a width=100%}
+![Organización de las dos primeras tramas de un archivo `.r4a` real. Fuente: Elaboración propia con ChatGPT](img/anexo_f_estructura_r4a.png){#fig-estructura-r4a width=100%}
 
 En las exportaciones utilizadas, la frecuencia de muestreo indicada por la cabecera es de 128 Hz por canal. Esto implica 128 tramas por segundo y una resolución temporal entre muestras de 7,8125 ms. La aplicación no presupone este valor, sino que lo obtiene del archivo `.h_a`. La especificación técnica también describe la transmisión de EEG crudo como datos entrelazados con una frecuencia de 128 muestras por segundo [@CovidienSerial2010].
 
@@ -173,7 +173,7 @@ La cabecera puede contener además identificadores de versión del algoritmo y o
 
 ## Archivo temporal: `.t_a`
 
-El archivo `.t_a` contiene, en texto, la fecha y hora asociadas al comienzo de la señal cruda. En los registros analizados consta de una única línea, por ejemplo:
+El archivo `.t_a` contiene, en texto, la fecha y hora (en formato MM/DD/AAAA HH:MM:SS) asociadas al comienzo de la señal cruda. En los registros analizados consta de una única línea, por ejemplo:
 
 ```text
 03/04/2026 10:35:21

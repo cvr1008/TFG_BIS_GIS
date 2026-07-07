@@ -11,7 +11,7 @@
 El proyecto se organiza en torno a una carpeta principal que contiene las aplicaciones desarrolladas, los datos de trabajo y los archivos auxiliares necesarios para la ejecución local del sistema. La estructura general es la siguiente:
 
 ```text
-tfg/
+TFG_BIS_GIS/
 |-- aplicaciones/
 |   |-- portal_bis_icca/
 |   |-- organizador_bis_icca/
@@ -38,9 +38,13 @@ La versión final del proyecto centraliza las tres aplicaciones dentro de la car
 
 Cada aplicación contiene un archivo `app.py`, que define la interfaz Dash y sus *callbacks* principales. Las funciones auxiliares se agrupan en la carpeta `src/` de cada aplicación, mientras que las pruebas automáticas se almacenan en su carpeta `tests/`.
 
-La carpeta `datos/pacientes/` contiene las carpetas generadas para cada paciente durante el uso del sistema, con las sesiones BIS seleccionadas, los archivos ICCA asociados y los archivos auxiliares generados para la visualización. Los archivos originales no se modifican durante este proceso; cuando es necesario, se trabaja sobre copias o archivos derivados.
+La carpeta `datos/pacientes/` contiene las carpetas generadas para cada paciente durante el uso del sistema. Contienen: 
+* Las sesiones BIS seleccionadas, 
+* los archivos ICCA asociados 
+* los archivos auxiliares generados para la visualización. 
 
-Los directorios como `.venv/`, `.runtime/`, `outputs/`, `tmp/` o carpetas de pruebas temporales no forman parte del código fuente principal y no deben considerarse elementos necesarios para la entrega final.
+Los archivos originales no se modifican durante este proceso; cuando es necesario, se trabaja sobre copias o archivos derivados.
+
 
 ## Compilación, instalación y ejecución del proyecto
 
