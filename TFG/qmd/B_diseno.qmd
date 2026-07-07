@@ -50,20 +50,20 @@ El sistema no utiliza una base de datos relacional. La información se organiza 
 
 ```text
 Pacientes/
-├── PACIENTE_001/
-│   ├── paciente.json
-│   ├── ICCA_ORIGINALES/
-│   └── SESIONES/
-│       ├── SESION_001_...
-│       │   ├── sesion.json
-│       │   ├── BIS/
-│       │   └── ICCA/
-│       └── SESION_002_...
-│           ├── sesion.json
-│           ├── BIS/
-│           └── ICCA/
-└── PACIENTE_002/
-    └── ...
+|-- PACIENTE_001/
+|   |-- paciente.json
+|   |-- ICCA_ORIGINALES/
+|   `-- SESIONES/
+|       |-- SESION_001_...
+|       |   |-- sesion.json
+|       |   |-- BIS/
+|       |   `-- ICCA/
+|       `-- SESION_002_...
+|           |-- sesion.json
+|           |-- BIS/
+|           `-- ICCA/
+`-- PACIENTE_002/
+    `-- ...
 ```
 
 Cada paciente dispone de una carpeta propia, donde se almacenan sus sesiones BIS, los registros ICCA asociados y los archivos auxiliares generados por la aplicación.
@@ -115,7 +115,7 @@ El visualizador incluye la lógica necesaria para:
 
 ### Justificación del diseño
 
-El diseño propuesto responde a las necesidades principales del proyecto y a las peticiones del personal clínico de la UCI: organizar sesiones BIS e información ICCA, permitir su consulta posterior y facilitar una posible adaptación a un entorno hospitalario.
+El diseño propuesto responde a las necesidades principales del proyecto: organizar sesiones BIS e información ICCA, permitir su consulta posterior y facilitar una posible adaptación a un entorno hospitalario.
 
 La separación entre organizador y visualizador evita mezclar tareas de preparación de datos con tareas de consulta. A su vez, el uso de una estructura fija de carpetas permite mantener los archivos originales y auxiliares asociados a cada paciente, sin necesidad de implantar una base de datos.
 

@@ -26,7 +26,7 @@ Todos los parámetros de la reconstrucción se centralizan en un único dicciona
 | `tiempo_referencia` | centro | La ventana se asigna a su instante central |
 | `umbral_sqi` | 15 | Límite mínimo de calidad de señal (`SQI10`) |
 | `aplicar_mascara_ceros_raw` | True | Activa la detección de pérdidas en el EEG crudo |
-| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si el 50 % de sus muestras o más  son cero |
+| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si $\geq$50 % de sus muestras son cero |
 | `excluir_invalidos_suavizado` | True | Los segundos inválidos se excluyen del promedio móvil |
 | `referencia_amplitud_uv_rms` | 0,0001 µV RMS | Referencia usada en la conversión logarítmica a dB |
 | `combinacion_unilateral` | canal 1 | Canal físico usado en unilateral |
@@ -44,7 +44,7 @@ Todos los parámetros de la reconstrucción se centralizan en un único dicciona
 
 La cabecera `.h_a` se lee como un binario y se interpretan cuatro campos mediante desplazamientos fijos de byte:
 
-| Parámetro | Desplazamiento (byte) | Tipo | Formato `struct` |
+| Parámetro | Offset (byte) | Tipo | Formato `struct` |
 |---|---:|---|---|
 | Número de canales | 178 | entero corto | `<h` |
 | Frecuencia de muestreo (fs) | 186 | entero | `<i` |
@@ -65,7 +65,7 @@ Antes del cálculo espectral, las muestras digitales se transforman a microvolti
 
 $$\text{EEG}_{\mu V} = \text{valor\_crudo} \cdot \text{pendiente} + \text{offset}$$
 
-Esta conversión se realiza ya alineada temporalmente con la timeline común: la función construye un array del tamaño exacto de la línea temporal objetivo, inicializado a `NaN`, y solo rellena con la conversión los instantes para los que existe muestra cruda real disponible. Así, cualquier tramo de la línea sin cobertura de señal cruda queda automáticamente como ausencia de información, sin necesidad de una máscara adicional en este paso.
+Esta conversión se realiza ya alineada temporalmente con la timeline común: la función construye un array del tamaño exacto de la timeline objetivo, inicializado a `NaN`, y solo rellena con la conversión los instantes para los que existe muestra cruda real disponible. Así, cualquier tramo de la timeline sin cobertura de señal cruda queda automáticamente como ausencia de información, sin necesidad de una máscara adicional en este paso.
 
 ## G.5 Filtro pasa-altos causal
 
@@ -201,9 +201,9 @@ $$\text{DSA}_{dB} = 10 \cdot \log_{10}\!\left(\frac{\text{potencia\_bin} + 10^{-
 
 El término $10^{-12}$ se añade únicamente para evitar problemas numéricos al calcular el logaritmo de valores nulos, y su magnitud es lo bastante pequeña como para no alterar de forma perceptible ninguna celda con señal real.
 
-La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS (*Root Mean Square*, valor eficaz o cuadrático medio de la señal) [CovidienExportData], mientras que lo que se compara en la fórmula es una potencia. Por ello la referencia debe elevarse al cuadrado, $(0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2$, antes de dividir; el resultado es equivalente a haber trabajado directamente con amplitudes y una expresión en $20 \log_{10}$. Esta referencia se mantiene constante en toda la aplicación para asegurar la comparabilidad entre registros y permitir la comparación con la DSA exportada por el monitor.
+La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS (*Root Mean Square*, valor eficaz o cuadrático medio de la señal), mientras que lo que se compara en la fórmula es una potencia. Por ello la referencia debe elevarse al cuadrado, $(0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2$, antes de dividir; el resultado es equivalente a haber trabajado directamente con amplitudes y una expresión en $20 \log_{10}$. Esta referencia se mantiene constante en toda la aplicación para asegurar la comparabilidad entre registros y permitir la comparación con la DSA exportada por el monitor.
 
-Para la representación gráfica se emplea la escala lineal fija de 49 a 94 dB especificada por el fabricante (ver G.2). Los valores que quedan fuera de ese intervalo no se eliminan ni se invalidan: se saturan en los extremos de la escala cromática, de modo que una celda con una potencia superior a 94 dB se muestra igual que una de exactamente 94 dB, y análogamente en el extremo inferior.
+Para la representación gráfica se emplea la escala lineal fija de 49 a 94 dB especificada por el fabricante [@CovidienBISVista; @CovidienVISTABilateral]. Los valores que quedan fuera de ese intervalo no se eliminan ni se invalidan: se saturan en los extremos de la escala cromática, de modo que una celda con una potencia superior a 94 dB se muestra igual que una de exactamente 94 dB, y análogamente en el extremo inferior.
 
 ## G.8 Alineación temporal de la DSA reconstruida
 
@@ -298,23 +298,52 @@ $$RMSE = \sqrt{\frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)^2}$$
 
 $$\text{sesgo} = \frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)$$
 
-<!-- NOTA: el módulo que implementa el cálculo de estas métricas no estaba entre los scripts revisados
-     (lectura_spa.py, pacientes_icca.py, reconstruccion.py, validacion_bis.py, visualizacion_icca.py,
-     figuras.py, vistas_temporales.py, alineacion_temporal.py, bandas.py, carpeta_bis.py,
-     figuras_estaticas.py, informe_pdf.py, lectura_fa.py). Si tienes ese script (posiblemente
-     "metricas.py" o similar), pásamelo para verificar esta sección igual que las anteriores. -->
-
 ## G.15 Resultados experimentales
 
-### G.15.1 Equivalencia entre Welch y `spectrogram`
+### G.15.1 Equivalencia entre Welch y `spectrogram`, y comparación con *wavelet*
 
-Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD como en dB y en las referencias temporales. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado, coherente con otros trabajos que también implementan el análisis espectral del EEG mediante Python mediante estas dos funciones equivalentes [@Sawa2022].
+Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos: de las 682 combinaciones de filtro, suavizado, ventana y desplazamiento evaluadas en la validación experimental, las 682 arrojaron exactamente el mismo Pearson, MAE y RMSE para ambas funciones. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado, coherente con otros trabajos que también implementan el análisis espectral del EEG mediante Python mediante estas dos funciones equivalentes [@Sawa2022].
 
-### G.15.2 Resultados de la validación por registro
+En la misma validación se probó adicionalmente una transformada wavelet como alternativa a Welch. Aunque el Pearson obtenido con wavelet resultó razonable (hasta 0,69 en su mejor configuración), el error en escala física fue muy superior al de Welch: MAE en torno a 18,8 dB y RMSE en torno a 19,3 dB, frente a los 3,7 y 5,0 dB de Welch. Esta diferencia tan marcada en el error absoluto, pese a una correlación de patrón similar, descartó la transformada wavelet como alternativa viable para este proyecto.
 
-::: {.callout-note}
-**Nota metodológica.** Las métricas de esta sección se obtuvieron con una versión anterior del módulo de reconstrucción, cuya máscara de calidad incluía un criterio espectral adicional (segundo inválido si el 90 % o más de sus *bins* eran nulos), que ya no forma parte de la implementación final. La implementación final sustituye ese criterio por la detección de pérdida de señal sobre la onda cruda (`umbral_ceros_raw`, 50 %, ver G.9), que actúa en una etapa anterior del proceso. Ambos criterios persiguen el mismo objetivo —detectar segundos sin información fiable—, pero al no ser idénticos, el porcentaje de segundos enmascarados y, en consecuencia, los valores exactos de Pearson, MAE y RMSE calculados sobre la implementación final podrían diferir ligeramente de los aquí presentados. Los resultados deben interpretarse como una validación orientativa de la estrategia de reconstrucción adoptada, no como una medición exacta y actualizada de la versión final del código. Repetir esta validación con el pipeline definitivo queda como tarea pendiente antes de la entrega, si el tiempo lo permite.
-:::
+| Método espectral | Pearson | MAE (dB) | RMSE (dB) |
+|---|---:|---:|---:|
+| Welch | 0,726 | 3,72 | 5,02 |
+| `spectrogram` | 0,726 | 3,72 | 5,02 |
+| Wavelet | 0,690 | 18,75 | 19,26 |
+
+: Comparación de métodos espectrales, mejor configuración de cada uno (registro `L03041035`) {#tbl-metodos-espectrales}
+
+### G.15.2 Comparación de filtrado y tipos de suavizado
+
+La misma validación experimental permitió comparar, sobre el mismo registro y con el resto de parámetros fijos, tres decisiones metodológicas adoptadas en G.5 y G.10: aplicar o no el filtro pasa-altos Butterworth, y qué forma de suavizado temporal usar.
+
+**Filtro pasa-altos (Butterworth).** Sobre la mejor combinación de ventana y desplazamiento en cada caso (suavizado `rolling`, ventana 30 s):
+
+| Filtro Butterworth | Shift (s) | Pearson | MAE (dB) | RMSE (dB) |
+|---|---:|---:|---:|---:|
+| Aplicado | 11 | 0,7258 | 3,718 | 5,021 |
+| No aplicado | 11 | 0,7041 | 4,527 | 6,448 |
+
+: Efecto del filtro pasa-altos sobre la correspondencia con la DSA original {#tbl-butterworth-comparacion}
+
+Aplicar el filtro reduce el RMSE en más de 1,4 dB (un 22 % de mejora relativa) y el MAE en 0,8 dB, además de mejorar ligeramente el Pearson. Esto respalda la decisión de aplicar sistemáticamente el filtro pasa-altos antes del cálculo espectral (G.5), y no solo como un ajuste opcional.
+
+**Tipo de suavizado temporal.** Comparando, para cada tipo de suavizado, su mejor combinación de ventana y desplazamiento (con filtro Butterworth aplicado):
+
+| Suavizado | Ventana (s) | Shift (s) | Pearson | MAE (dB) | RMSE (dB) |
+|---|---:|---:|---:|---:|---:|
+| Sin suavizar | — | 24 | 0,470 | 6,643 | 8,584 |
+| Media móvil causal (`rolling`) | 30 | 11 | 0,726 | 3,718 | 5,021 |
+| Media móvil exponencial (`ewm`) | 30 | 11 | 0,694 | 3,813 | 5,161 |
+
+: Comparación de estrategias de suavizado temporal {#tbl-suavizado-comparacion}
+
+No suavizar la señal deja un RMSE muy superior (8,58 dB) al de cualquiera de las dos formas de suavizado probadas, lo que confirma que el suavizado temporal es necesario y no una simple opción estética. Entre las dos formas de suavizado con memoria, la media móvil causal (`rolling`), adoptada finalmente en el proyecto (G.10), obtuvo mejores resultados que la media móvil exponencial en las tres métricas, aunque la diferencia entre ambas es más moderada que frente a no suavizar en absoluto.
+
+Cabe destacar que, en las tres comparaciones anteriores (Welch frente a *wavelet* en G.15.1, Butterworth aplicado o no, y los tres tipos de suavizado), la combinación finalmente adoptada por el proyecto —Welch, filtro Butterworth aplicado, suavizado `rolling`— coincide en los tres casos con la opción de mejor resultado experimental, y no solo con una elección razonable a priori.
+
+### G.15.3 Resultados de la validación por registro
 
 La evaluación se realizó sobre tres registros BIS. Los registros bilaterales aportaron dos matrices independientes, una por hemisferio, por lo que se compararon cinco matrices en total.
 
@@ -330,18 +359,18 @@ La evaluación se realizó sobre tres registros BIS. Los registros bilaterales a
 
 | Registro | Lado | Shift (s) | Pearson | MAE (dB) | RMSE (dB) | Enmascarado |
 |:---|:---|---:|---:|---:|---:|---:|
-| `L03041035` | Unilateral | 10 | 0,7238 | 3,720 | 5,033 | 7,6 % |
+| `L03041035` | Unilateral | 10 | 0,7260 | 3,711 | 5,022 | 7,8 % |
 | `L05141322` | Izquierdo | 6 | 0,9388 | 1,600 | 2,308 | 5,1 % |
 | `L05141322` | Derecho | 6 | 0,9455 | 1,746 | 2,387 | 1,0 % |
 | `L04301923` | Izquierdo | 6 | 0,9836 | 0,994 | 1,577 | 0,4 % |
 | `L04301923` | Derecho | 6 | 0,9830 | 1,022 | 1,598 | 0,4 % |
-| **Promedio** | | | **0,9149** | **1,816** | **2,581** | **2,9 %** |
+| **Promedio** | | | **0,9154** | **1,815** | **2,578** | **2,9 %** |
 
 : Resultados finales de validación por registro {#tbl-resultados-finales}
 
 El registro unilateral presentó resultados inferiores a los bilaterales y una mayor proporción de segundos con calidad insuficiente. Esto refuerza la necesidad de ampliar la validación unilateral y evita interpretar el promedio global como una estimación definitiva del rendimiento en nuevos pacientes.
 
-### G.15.3 Configuración final
+### G.15.4 Configuración final
 
 | Elemento | Decisión final |
 |---|---|
@@ -353,6 +382,7 @@ El registro unilateral presentó resultados inferiores a los bilaterales y una m
 | Bin | 0,5 Hz |
 | Unilateral | Canal 1 |
 | Bilateral | Canal 1 izquierdo, canal 3 derecho |
+| Filtro pasa-altos | Butterworth aplicado (G.15.2) |
 | Suavizado | `SpSmooth` (media móvil causal) |
 | Máscara previa al suavizado | Sí |
 | Shift unilateral | 10 s |
@@ -360,7 +390,7 @@ El registro unilateral presentó resultados inferiores a los bilaterales y una m
 
 : Configuración final adoptada para la reconstrucción {#tbl-configuracion-final}
 
-Esta configuración ofreció el mejor equilibrio entre correspondencia con la DSA exportada, error en escala física, conservación de información y simplicidad metodológica.
+Esta configuración ofreció el mejor equilibrio entre correspondencia con la DSA exportada, error en escala física, conservación de información y simplicidad metodológica; y, como se detalla en G.15.1 y G.15.2, coincide en cada una de las decisiones comparadas (método espectral, filtro y suavizado) con la opción experimentalmente superior.
 
 **Limitaciones de la validación.** La selección se obtuvo a partir de tres registros y cinco matrices. Aunque los resultados bilaterales fueron consistentes, solo se dispuso de un registro unilateral con archivo `.f_a` válido. Por ello, la configuración debe considerarse seleccionada pero todavía sujeta a validación externa con un mayor número de registros unilaterales.
 

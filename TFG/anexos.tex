@@ -202,6 +202,9 @@
 \usepackage{graphicx}
 \graphicspath{{./img/}}
 
+% Necesario para \includepdf en el Anexo J (documentación CEIm)
+\usepackage{pdfpages}
+
 \newcommand{\imagen}[3]{%
   \begin{figure}[!h]
     \centering
@@ -304,27 +307,11 @@
     \noindent\Large
     \@date{}\\
     \vspace{0.5cm}
-    Tutor: \@tutor{} -- \@tutorb{} -- \@tutorc{}\\
+    Tutores: \@tutor{} -- \@tutorb{} -- \@tutorc{}\\
   \end{center}
   \null
   \cleardoublepage
 }
-\makeatother
-\makeatletter
-\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
-\@ifpackageloaded{fontawesome5}{}{\usepackage{fontawesome5}}
-\definecolor{quarto-callout-color}{HTML}{909090}
-\definecolor{quarto-callout-note-color}{HTML}{0758E5}
-\definecolor{quarto-callout-important-color}{HTML}{CC1914}
-\definecolor{quarto-callout-warning-color}{HTML}{EB9113}
-\definecolor{quarto-callout-tip-color}{HTML}{00A047}
-\definecolor{quarto-callout-caution-color}{HTML}{FC5300}
-\definecolor{quarto-callout-color-frame}{HTML}{acacac}
-\definecolor{quarto-callout-note-color-frame}{HTML}{4582ec}
-\definecolor{quarto-callout-important-color-frame}{HTML}{d9534f}
-\definecolor{quarto-callout-warning-color-frame}{HTML}{f0ad4e}
-\definecolor{quarto-callout-tip-color-frame}{HTML}{02b875}
-\definecolor{quarto-callout-caution-color-frame}{HTML}{fd7e14}
 \makeatother
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
@@ -426,41 +413,258 @@ retrospectivo en UCI}
 
 \chapter{Introducción}\label{introducciuxf3n}
 
-En este apartado se describe de forma breve el propósito general del
-proyecto, su contexto y el alcance del trabajo realizado, indicando qué
-problema se aborda y qué se pretende conseguir con el TFG.
+Este proyecto surge de la necesidad, detectada en la Unidad de Cuidados
+Intensivos del Hospital Universitario de Burgos (HUBU), de facilitar el
+análisis retrospectivo de pacientes críticos combinando dos fuentes de
+información que hasta ahora se consultaban por separado: la
+neuromonitorización del monitor BIS y las variables clínicas registradas
+en el sistema ICCA. Ambas fuentes tienen resoluciones temporales muy
+distintas y formatos propios, lo que dificulta relacionar la evolución
+del BIS y de la DSA con el contexto clínico del paciente en un mismo
+momento.
+
+El alcance del trabajo se limita deliberadamente a una prueba de
+concepto: no se pretende sustituir la interpretación clínica ni ofrecer
+un producto validado para uso asistencial, sino demostrar que es viable
+organizar, sincronizar y visualizar conjuntamente ambos tipos de datos.
+Para ello se han desarrollado tres piezas complementarias (un portal de
+acceso, una aplicación de organización de pacientes y sesiones, y un
+visualizador interactivo), apoyadas en un flujo de reconstrucción de la
+matriz de densidad espectral cuando el archivo espectral original no
+está disponible.
 
 \chapter{Metodología de ingeniería del
 software}\label{metodologuxeda-de-ingenieruxeda-del-software}
 
-Si procede. Se debe describir la metodología seguida durante el
-desarrollo del proyecto. En caso de existir desarrollo software, se
-indicará la metodología utilizada (por ejemplo, cascada, ágil o
-experimental) En cada apartado de los apéndices (A hasta el G) se deberá
-indicar que tarea o fase de la metodología utilizada se está realizando,
-o bien en este nuevo apéndice deberá quedar reflejado con detalle las
-tareas y fases que se han ido realizando. Si el TFG no contiene todo el
-ciclo de vida de la metodología utilizada, deberá indicarse las fases y
-tareas que han quedado pendientes. Si el TFG no está centrado el
-desarrollo software, pero puede servir para un posterior desarrollo
-software, se deberá indicar qué metodología de desarrollo se recomienda
-y argumentar los motivos.
+El desarrollo no siguió una metodología formal predefinida (no se
+emplearon, por ejemplo, sprints de Scrum ni un ciclo en cascada
+completo), sino un enfoque incremental basado en prototipos, adoptado
+principalmente porque la disponibilidad real de los datos condicionó el
+orden de trabajo: los datos clínicos reales del HUBU no se obtuvieron
+hasta las últimas semanas del proyecto, por lo que fue necesario diseñar
+y validar buena parte del sistema con datos ficticios antes de disponer
+de los reales.
+
+El proceso seguido fue el siguiente:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Exploración inicial.} Se estudió la estructura de los archivos
+  BIS (\texttt{.spa}, \texttt{.f\_a}, \texttt{.r2a}/\texttt{.r4a},
+  \texttt{.h\_a}, \texttt{.t\_a}) mediante \emph{notebooks}
+  exploratorios, implementando funciones de lectura y decodificación
+  como primer contacto con los datos.
+\item
+  \textbf{Consolidación en módulos.} Las funciones exploratorias se
+  reorganizaron en módulos reutilizables (\texttt{reconstruccion.py},
+  \texttt{lectura\_spa.py}, \texttt{lectura\_fa.py},
+  \texttt{alineacion\_temporal.py}, entre otros), separando la lógica de
+  procesamiento de la interfaz.
+\item
+  \textbf{Desarrollo de las aplicaciones.} Sobre esos módulos se
+  construyeron las tres aplicaciones Dash (portal, organizador y
+  visualizador), cada una con su propio ciclo de prueba.
+\item
+  \textbf{Ciclos de prueba y ajuste.} Cada iteración se comprobó con
+  registros reales unilaterales y bilaterales, revisando visualmente las
+  salidas y, cuando existía un archivo \texttt{.f\_a} disponible,
+  validando cuantitativamente la reconstrucción frente a él (Anexo G).
+\item
+  \textbf{Adaptación a los datos reales.} La llegada progresiva de los
+  archivos clínicos reales obligó a ajustar de nuevo las visualizaciones
+  y algunos criterios de lectura, ya definidos inicialmente sobre datos
+  ficticios.
+\end{enumerate}
+
+En cuanto a la trazabilidad y reproducibilidad, se mantuvieron siempre
+separados los archivos originales de los derivados generados por las
+aplicaciones, y los procesos de reconstrucción y organización son
+deterministas: repetirlos sobre los mismos archivos de entrada produce
+los mismos resultados.
+
+Dado que este apéndice recoge de forma centralizada las fases seguidas,
+no se ha considerado necesario anotar de nuevo la fase correspondiente
+en cada uno de los apéndices B a G.
 
 \chapter{Planificación temporal}\label{planificaciuxf3n-temporal}
 
-Se presentará la planificación temporal del proyecto, preferiblemente
-mediante un cronograma o diagrama de Gantt, donde se reflejen las
-principales tareas, fases y su duración aproximada.
+La planificación temporal del proyecto estuvo condicionada por la
+disponibilidad progresiva de los datos clínicos reales. Por este motivo,
+el desarrollo se organizó de forma incremental: primero se trabajó con
+datos ficticios y registros BIS disponibles para construir la
+arquitectura general del sistema, y posteriormente se adaptó el flujo a
+los datos reales procedentes del HUBU una vez obtenida la aprobación
+ética.
 
-\section{Planificación económica}\label{planificaciuxf3n-econuxf3mica}
+\begin{figure}
 
-\section{Viabilidad legal}\label{viabilidad-legal}
+\centering{
 
-Si corresponde, incluir aquí el documento de aprovación por parte de la
-Comisión de Bioética.
+\includegraphics[width=0.95\linewidth,height=\textheight,keepaspectratio]{img/planificacion_temporal.png}
 
-Ojo
-\footnote{Los anexos deben de tener su propia bibliografía, eso es tan fácil como utilizar referencias igual que en la memoria \cite{bortolot2005}}
+}
+
+\caption{\label{fig-planificacion-temporal}Planificación temporal real
+del proyecto.}
+
+\end{figure}%
+
+En la Figura Figura~\ref{fig-planificacion-temporal} se recoge el
+cronograma real del proyecto, diferenciando las fases de desarrollo
+técnico, documentación, tramitación ética, entrega y preparación de la
+defensa.
+
+\chapter{Planificación económica}\label{planificaciuxf3n-econuxf3mica}
+
+La planificación económica se plantea como una estimación del coste
+equivalente del proyecto, no como un coste facturado real. La mayor
+parte de herramientas utilizadas son de libre acceso o cuentan con
+licencia institucional, por lo que el coste principal corresponde al
+tiempo de desarrollo.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3000}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4000}}@{}}
+\caption{Estimación económica del
+proyecto}\label{tbl-planificacion-economica}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concepto
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Descripción
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Coste estimado
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concepto
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Descripción
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Coste estimado
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Personal & 300 horas de desarrollo, análisis, pruebas y documentación,
+estimadas a 15 €/h & 4.500 € \\
+Hardware & Amortización parcial del equipo clínico empleado durante el
+desarrollo & 125 € \\
+Software & Python, Dash, Plotly, Quarto, R, GitHub y librerías de
+análisis empleadas sin coste directo & 0 € \\
+Documentación y almacenamiento & Material de documentación,
+almacenamiento local y copias auxiliares & 30 € \\
+Otros costes indirectos & Electricidad, conexión a red y uso general del
+equipo & 50 € \\
+\textbf{Total estimado} & & \textbf{4705 €} \\
+\end{longtable}
+
+\chapter{Viabilidad técnica}\label{viabilidad-tuxe9cnica}
+
+La viabilidad técnica del proyecto se apoya en el uso de herramientas
+abiertas y ampliamente utilizadas en análisis de datos biomédicos y
+desarrollo de aplicaciones interactivas. El procesamiento de datos se
+realizó principalmente en Python, utilizando librerías para lectura,
+transformación, análisis numérico y visualización. La interfaz se
+desarrolló mediante Dash y Plotly, lo que permitió construir una
+aplicación web local sin necesidad de desplegar inicialmente el sistema
+en un servidor hospitalario.
+
+El proyecto también se diseñó separando la lógica de procesamiento de
+datos de la interfaz gráfica. Esta decisión facilita la reutilización de
+los módulos de lectura, alineación temporal, reconstrucción de DSA y
+visualización, y permite modificar partes concretas del sistema sin
+rehacer toda la aplicación.
+
+Para reducir problemas de compatibilidad entre equipos, versiones de
+Python y dependencias, el sistema puede ejecutarse en un entorno
+controlado, como un entorno virtual o una máquina virtual configurada
+con las librerías necesarias. Esta posibilidad resulta especialmente
+útil si en el futuro se desea reproducir el proyecto en otro equipo o
+trasladarlo a un entorno más cercano al hospitalario.
+
+\chapter{Gestión de riesgos}\label{gestiuxf3n-de-riesgos}
+
+Durante el desarrollo se identificaron varios riesgos técnicos y
+organizativos. La Tabla Tabla~\ref{tbl-riesgos} resume los principales
+riesgos detectados y las medidas adoptadas para reducir su impacto.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\caption{Riesgos principales del proyecto y medidas
+adoptadas}\label{tbl-riesgos}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Riesgo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impacto
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Medida adoptada
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Riesgo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impacto
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Medida adoptada
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Retraso en la disponibilidad de datos reales & Dificultad para probar el
+flujo completo desde el inicio & Desarrollo inicial con datos ficticios
+y adaptación posterior \\
+Ausencia o invalidez del archivo \texttt{.f\_a} & Imposibilidad de
+visualizar la DSA original & Implementación de reconstrucción desde EEG
+crudo \\
+Algoritmo BIS propietario & Imposibilidad de reproducir exactamente el
+procesamiento interno del monitor & Validación comparativa frente a
+\texttt{.f\_a} cuando está disponible \\
+Heterogeneidad temporal entre BIS e ICCA & Dificultad para representar
+todas las variables en una línea temporal común & Diseño de una timeline
+basada en la sesión BIS y representación diferenciada por tipo de
+variable \\
+Restricciones éticas y de protección de datos & Limitación en el acceso
+y tratamiento de datos clínicos & Tramitación de aprobación ética y
+trabajo con datos bajo condiciones autorizadas \\
+Calidad variable de la señal BIS & Posible representación de tramos no
+interpretables & Incorporación de máscaras de calidad y detección de
+discontinuidades \\
+\end{longtable}
+
+\chapter{Viabilidad legal}\label{viabilidad-legal}
+
+El proyecto se ha desarrollado con datos clínicos procedentes del
+Hospital Universitario de Burgos (HUBU). Su uso fue autorizado por el
+Comité de Bioética correspondiente, cuya aprobación fue concedida el 2
+de julio de 2026, habilitando el tratamiento de información clínica
+retrospectiva bajo condiciones de confidencialidad, protección de datos
+y finalidad investigadora.
+
+El trabajo se limita a la organización, integración temporal y
+visualización retrospectiva de los datos recibidos. La extracción de las
+variables clínicas procedentes de ICCA fue realizada por personal
+autorizado, y la aplicación desarrollada no accede directamente a la
+base de datos hospitalaria ni modifica los datos originales.
+
+Esta aprobación ampara el desarrollo y la prueba de concepto descritos
+en este trabajo, pero no constituye una validación clínica de la
+herramienta ni autoriza su uso como apoyo a la toma de decisiones
+asistenciales. El sistema debe entenderse como una herramienta
+experimental orientada al análisis retrospectivo y a la exploración de
+datos.
 
 %% ══════════════════════════════════════════════════════
 %%  APÉNDICE B – Especificación de Diseño
@@ -468,7 +672,7 @@ Ojo
 
 \apendice{Manual de especificación de diseño}
 
-\section{Planos}\label{planos}
+\chapter{Planos}\label{planos}
 
 No se incluyen planos físicos del sistema, ya que el proyecto no
 desarrolla hardware propio ni modifica la infraestructura hospitalaria
@@ -480,9 +684,9 @@ representar cómo se organiza la aplicación y cómo se separa la ejecución
 del sistema del almacenamiento de los pacientes. Este esquema se
 describe en el apartado de diseño arquitectónico.
 
-\section{Diseño arquitectónico}\label{diseuxf1o-arquitectuxf3nico}
+\chapter{Diseño arquitectónico}\label{diseuxf1o-arquitectuxf3nico}
 
-\subsection{Visión general}\label{visiuxf3n-general}
+\section{Visión general}\label{visiuxf3n-general}
 
 El sistema BIS-ICCA se organiza en tres aplicaciones Dash diferenciadas:
 
@@ -507,7 +711,7 @@ permite que los datos generados por el organizador sean utilizados
 posteriormente por el visualizador sin necesidad de emplear una base de
 datos relacional.
 
-\subsection{Arquitectura lógica de la
+\section{Arquitectura lógica de la
 aplicación}\label{arquitectura-luxf3gica-de-la-aplicaciuxf3n}
 
 El portal funciona como una capa superior de acceso. Desde él, el
@@ -522,7 +726,7 @@ El visualizador utiliza esa estructura para cargar las sesiones
 disponibles, mostrar la matriz DSA, representar las variables BIS y EMG,
 incorporar información clínica ICCA y generar informes PDF.
 
-\subsection{Diseño de despliegue}\label{diseuxf1o-de-despliegue}
+\section{Diseño de despliegue}\label{diseuxf1o-de-despliegue}
 
 Para aproximar el sistema a un posible uso dentro de una intranet
 hospitalaria, se plantea una arquitectura basada en máquinas virtuales.
@@ -536,7 +740,7 @@ mediante una carpeta compartida por red utilizando Samba/SMB.
 
 \centering{
 
-\includegraphics[width=0.9\linewidth,height=\textheight,keepaspectratio]{img/esquema_arquitectura_ubu.png}
+\includegraphics[width=0.9\linewidth,height=\textheight,keepaspectratio]{img/esquema_arquitectura_hubu.png}
 
 }
 
@@ -553,8 +757,7 @@ De esta forma, la aplicación trabaja siempre sobre una ruta fija de
 pacientes, evitando que el usuario tenga que seleccionar manualmente la
 carpeta de trabajo.
 
-\subsection{Organización de los
-datos}\label{organizaciuxf3n-de-los-datos}
+\section{Organización de los datos}\label{organizaciuxf3n-de-los-datos}
 
 El sistema no utiliza una base de datos relacional. La información se
 organiza mediante carpetas y archivos, manteniendo una estructura común
@@ -563,20 +766,20 @@ para todos los pacientes.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{Pacientes/}
-\NormalTok{├── PACIENTE\_001/}
-\NormalTok{│   ├── paciente.json}
-\NormalTok{│   ├── ICCA\_ORIGINALES/}
-\NormalTok{│   └── SESIONES/}
-\NormalTok{│       ├── SESION\_001\_...}
-\NormalTok{│       │   ├── sesion.json}
-\NormalTok{│       │   ├── BIS/}
-\NormalTok{│       │   └── ICCA/}
-\NormalTok{│       └── SESION\_002\_...}
-\NormalTok{│           ├── sesion.json}
-\NormalTok{│           ├── BIS/}
-\NormalTok{│           └── ICCA/}
-\NormalTok{└── PACIENTE\_002/}
-\NormalTok{    └── ...}
+\NormalTok{|{-}{-} PACIENTE\_001/}
+\NormalTok{|   |{-}{-} paciente.json}
+\NormalTok{|   |{-}{-} ICCA\_ORIGINALES/}
+\NormalTok{|   \textasciigrave{}{-}{-} SESIONES/}
+\NormalTok{|       |{-}{-} SESION\_001\_...}
+\NormalTok{|       |   |{-}{-} sesion.json}
+\NormalTok{|       |   |{-}{-} BIS/}
+\NormalTok{|       |   \textasciigrave{}{-}{-} ICCA/}
+\NormalTok{|       \textasciigrave{}{-}{-} SESION\_002\_...}
+\NormalTok{|           |{-}{-} sesion.json}
+\NormalTok{|           |{-}{-} BIS/}
+\NormalTok{|           \textasciigrave{}{-}{-} ICCA/}
+\NormalTok{\textasciigrave{}{-}{-} PACIENTE\_002/}
+\NormalTok{    \textasciigrave{}{-}{-} ...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -584,7 +787,7 @@ Cada paciente dispone de una carpeta propia, donde se almacenan sus
 sesiones BIS, los registros ICCA asociados y los archivos auxiliares
 generados por la aplicación.
 
-\subsection{Organización interna del
+\section{Organización interna del
 código}\label{organizaciuxf3n-interna-del-cuxf3digo}
 
 El código se divide en aplicaciones independientes y módulos internos
@@ -624,7 +827,7 @@ El visualizador incluye la lógica necesaria para:
   generar informes PDF.
 \end{itemize}
 
-\subsection{Principales módulos del
+\section{Principales módulos del
 sistema}\label{principales-muxf3dulos-del-sistema}
 
 \begin{longtable}[]{@{}
@@ -679,8 +882,7 @@ ICCA. \\
 visualizado. \\
 \end{longtable}
 
-\subsection{Justificación del
-diseño}\label{justificaciuxf3n-del-diseuxf1o}
+\section{Justificación del diseño}\label{justificaciuxf3n-del-diseuxf1o}
 
 El diseño propuesto responde a las necesidades principales del proyecto:
 organizar sesiones BIS e información ICCA, permitir su consulta
@@ -702,7 +904,7 @@ del almacenamiento común de los pacientes.
 
 \apendice{Especificación de Requisitos}
 
-\section{Diagrama de casos de uso}\label{diagrama-de-casos-de-uso}
+\chapter{Diagrama de casos de uso}\label{diagrama-de-casos-de-uso}
 
 El sistema distingue dos actores principales: el \textbf{usuario
 clínico}, que organiza pacientes y consulta sus sesiones, y el
@@ -724,7 +926,7 @@ sistema. Fuente: elaboración propia.}
 
 \end{figure}%
 
-\section{Explicación de los casos de
+\chapter{Explicación de los casos de
 uso}\label{explicaciuxf3n-de-los-casos-de-uso}
 
 A continuación se detallan los cuatro casos de uso principales del
@@ -844,7 +1046,7 @@ sistema.
     \caption{CU-4 Generar informe PDF.}
 \end{table}
 
-\section{Prototipos de interfaz o interacción con el
+\chapter{Prototipos de interfaz o interacción con el
 proyecto}\label{prototipos-de-interfaz-o-interacciuxf3n-con-el-proyecto}
 
 A continuación se muestran las pantallas más representativas de cada
@@ -853,7 +1055,7 @@ visualizador (DSA, variables BIS e ICCA) y al informe PDF generado
 (CU-4) ya se muestran con su contexto de resultado en el capítulo de
 Resultados de la memoria, por lo que aquí no se duplican.
 
-\subsection{CU-1: Crear paciente}\label{cu-1-crear-paciente}
+\section{CU-1: Crear paciente}\label{cu-1-crear-paciente}
 
 La creación de un paciente parte de la pantalla inicial del organizador
 (Figura~\ref{fig-inicio-organizador}), donde el usuario aporta las
@@ -906,7 +1108,7 @@ auxiliar. Fuente: elaboración propia.}
 
 \end{figure}%
 
-\subsection{CU-2: Editar/eliminar
+\section{CU-2: Editar/eliminar
 paciente}\label{cu-2-editareliminar-paciente}
 
 La edición de un paciente ya creado permite añadir o retirar sesiones
@@ -926,7 +1128,7 @@ paciente ya creado. Fuente: elaboración propia.}
 
 \end{figure}%
 
-\subsection{CU-3: Visualizar sesión
+\section{CU-3: Visualizar sesión
 BIS-ICCA}\label{cu-3-visualizar-sesiuxf3n-bis-icca}
 
 El visualizador parte de una pantalla inicial
@@ -964,7 +1166,7 @@ El resultado de la carga (DSA, variables BIS e información ICCA) se
 muestra con su contexto de resultado en el capítulo de Resultados de la
 memoria.
 
-\subsection{CU-4: Generar informe PDF}\label{cu-4-generar-informe-pdf}
+\section{CU-4: Generar informe PDF}\label{cu-4-generar-informe-pdf}
 
 El resultado de este caso de uso, el propio informe PDF generado, se
 muestra en el capítulo de Resultados de la memoria.
@@ -975,7 +1177,7 @@ muestra en el capítulo de Resultados de la memoria.
 
 \apendice{Documentación de usuario}
 
-\section{Requisitos software y hardware para ejecutar el
+\chapter{Requisitos software y hardware para ejecutar el
 proyecto}\label{requisitos-software-y-hardware-para-ejecutar-el-proyecto}
 
 Para utilizar la aplicación BIS-ICCA es necesario disponer de un equipo
@@ -1014,14 +1216,14 @@ virtuales: una para ejecutar la aplicación y otra para almacenar los
 datos de pacientes mediante una carpeta compartida por red (ver diseño
 de despliegue en el Anexo B).
 
-\section{Instalación y puesta en
+\chapter{Instalación y puesta en
 marcha}\label{instalaciuxf3n-y-puesta-en-marcha}
 
 La aplicación puede ejecutarse en dos escenarios: en local durante el
 desarrollo, y en un entorno virtualizado para simular su funcionamiento
 dentro de una intranet hospitalaria.
 
-\subsection{Ejecución local}\label{ejecuciuxf3n-local}
+\section{Ejecución local}\label{ejecuciuxf3n-local}
 
 Para ejecutar la aplicación en local, se debe abrir una terminal de
 PowerShell y situarse en la carpeta del proyecto:
@@ -1054,7 +1256,7 @@ se puede acceder al organizador de pacientes o al visualizador. El
 proceso de instalación del entorno (creación del entorno virtual e
 instalación de dependencias) se detalla en el Anexo E.
 
-\subsection{Ejecución en entorno con máquinas
+\section{Ejecución en entorno con máquinas
 virtuales}\label{ejecuciuxf3n-en-entorno-con-muxe1quinas-virtuales}
 
 Para simular el funcionamiento en un entorno hospitalario, se plantea
@@ -1084,11 +1286,10 @@ De esta forma, la aplicación trabaja siempre sobre una ruta fija y el
 usuario no tiene que seleccionar manualmente dónde guardar o buscar los
 pacientes.
 
-\section{Manuales y demostraciones
+\chapter{Manuales y demostraciones
 prácticas}\label{manuales-y-demostraciones-pruxe1cticas}
 
-\subsection{Acceso al portal
-principal}\label{acceso-al-portal-principal}
+\section{Acceso al portal principal}\label{acceso-al-portal-principal}
 
 Al abrir la aplicación desde el navegador, aparece el portal principal
 (Figura~\ref{fig-manual-portal}). Desde esta pantalla se puede elegir
@@ -1119,7 +1320,7 @@ El portal funciona como punto de entrada común y permite separar
 claramente las tareas de organización de pacientes de las tareas de
 consulta o visualización.
 
-\subsection{Añadir o gestionar
+\section{Añadir o gestionar
 pacientes}\label{auxf1adir-o-gestionar-pacientes}
 
 La opción de añadir o gestionar pacientes permite crear nuevos pacientes
@@ -1153,7 +1354,7 @@ almacenan las sesiones BIS, los registros ICCA originales y los archivos
 auxiliares necesarios para la visualización posterior
 (Figura~\ref{fig-contenido-paciente}, Anexo C).
 
-\subsection{Visualizar paciente}\label{visualizar-paciente}
+\section{Visualizar paciente}\label{visualizar-paciente}
 
 La opción de visualizar paciente permite consultar los pacientes ya
 creados. El flujo general es el siguiente:
@@ -1182,7 +1383,7 @@ Figura~\ref{fig-visualizador-seleccion}). El resultado de la carga (DSA,
 variables BIS e información ICCA) se muestra en el capítulo de
 Resultados de la memoria.
 
-\subsection{Exportación de informe
+\section{Exportación de informe
 PDF}\label{exportaciuxf3n-de-informe-pdf}
 
 El visualizador permite generar un informe PDF del intervalo
@@ -1197,7 +1398,7 @@ El informe está pensado como documento auxiliar para revisión o
 impresión, pero no sustituye la valoración clínica ni la revisión de los
 registros originales.
 
-\section{Consideraciones de uso}\label{consideraciones-de-uso}
+\chapter{Consideraciones de uso}\label{consideraciones-de-uso}
 
 Todos los usuarios acceden a la misma ubicación común de pacientes. La
 aplicación no distingue entre usuarios individuales ni incorpora roles
@@ -1215,7 +1416,7 @@ trasladar el repositorio completo.
 
 \apendice{Manual del desarrollador e investigador}
 
-\section{Estructura de directorios}\label{estructura-de-directorios}
+\chapter{Estructura de directorios}\label{estructura-de-directorios}
 
 El proyecto se organiza en torno a una carpeta principal que contiene
 las aplicaciones desarrolladas, los datos de trabajo y los archivos
@@ -1225,20 +1426,20 @@ general es la siguiente:
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{tfg/}
-\NormalTok{├── aplicaciones/}
-\NormalTok{│   ├── portal\_bis\_icca/}
-\NormalTok{│   ├── organizador\_bis\_icca/}
-\NormalTok{│   │   └── requirements.txt}
-\NormalTok{│   ├── visualizador\_bis\_icca/}
-\NormalTok{│   │   └── requirements.txt}
-\NormalTok{│   ├── requirements.txt}
-\NormalTok{│   ├── preparar\_entorno.ps1}
-\NormalTok{│   ├── iniciar\_aplicaciones.ps1}
-\NormalTok{│   └── detener\_aplicaciones.ps1}
-\NormalTok{├── datos/}
-\NormalTok{│   └── pacientes/}
-\NormalTok{├── README.md}
-\NormalTok{└── .gitignore}
+\NormalTok{|{-}{-} aplicaciones/}
+\NormalTok{|   |{-}{-} portal\_bis\_icca/}
+\NormalTok{|   |{-}{-} organizador\_bis\_icca/}
+\NormalTok{|   |   \textasciigrave{}{-}{-} requirements.txt}
+\NormalTok{|   |{-}{-} visualizador\_bis\_icca/}
+\NormalTok{|   |   \textasciigrave{}{-}{-} requirements.txt}
+\NormalTok{|   |{-}{-} requirements.txt}
+\NormalTok{|   |{-}{-} preparar\_entorno.ps1}
+\NormalTok{|   |{-}{-} iniciar\_aplicaciones.ps1}
+\NormalTok{|   \textasciigrave{}{-}{-} detener\_aplicaciones.ps1}
+\NormalTok{|{-}{-} datos/}
+\NormalTok{|   \textasciigrave{}{-}{-} pacientes/}
+\NormalTok{|{-}{-} README.md}
+\NormalTok{\textasciigrave{}{-}{-} .gitignore}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1283,7 +1484,7 @@ Los directorios como \texttt{.venv/}, \texttt{.runtime/},
 forman parte del código fuente principal y no deben considerarse
 elementos necesarios para la entrega final.
 
-\section{Compilación, instalación y ejecución del
+\chapter{Compilación, instalación y ejecución del
 proyecto}\label{compilaciuxf3n-instalaciuxf3n-y-ejecuciuxf3n-del-proyecto}
 
 El proyecto está desarrollado en Python y utiliza Dash para la
@@ -1352,7 +1553,7 @@ En un despliegue hospitalario, la ruta local \texttt{datos/pacientes}
 puede sustituirse por una ruta compartida definida por el servicio
 técnico, manteniendo el mismo código de la aplicación.
 
-\section{Pruebas del sistema}\label{pruebas-del-sistema}
+\chapter{Pruebas del sistema}\label{pruebas-del-sistema}
 
 Durante el desarrollo se incluyeron pruebas automáticas para comprobar
 partes críticas del sistema. Estas pruebas se centran en la lectura y
@@ -1384,7 +1585,7 @@ matriz original o reconstruida, la visualización por intervalos
 temporales, la integración de variables ICCA y la exportación de
 informes en PDF.
 
-\section{Instrucciones para la modificación o mejora del
+\chapter{Instrucciones para la modificación o mejora del
 proyecto}\label{instrucciones-para-la-modificaciuxf3n-o-mejora-del-proyecto}
 
 Para ampliar el sistema se recomienda mantener la separación entre
@@ -1456,7 +1657,7 @@ Como líneas futuras de mejora orientadas al desarrollador, se plantean:
 
 \apendice{Descripción de adquisición y tratamiento de datos}
 
-\section{Introducción}\label{introducciuxf3n-1}
+\chapter{Introducción}\label{introducciuxf3n-1}
 
 Este apéndice describe los datos empleados en el proyecto, su
 procedencia, estructura y tratamiento. El núcleo del trabajo está
@@ -1480,14 +1681,16 @@ Los nombres de archivos mostrados en este documento corresponden a
 códigos de registro y no contienen datos identificativos directos del
 paciente.
 
-\section{Aprobación ética y marco de uso de los
+\chapter{Aprobación ética y marco de uso de los
 datos}\label{aprobaciuxf3n-uxe9tica-y-marco-de-uso-de-los-datos}
 
 Los datos empleados en este proyecto proceden de pacientes reales
 ingresados en la Unidad de Cuidados Intensivos del Hospital
 Universitario de Burgos (HUBU). Su uso con fines de investigación fue
-autorizado por el Comité de Bioética correspondiente, cuya aprobación
-fue concedida el 2 de julio de 2026.
+autorizado por el Comité de Ética de la Investigación con medicamentos
+(CEIm) correspondiente, cuya aprobación (dictamen CEIm nº 3592) fue
+concedida el 2 de julio de 2026. En el Anexo J se incluyen tanto la
+solicitud como la resolución favorable.
 
 Esta aprobación habilita el tratamiento de información clínica
 retrospectiva bajo las condiciones de confidencialidad, protección de
@@ -1512,7 +1715,7 @@ consecuencia:
   autoriza su uso como apoyo a la toma de decisiones asistenciales.
 \end{itemize}
 
-\section{Origen y adquisición de los datos
+\chapter{Origen y adquisición de los datos
 BIS}\label{origen-y-adquisiciuxf3n-de-los-datos-bis}
 
 La señal se adquiere mediante un sensor frontal conectado a un módulo
@@ -1539,9 +1742,10 @@ El tipo de sensor determina la modalidad del registro:
 
 En unilateral se utiliza una matriz de cuatro electrodos. El electrodo 1
 actúa como referencia positiva compartida, el electrodo 2 como tierra y
-los electrodos 3 y 4 como puntos de lectura. De esta disposición se
-obtienen el canal 1, como diferencia entre los electrodos 1 y 3, y el
-canal 2, como diferencia entre los electrodos 1 y 4.
+los electrodos 3 y 4 como puntos de lectura \citep{CovidienBISadvanced}.
+De esta disposición se obtienen el canal 1, como diferencia entre los
+electrodos 1 y 3, y el canal 2, como diferencia entre los electrodos 1 y
+4.
 
 \begin{figure}
 
@@ -1561,8 +1765,20 @@ En bilateral, el sensor dispone de un electrodo central común
 (\texttt{C}), un electrodo de tierra (\texttt{G}) y cuatro electrodos de
 lectura: temporal izquierdo (\texttt{LT}), frontal izquierdo
 (\texttt{LE}), frontal derecho (\texttt{RE}) y temporal derecho
-(\texttt{RT}). Los canales 1 y 2 se obtienen en el lado izquierdo y los
-canales 3 y 4 en el derecho.
+(\texttt{RT}) \citep{CovidienBISadvanced}. Los canales 1 y 2 se obtienen
+en el lado izquierdo y los canales 3 y 4 en el derecho.
+
+De forma análoga al sensor unilateral, cada canal bilateral se obtiene
+como la diferencia de potencial entre el electrodo central \texttt{C}
+(positivo, compartido por los cuatro canales) y cada uno de los cuatro
+electrodos de lectura (negativos): el canal 1 corresponde a la
+diferencia entre \texttt{C} y \texttt{LT}, el canal 2 a la diferencia
+entre \texttt{C} y \texttt{LE}, el canal 3 a la diferencia entre
+\texttt{C} y \texttt{RT}, y el canal 4 a la diferencia entre \texttt{C}
+y \texttt{RE} \citep{CovidienExportData}. Los canales elegidos para la
+reconstrucción en este proyecto, el 1 y el 3, corresponden por tanto a
+los dos electrodos temporales (\texttt{LT} y \texttt{RT}), uno por
+hemisferio.
 
 \begin{figure}
 
@@ -1630,7 +1846,7 @@ Bilateral & \texttt{.r4a} & 4 & \texttt{Ch\ 1} izquierdo y
 \texttt{Ch\ 3} derecho & Canal 1 izquierdo y canal 3 derecho \\
 \end{longtable}
 
-\section{Organización de una exportación
+\chapter{Organización de una exportación
 BIS}\label{organizaciuxf3n-de-una-exportaciuxf3n-bis}
 
 Los archivos de un mismo registro comparten el nombre base. Por ejemplo,
@@ -1638,7 +1854,9 @@ Los archivos de un mismo registro comparten el nombre base. Por ejemplo,
 pertenecen a la misma sesión. La aplicación busca estos archivos de
 forma recursiva, comprueba que exista una única exportación y determina
 automáticamente la modalidad a partir de la extensión del archivo de
-EEG.
+EEG. Las extensiones y el contenido de cada archivo de exportación
+siguen la convención documentada por el fabricante
+\citep{CovidienBISadvanced}.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -1695,13 +1913,16 @@ del registro \\
 conserva, pero no se interpreta \\
 \end{longtable}
 
-No todos los equipos o configuraciones producen archivos con contenido.
-En particular, se han encontrado registros en los que \texttt{.f\_a}
-existe pero tiene un tamaño de cero bytes. Esta situación es relevante
-para el proyecto, porque justifica la reconstrucción de la DSA a partir
-del EEG crudo.
+No todos los equipos producen archivos \texttt{.f\_a} con contenido. En
+concreto, el equipo BIS VISTA exporta sistemáticamente un archivo
+\texttt{.f\_a} de cero bytes: no se trata de una incidencia ocasional de
+algunos registros, sino de un comportamiento propio de este modelo de
+monitor, a diferencia del BIS Advance, cuyas exportaciones sí contienen
+la matriz espectral. Esta circunstancia es relevante para el proyecto,
+porque justifica por sí sola la necesidad de reconstruir la DSA a partir
+del EEG crudo para todos los registros procedentes de BIS VISTA.
 
-\section{\texorpdfstring{Archivos de EEG crudo: \texttt{.r2a} y
+\chapter{\texorpdfstring{Archivos de EEG crudo: \texttt{.r2a} y
 \texttt{.r4a}}{Archivos de EEG crudo: .r2a y .r4a}}\label{archivos-de-eeg-crudo-.r2a-y-.r4a}
 
 Los archivos \texttt{.r2a} y \texttt{.r4a} contienen las muestras
@@ -1803,7 +2024,7 @@ C4(127) \\
 1 s & 128 & C1(128), C2(128) & C1(128), C2(128), C3(128), C4(128) \\
 \end{longtable}
 
-\section{Decodificación y calibración de las
+\chapter{Decodificación y calibración de las
 muestras}\label{decodificaciuxf3n-y-calibraciuxf3n-de-las-muestras}
 
 Los enteros almacenados no deben interpretarse directamente como
@@ -1868,7 +2089,7 @@ cuenta porque una fila con una proporción elevada de ceros puede
 representar una pérdida de información y no una señal EEG
 fisiológicamente plana.
 
-\subsection{Diferencias entre unilateral y
+\section{Diferencias entre unilateral y
 bilateral}\label{diferencias-entre-unilateral-y-bilateral}
 
 La estructura numérica es la misma en ambas modalidades; cambia el
@@ -1893,7 +2114,7 @@ decisión es coherente con los conjuntos espectrales identificados por el
 fabricante: el primer conjunto corresponde al canal 1 y, en bilateral,
 el segundo corresponde al canal 3 \citep{CovidienSerial2010}.
 
-\section{\texorpdfstring{Archivo de cabecera:
+\chapter{\texorpdfstring{Archivo de cabecera:
 \texttt{.h\_a}}{Archivo de cabecera: .h\_a}}\label{archivo-de-cabecera-.h_a}
 
 El archivo \texttt{.h\_a} es una cabecera binaria de tamaño reducido que
@@ -1932,7 +2153,7 @@ La cabecera puede contener además identificadores de versión del
 algoritmo y otros parámetros internos. Estos campos se conservan como
 metadatos, pero no son necesarios para la visualización desarrollada.
 
-\section{\texorpdfstring{Archivo temporal:
+\chapter{\texorpdfstring{Archivo temporal:
 \texttt{.t\_a}}{Archivo temporal: .t\_a}}\label{archivo-temporal-.t_a}
 
 El archivo \texttt{.t\_a} contiene, en texto, la fecha y hora asociadas
@@ -1950,7 +2171,7 @@ cada trama puede asignarse una marca temporal a todas las muestras del
 EEG. La aplicación admite las variantes de fecha observadas en las
 exportaciones y redondea el instante inicial al segundo.
 
-\section{\texorpdfstring{Archivo de espectros:
+\chapter{\texorpdfstring{Archivo de espectros:
 \texttt{.f\_a}}{Archivo de espectros: .f\_a}}\label{archivo-de-espectros-.f_a}
 
 El archivo \texttt{.f\_a} contiene la matriz espectral producida por el
@@ -1990,7 +2211,7 @@ una escala de color expresada en decibelios, pero este hecho no basta
 por sí solo para demostrar cómo se codifica internamente cada valor del
 archivo \citep{CovidienBISadvanced}.
 
-\subsection{Diferencias entre unilateral y
+\section{Diferencias entre unilateral y
 bilateral}\label{diferencias-entre-unilateral-y-bilateral-1}
 
 El archivo unilateral contiene una única columna \texttt{Spectra} y
@@ -2006,7 +2227,7 @@ automáticamente la reconstrucción desde \texttt{.r2a} o \texttt{.r4a},
 siempre que estén disponibles \texttt{.h\_a}, \texttt{.t\_a} y
 \texttt{.spa}.
 
-\section{\texorpdfstring{Archivo de variables procesadas:
+\chapter{\texorpdfstring{Archivo de variables procesadas:
 \texttt{.spa}}{Archivo de variables procesadas: .spa}}\label{archivo-de-variables-procesadas-.spa}
 
 El archivo \texttt{.spa} contiene los parámetros calculados por el
@@ -2026,7 +2247,7 @@ códigos centinela de dato no válido y se convierten a valores ausentes.
 Esta conversión es necesaria antes de calcular máscaras, estadísticas o
 representaciones.
 
-\subsection{Estructura unilateral}\label{estructura-unilateral}
+\section{Estructura unilateral}\label{estructura-unilateral}
 
 En una exportación unilateral aparecen tres bloques:
 
@@ -2055,7 +2276,7 @@ Por este motivo, la aplicación prioriza \texttt{SEF08\_3},
 \texttt{MEDFRQ08\_3}, \texttt{SQI10\_3}, \texttt{TOTPOW08\_3} y
 \texttt{DB13U01\_3}, y los normaliza internamente eliminando el sufijo.
 
-\subsection{Estructura bilateral}\label{estructura-bilateral}
+\section{Estructura bilateral}\label{estructura-bilateral}
 
 En bilateral aparecen cuatro bloques de variables. Para el análisis se
 conservan:
@@ -2076,7 +2297,7 @@ variables de alto nivel, por lo que no se utilizan en la visualización
 clínica. La modalidad bilateral añade, además, variables que comparan
 ambos hemisferios, especialmente \texttt{ASYM09}.
 
-\section{Variables procesadas de mayor
+\chapter{Variables procesadas de mayor
 interés}\label{variables-procesadas-de-mayor-interuxe9s}
 
 La tabla Tabla~\ref{tbl-variables-principales} resume las variables del
@@ -2134,7 +2355,7 @@ discreto & Configuración del filtro pasa-altos aplicado al EEG \\
 bilateral & Comparación izquierda-derecha \\
 \end{longtable}
 
-\subsection{\texorpdfstring{Índice BIS:
+\section{\texorpdfstring{Índice BIS:
 \texttt{DB13U01}}{Índice BIS: DB13U01}}\label{uxedndice-bis-db13u01}
 
 Es el índice numérico derivado del EEG que resume el estado hipnótico en
@@ -2147,7 +2368,7 @@ Los valores fuera del intervalo 0-100 y los códigos centinela se
 consideran no válidos. Además, el BIS se oculta cuando la matriz del
 hemisferio correspondiente ha sido invalidada por falta de calidad.
 
-\subsection{\texorpdfstring{Calidad de señal:
+\section{\texorpdfstring{Calidad de señal:
 \texttt{SQI10}}{Calidad de señal: SQI10}}\label{calidad-de-seuxf1al-sqi10}
 
 El SQI expresa la calidad o fiabilidad de la señal recibida. Una
@@ -2160,7 +2381,7 @@ a 15. Los segundos afectados se eliminan de la DSA y de las curvas
 asociadas. El umbral se utiliza como criterio técnico de visualización y
 no como una decisión clínica aislada.
 
-\subsection{\texorpdfstring{Potencia total:
+\section{\texorpdfstring{Potencia total:
 \texttt{TOTPOW08}}{Potencia total: TOTPOW08}}\label{potencia-total-totpow08}
 
 Representa la potencia total del EEG en el intervalo espectral de 0,5 a
@@ -2173,7 +2394,7 @@ bandas blancas de la DSA coinciden con valores no válidos de
 \texttt{TOTPOW08} y con descensos del SQI. Por ello, ambas variables
 forman parte de la máscara final.
 
-\subsection{Frecuencias SEF y MEF}\label{frecuencias-sef-y-mef}
+\section{Frecuencias SEF y MEF}\label{frecuencias-sef-y-mef}
 
 \texttt{SEF08} es la frecuencia del borde espectral, definida como la
 frecuencia por debajo de la cual se concentra el 95 \% de la potencia.
@@ -2185,7 +2406,7 @@ se distribuye la potencia sin reducir toda la información a un único
 La aplicación superpone estas curvas sobre cada DSA. Solo se aceptan
 valores entre 0,5 y 30 Hz, que es el intervalo frecuencial representado.
 
-\subsection{\texorpdfstring{Suavizado espectral:
+\section{\texorpdfstring{Suavizado espectral:
 \texttt{SpSmooth}}{Suavizado espectral: SpSmooth}}\label{suavizado-espectral-spsmooth}
 
 \texttt{SpSmooth} codifica la ventana de suavizado configurada en el
@@ -2216,7 +2437,7 @@ lo que se aplica una media móvil causal de 30 segundos. Así, la ventana
 no se elige únicamente por inspección visual, sino a partir de la
 configuración exportada por el propio equipo.
 
-\subsection{\texorpdfstring{Filtro de baja frecuencia:
+\section{\texorpdfstring{Filtro de baja frecuencia:
 \texttt{LoFilter}}{Filtro de baja frecuencia: LoFilter}}\label{filtro-de-baja-frecuencia-lofilter}
 
 \texttt{LoFilter} indica el corte inferior configurado. La
@@ -2246,7 +2467,7 @@ primer orden con la frecuencia indicada. Si el campo no está disponible,
 se utiliza 0,25 Hz como valor predeterminado y se registra esta
 circunstancia en los parámetros del resultado.
 
-\subsection{\texorpdfstring{Asimetría bilateral:
+\section{\texorpdfstring{Asimetría bilateral:
 \texttt{ASYM09}}{Asimetría bilateral: ASYM09}}\label{asimetruxeda-bilateral-asym09}
 
 \texttt{ASYM09} solo es relevante en monitorización bilateral y resume
@@ -2254,7 +2475,7 @@ la diferencia de potencia entre ambos hemisferios. Se representa entre
 las dos matrices DSA. Para evitar comparaciones engañosas, se invalida
 cuando falta la DSA izquierda o la derecha en ese instante.
 
-\section{\texorpdfstring{Otras variables disponibles en
+\chapter{\texorpdfstring{Otras variables disponibles en
 \texttt{.spa}}{Otras variables disponibles en .spa}}\label{otras-variables-disponibles-en-.spa}
 
 El archivo contiene otras variables útiles para interpretar la calidad y
@@ -2289,7 +2510,7 @@ se incorporan a la interfaz. La selección final prioriza las que
 intervienen en la reconstrucción, en la evaluación de calidad o en la
 visualización sincronizada.
 
-\section{Preparación y validación de los
+\chapter{Preparación y validación de los
 datos}\label{preparaciuxf3n-y-validaciuxf3n-de-los-datos}
 
 La preparación de una sesión sigue los siguientes pasos:
@@ -2324,7 +2545,7 @@ Los tiempos duplicados se resuelven conservando la última fila recibida
 y los huecos se mantienen como valores ausentes, sin interpolar
 información clínica.
 
-\section{Tratamiento de la DSA
+\chapter{Tratamiento de la DSA
 original}\label{tratamiento-de-la-dsa-original}
 
 Cuando \texttt{.f\_a} está disponible, el procesamiento consiste en:
@@ -2349,7 +2570,7 @@ Cuando \texttt{.f\_a} está disponible, el procesamiento consiste en:
 En bilateral se realiza el mismo proceso para \texttt{Left\ Spectra} y
 \texttt{Right\ Spectra}, manteniendo una línea temporal común.
 
-\section{Reconstrucción desde el EEG
+\chapter{Reconstrucción desde el EEG
 crudo}\label{reconstrucciuxf3n-desde-el-eeg-crudo}
 
 Si \texttt{.f\_a} no está disponible, la aplicación reconstruye la DSA
@@ -2411,7 +2632,7 @@ requiere que ambas matrices sean válidas. El desarrollo completo de esta
 metodología, incluyendo la validación experimental de cada parámetro, se
 recoge en el Anexo G.
 
-\section{Plantilla ICCA: estructura y
+\chapter{Plantilla ICCA: estructura y
 organización}\label{plantilla-icca-estructura-y-organizaciuxf3n}
 
 Las variables clínicas se reciben en forma de una plantilla Excel
@@ -2450,7 +2671,7 @@ Naturaleza temporal
 \texttt{general} & Contexto del ingreso: identificador, fechas de
 ingreso y alta, edad, peso & Estática (una fila por paciente) \\
 \texttt{constantes\_vitales} & Frecuencia cardiaca, presión arterial,
-SpO₂, temperatura, frecuencia respiratoria, PIC & Mediciones
+SpO\(_2\), temperatura, frecuencia respiratoria, PIC & Mediciones
 periódicas \\
 \texttt{analisis} & Resultados analíticos: hemoglobina, iones, glucosa,
 gasometría & Observaciones puntuales \\
@@ -2470,7 +2691,7 @@ columnas \texttt{fecha\_hora\_ingreso} y \texttt{fecha\_hora\_alta}, que
 delimitan el intervalo temporal completo cubierto por el Excel cuando
 están disponibles.
 
-\section{Organización de pacientes y
+\chapter{Organización de pacientes y
 sesiones}\label{organizaciuxf3n-de-pacientes-y-sesiones}
 
 Además de interpretar los archivos BIS e ICCA de forma aislada, la
@@ -2479,7 +2700,7 @@ paciente, generando manifiestos que documentan la procedencia de cada
 archivo. Esta sección describe la implementación concreta de dicha
 organización.
 
-\subsection{Detección de sesiones BIS y de plantillas ICCA
+\section{Detección de sesiones BIS y de plantillas ICCA
 compatibles}\label{detecciuxf3n-de-sesiones-bis-y-de-plantillas-icca-compatibles}
 
 Antes de crear un paciente, la aplicación localiza automáticamente las
@@ -2504,7 +2725,7 @@ seleccionadas:
   partir del rango de timestamps observado en las hojas temporales.
 \end{itemize}
 
-\subsection{Cálculo de solapamiento y compatibilidad
+\section{Cálculo de solapamiento y compatibilidad
 BIS-ICCA}\label{cuxe1lculo-de-solapamiento-y-compatibilidad-bis-icca}
 
 Para cada sesión BIS se calcula su solapamiento temporal con cada
@@ -2514,7 +2735,7 @@ ICCA cubre por completo el intervalo de la sesión. Solo las plantillas
 ICCA con solapamiento mayor que cero segundos se consideran compatibles
 con esa sesión y se ofrecen como fuente de su archivo auxiliar.
 
-\subsection{Estructura de carpetas y
+\section{Estructura de carpetas y
 manifiestos}\label{estructura-de-carpetas-y-manifiestos}
 
 Cada paciente se numera automáticamente siguiendo el patrón
@@ -2567,7 +2788,7 @@ Ambos manifiestos permiten reconstruir en cualquier momento de qué
 archivos originales procede cada paciente, sin necesidad de volver a
 inspeccionar los datos.
 
-\subsection{Generación del Excel ICCA
+\section{Generación del Excel ICCA
 auxiliar}\label{generaciuxf3n-del-excel-icca-auxiliar}
 
 El Excel auxiliar de cada sesión se genera a partir de la plantilla ICCA
@@ -2588,7 +2809,7 @@ adicional, \texttt{metadata\_sesion}, con un resumen de procedencia
 (paciente, sesión BIS, intervalo, modo de monitorización, archivos ICCA
 de origen y fecha de generación).
 
-\subsection{Validaciones y robustez}\label{validaciones-y-robustez}
+\section{Validaciones y robustez}\label{validaciones-y-robustez}
 
 La creación de un paciente incorpora varias comprobaciones para evitar
 inconsistencias:
@@ -2619,7 +2840,7 @@ inconsistencias:
   impida generar el Excel auxiliar.
 \end{itemize}
 
-\section{Preparación de datos ICCA para el
+\chapter{Preparación de datos ICCA para el
 visualizador}\label{preparaciuxf3n-de-datos-icca-para-el-visualizador}
 
 El Excel auxiliar generado por el organizador (ver apartado anterior) no
@@ -2629,7 +2850,7 @@ una serie temporal de resolución uniforme para las constantes vitales y
 decidir, de forma auditable, qué determinaciones de gasometría pueden
 mostrarse con garantías.
 
-\subsection{Generación de series sintéticas a resolución de un
+\section{Generación de series sintéticas a resolución de un
 segundo}\label{generaciuxf3n-de-series-sintuxe9ticas-a-resoluciuxf3n-de-un-segundo}
 
 Para las constantes vitales, la aplicación genera un archivo derivado
@@ -2647,15 +2868,15 @@ sintética dos veces a partir de los mismos datos produce exactamente el
 mismo resultado, lo que permite tratarla como un artefacto reproducible
 y no como una fuente adicional de variabilidad.
 
-\subsection{Auditoría e inferencia del tipo de
+\section{Auditoría e inferencia del tipo de
 gasometría}\label{auditoruxeda-e-inferencia-del-tipo-de-gasometruxeda}
 
-Las determinaciones de gasometría (pO₂, pCO₂) requieren saber si la
-muestra es arterial o venosa para interpretarse correctamente, y esta
-información no siempre consta de forma explícita en ICCA. La aplicación
-resuelve esta situación mediante un procedimiento de auditoría que, para
-cada determinación, decide si puede incluirse en la visualización y con
-qué grado de confianza:
+Las determinaciones de gasometría (pO\(_2\), pCO\(_2\)) requieren saber
+si la muestra es arterial o venosa para interpretarse correctamente, y
+esta información no siempre consta de forma explícita en ICCA. La
+aplicación resuelve esta situación mediante un procedimiento de
+auditoría que, para cada determinación, decide si puede incluirse en la
+visualización y con qué grado de confianza:
 
 \begin{itemize}
 \tightlist
@@ -2664,12 +2885,12 @@ qué grado de confianza:
   se respeta y la determinación se incluye con origen ``indicado''.
 \item
   Si no se indica explícitamente pero la determinación aparece aislada,
-  sin su pareja pO₂/pCO₂ en el mismo instante, se excluye por
+  sin su pareja pO\(_2\)/pCO\(_2\) en el mismo instante, se excluye por
   considerarse incompleta.
 \item
-  Si pO₂ y pCO₂ aparecen juntas en el mismo instante y las marcas
-  asociadas a la medición son coherentes entre sí, el tipo de muestra
-  puede inferirse con confianza alta a partir de ese contexto.
+  Si pO\(_2\) y pCO\(_2\) aparecen juntas en el mismo instante y las
+  marcas asociadas a la medición son coherentes entre sí, el tipo de
+  muestra puede inferirse con confianza alta a partir de ese contexto.
 \item
   Si los indicios disponibles resultan contradictorios o insuficientes
   para una inferencia fiable, la determinación se excluye.
@@ -2684,7 +2905,7 @@ disponible para recuperar determinaciones interpretables, y solo
 descarta aquellas en las que el tipo de muestra no puede establecerse
 con garantías suficientes.
 
-\section{Consideraciones clínicas y
+\chapter{Consideraciones clínicas y
 limitaciones}\label{consideraciones-cluxednicas-y-limitaciones}
 
 El índice BIS y las variables espectrales son resultados procesados y no
@@ -2707,7 +2928,7 @@ automático.
 \apendice{Metodología de reconstrucción de la matriz DSA}
 \label{ap:estudio-experimental}
 
-\section{G.1 Objetivo del anexo}\label{g.1-objetivo-del-anexo}
+\chapter{G.1 Objetivo del anexo}\label{g.1-objetivo-del-anexo}
 
 Este anexo describe la metodología implementada para reconstruir la
 matriz de densidad espectral (DSA) a partir de los archivos de onda
@@ -2717,7 +2938,7 @@ metodológicas adoptadas y las métricas utilizadas para comparar la
 matriz reconstruida con la matriz espectral exportada por el monitor
 cuando esta se encuentra disponible.
 
-\section{G.2 Parámetros generales de
+\chapter{G.2 Parámetros generales de
 reconstrucción}\label{g.2-paruxe1metros-generales-de-reconstrucciuxf3n}
 
 Todos los parámetros de la reconstrucción se centralizan en un único
@@ -2766,13 +2987,10 @@ ventanas \\
 instante central \\
 \texttt{umbral\_sqi} & 15 & Límite mínimo de calidad de señal
 (\texttt{SQI10}) \\
-\texttt{umbral\_ceros}\(^*\) & 0,9 & Definido en el diccionario de
-parámetros, pero no consumido por la función de máscara actualmente en
-uso (ver nota tras la tabla) \\
 \texttt{aplicar\_mascara\_ceros\_raw} & True & Activa la detección de
 pérdidas en el EEG crudo \\
-\texttt{umbral\_ceros\_raw} & 0,5 & Segundo de EEG crudo inválido si ≥50
-\% de sus muestras son cero \\
+\texttt{umbral\_ceros\_raw} & 0,5 & Segundo de EEG crudo inválido si
+\$\geq\$50 \% de sus muestras son cero \\
 \texttt{excluir\_invalidos\_suavizado} & True & Los segundos inválidos
 se excluyen del promedio móvil \\
 \texttt{referencia\_amplitud\_uv\_rms} & 0,0001 µV RMS & Referencia
@@ -2791,23 +3009,7 @@ unilateral \\
 bilateral \\
 \end{longtable}
 
-Nótese que \texttt{umbral\_ceros} (90 \%, aplicado sobre los \emph{bins}
-espectrales ya calculados) y \texttt{umbral\_ceros\_raw} (50 \%,
-aplicado sobre las muestras de la onda cruda) son dos criterios
-distintos y complementarios: el primero detecta espectros degenerados
-una vez calculados; el segundo detecta la pérdida de señal en origen,
-antes incluso de aplicar Welch (ver G.9).
-
-\(^*\) \emph{Nota:} \texttt{umbral\_ceros} es un parámetro heredado de
-una versión anterior del módulo de reconstrucción. La función que
-efectivamente calcula la máscara de calidad en la implementación actual
-(\texttt{\_calcular\_mascaras\_comunes}) no lo utiliza; el criterio
-equivalente que sí está activo es la detección de pérdida de señal en la
-onda cruda (\texttt{umbral\_ceros\_raw}, G.9). Se mantiene documentado
-aquí porque el parámetro sigue presente en el diccionario de
-configuración, aunque no tiene efecto sobre el resultado.
-
-\section{G.3 Lectura de cabecera, tiempo inicial y onda
+\chapter{G.3 Lectura de cabecera, tiempo inicial y onda
 cruda}\label{g.3-lectura-de-cabecera-tiempo-inicial-y-onda-cruda}
 
 \textbf{Funciones:} \texttt{\_extraer\_parametros\_eeg},
@@ -2849,7 +3051,7 @@ múltiplo exacto del número de canales, la implementación descarta el
 resto final en lugar de fallar, evitando así perder todo el registro por
 un desajuste de unas pocas muestras sueltas.
 
-\section{G.4 Conversión de la señal cruda a
+\chapter{G.4 Conversión de la señal cruda a
 microvoltios}\label{g.4-conversiuxf3n-de-la-seuxf1al-cruda-a-microvoltios}
 
 \textbf{Función:} \texttt{\_canal\_alineado\_uv}.
@@ -2867,7 +3069,7 @@ cualquier tramo de la timeline sin cobertura de señal cruda queda
 automáticamente como ausencia de información, sin necesidad de una
 máscara adicional en este paso.
 
-\section{G.5 Filtro pasa-altos
+\chapter{G.5 Filtro pasa-altos
 causal}\label{g.5-filtro-pasa-altos-causal}
 
 \textbf{Funciones:} \texttt{\_extraer\_filtro\_lofilter},
@@ -2875,11 +3077,12 @@ causal}\label{g.5-filtro-pasa-altos-causal}
 
 El filtro pasa-altos se aplica antes del cálculo espectral con el
 objetivo de atenuar componentes de muy baja frecuencia y deriva de línea
-base. Se utiliza un filtro Butterworth causal de primer orden,
-implementado con \texttt{scipy.signal.butter} (\texttt{output="sos"}) y
-aplicado mediante \texttt{sosfilt}. Al ser causal, cada muestra de
-salida depende únicamente de muestras presentes y anteriores, respetando
-la dirección temporal de adquisición.
+base. Se utiliza un filtro Butterworth causal de primer orden
+\citep{OppenheimSchafer2014}, implementado con
+\texttt{scipy.signal.butter} (\texttt{output="sos"}) y aplicado mediante
+\texttt{sosfilt}. Al ser causal, cada muestra de salida depende
+únicamente de muestras presentes y anteriores, respetando la dirección
+temporal de adquisición.
 
 La frecuencia de corte se obtiene de la columna \texttt{LoFilter} del
 archivo \texttt{.spa}:
@@ -2919,7 +3122,7 @@ transitorios de filtro los tramos válidos situados antes o después de
 él, y los valores no finitos permanecen como ausencia de información en
 la salida.
 
-\subsection{Ejemplo numérico del
+\section{Ejemplo numérico del
 filtrado}\label{ejemplo-numuxe9rico-del-filtrado}
 
 Para ilustrar el funcionamiento del filtro, se toma un caso concreto:
@@ -2927,8 +3130,8 @@ frecuencia de muestreo \(f_s = 128\) Hz, frecuencia de corte
 \(f_c = 2,5\) Hz (código \texttt{LoFilter} 3) y orden 1.
 
 Para un filtro Butterworth pasa-altos digital de primer orden diseñado
-mediante transformación bilineal, los coeficientes pueden expresarse a
-partir de:
+mediante transformación bilineal \citep{OppenheimSchafer2014}, los
+coeficientes pueden expresarse a partir de:
 
 \[K = \tan\left(\frac{\pi f_c}{f_s}\right)\]
 
@@ -3001,11 +3204,16 @@ para explicar su origen matemático. El filtrado se aplica después con
 filtrada depende de la muestra actual, de muestras previas y del estado
 previo del filtro, sin utilizar en ningún momento muestras futuras.
 
-\section{G.6 Reconstrucción espectral mediante
+\chapter{G.6 Reconstrucción espectral mediante
 Welch}\label{g.6-reconstrucciuxf3n-espectral-mediante-welch}
 
 \textbf{Funciones:} \texttt{\_welch\_por\_bloques},
 \texttt{\_reconstruir\_lado}.
+
+La estimación espectral se realiza mediante el método de Welch
+\citep{Welch1967}, que promedia periodogramas modificados calculados
+sobre segmentos solapados de la señal para reducir la varianza de la
+estimación respecto a un periodograma único sobre toda la señal.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
@@ -3041,16 +3249,17 @@ Referencia temporal central & Cada ventana se asigna a su instante
 central \\
 \end{longtable}
 
-\subsection{De la señal discreta a la resolución de 0,5
+\section{De la señal discreta a la resolución de 0,5
 Hz}\label{de-la-seuxf1al-discreta-a-la-resoluciuxf3n-de-05-hz}
 
 El EEG no llega al ordenador como una señal continua, sino como una
 secuencia finita de muestras. Por eso el análisis frecuencial no puede
 usar la Transformada de Fourier continua, sino su versión para señales
-muestreadas y finitas, la Transformada Discreta de Fourier (DFT); la FFT
-(\emph{Fast Fourier Transform}) no es una transformada distinta, sino el
-algoritmo con el que se calcula esa misma DFT de forma mucho más rápida,
-y es lo que usa internamente \texttt{scipy.signal.welch}.
+muestreadas y finitas, la Transformada Discreta de Fourier (DFT)
+\citep{OppenheimSchafer2014}; la FFT (\emph{Fast Fourier Transform}) no
+es una transformada distinta, sino el algoritmo con el que se calcula
+esa misma DFT de forma mucho más rápida, y es lo que usa internamente
+\texttt{scipy.signal.welch}.
 
 La resolución frecuencial que se obtiene de una ventana de \(N\)
 muestras a una frecuencia de muestreo \(f_s\) es:
@@ -3110,7 +3319,8 @@ dicho:
   ese punto de unión. Ese salto, al descomponerse en frecuencias, se
   parece a componentes de alta frecuencia y añade potencia que no está
   realmente presente en el EEG. La ventana Hann atenúa los bordes para
-  reducir ese salto y, con ello, la fuga espectral que provocaría.
+  reducir ese salto y, con ello, la fuga espectral que provocaría
+  \citep{OppenheimSchafer2014}.
 \end{itemize}
 
 La implementación no llama a \texttt{scipy.signal.welch} sobre la señal
@@ -3132,12 +3342,12 @@ canal 1 (índice 0). En registros bilaterales,
 (izquierdo) y el canal 3 (derecho); los canales 2 y 4 no intervienen en
 la reconstrucción final.
 
-\section{G.7 Conversión de densidad espectral a
+\chapter{G.7 Conversión de densidad espectral a
 dB}\label{g.7-conversiuxf3n-de-densidad-espectral-a-db}
 
 \textbf{Función:} \texttt{\_convertir\_potencia\_a\_db}.
 
-\subsection{De la FFT a la densidad espectral de
+\section{De la FFT a la densidad espectral de
 potencia}\label{de-la-fft-a-la-densidad-espectral-de-potencia}
 
 Para cada segmento, la FFT devuelve un valor complejo por frecuencia,
@@ -3166,7 +3376,7 @@ componente). El flujo hasta llegar a la densidad espectral de potencia
   \texttt{scipy.signal.welch} con \texttt{scaling="density"}.
 \end{enumerate}
 
-\subsection{Integración por bin y paso a
+\section{Integración por bin y paso a
 decibelios}\label{integraciuxf3n-por-bin-y-paso-a-decibelios}
 
 Dado que Welch devuelve densidad espectral de potencia (µV²/Hz) y cada
@@ -3186,9 +3396,10 @@ numéricos al calcular el logaritmo de valores nulos, y su magnitud es lo
 bastante pequeña como para no alterar de forma perceptible ninguna celda
 con señal real.
 
-La referencia del fabricante se expresa como una amplitud, 0,0001 µV
-RMS, mientras que lo que se compara en la fórmula es una potencia. Por
-ello la referencia debe elevarse al cuadrado,
+La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS
+(\emph{Root Mean Square}, valor eficaz o cuadrático medio de la señal),
+mientras que lo que se compara en la fórmula es una potencia. Por ello
+la referencia debe elevarse al cuadrado,
 \((0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2\), antes de dividir; el
 resultado es equivalente a haber trabajado directamente con amplitudes y
 una expresión en \(20 \log_{10}\). Esta referencia se mantiene constante
@@ -3196,13 +3407,14 @@ en toda la aplicación para asegurar la comparabilidad entre registros y
 permitir la comparación con la DSA exportada por el monitor.
 
 Para la representación gráfica se emplea la escala lineal fija de 49 a
-94 dB especificada por el fabricante (ver G.2). Los valores que quedan
+94 dB especificada por el fabricante
+\citep{CovidienBISVista, CovidienVISTABilateral}. Los valores que quedan
 fuera de ese intervalo no se eliminan ni se invalidan: se saturan en los
 extremos de la escala cromática, de modo que una celda con una potencia
 superior a 94 dB se muestra igual que una de exactamente 94 dB, y
 análogamente en el extremo inferior.
 
-\section{G.8 Alineación temporal de la DSA
+\chapter{G.8 Alineación temporal de la DSA
 reconstruida}\label{g.8-alineaciuxf3n-temporal-de-la-dsa-reconstruida}
 
 \textbf{Funciones:} \texttt{\_ajustar\_reconstruida\_a\_timeline},
@@ -3217,7 +3429,7 @@ corresponda al mismo segundo que las variables procesadas del
 conserva la última aparición. El \texttt{.spa} se alinea de forma
 equivalente sobre la misma timeline mediante \texttt{\_alinear\_spa}.
 
-\section{G.9 Máscaras de calidad}\label{g.9-muxe1scaras-de-calidad}
+\chapter{G.9 Máscaras de calidad}\label{g.9-muxe1scaras-de-calidad}
 
 \textbf{Funciones:} \texttt{\_detectar\_perdidas\_raw\_por\_segundo},
 \texttt{\_proyectar\_mascara\_raw\_a\_timeline\_dsa},
@@ -3253,8 +3465,8 @@ Criterio
 \endlastfoot
 Calidad \texttt{.spa} & \texttt{SQI10\ \textless{}\ 15} o
 \texttt{TOTPOW08} ausente \\
-Pérdida de señal cruda & ≥50 \% de las muestras del segundo, en el canal
-correspondiente, son exactamente cero \\
+Pérdida de señal cruda & \$\geq\$50 \% de las muestras del segundo, en
+el canal correspondiente, son exactamente cero \\
 Segundo incompleto & La alineación no dispuso del conjunto completo de
 128 muestras crudas para ese segundo (p.~ej. en los bordes del
 registro) \\
@@ -3297,7 +3509,7 @@ En registros bilaterales, todos estos criterios (salvo la calidad
 correspondientes) se calculan de forma independiente para cada
 hemisferio.
 
-\section{\texorpdfstring{G.10 Suavizado temporal mediante
+\chapter{\texorpdfstring{G.10 Suavizado temporal mediante
 \texttt{SpSmooth}}{G.10 Suavizado temporal mediante SpSmooth}}\label{g.10-suavizado-temporal-mediante-spsmooth}
 
 \textbf{Función:} \texttt{\_suavizar\_y\_desplazar}.
@@ -3338,7 +3550,7 @@ aproximación reproducible y coherente con el carácter temporal del
 parámetro, sin pretender reproducir exactamente el algoritmo
 propietario.
 
-\section{G.11 Desplazamiento temporal
+\chapter{G.11 Desplazamiento temporal
 aplicado}\label{g.11-desplazamiento-temporal-aplicado}
 
 \textbf{Función:} \texttt{\_suavizar\_y\_desplazar}.
@@ -3370,7 +3582,7 @@ utilizados fueron seleccionados tras comparar diferentes desplazamientos
 bibliográfica para justificarlo, ya que se trata de un resultado
 experimental propio y no de una propiedad documentada del dispositivo.
 
-\section{G.12 Aplicación final de máscaras y variables
+\chapter{G.12 Aplicación final de máscaras y variables
 BIS}\label{g.12-aplicaciuxf3n-final-de-muxe1scaras-y-variables-bis}
 
 \textbf{Funciones:} \texttt{\_preparar\_curva},
@@ -3384,7 +3596,7 @@ en los que no existe información espectral válida. En bilateral,
 \texttt{ASYM09} se invalida cuando falta información válida en
 cualquiera de los dos hemisferios.
 
-\section{\texorpdfstring{G.13 Funciones principales del módulo
+\chapter{\texorpdfstring{G.13 Funciones principales del módulo
 \texttt{reconstruccion.py}}{G.13 Funciones principales del módulo reconstruccion.py}}\label{g.13-funciones-principales-del-muxf3dulo-reconstruccion.py}
 
 \begin{itemize}
@@ -3408,7 +3620,7 @@ cualquiera de los dos hemisferios.
   \texttt{.f\_a} pero se quiere aplicar el mismo criterio de calidad.
 \end{itemize}
 
-\section{G.14 Métricas de
+\chapter{G.14 Métricas de
 comparación}\label{g.14-muxe9tricas-de-comparaciuxf3n}
 
 La comparación entre la DSA reconstruida y la DSA exportada por el
@@ -3461,45 +3673,132 @@ sistemático \\
 
 \[\text{sesgo} = \frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)\]
 
-\section{G.15 Resultados
+\chapter{G.15 Resultados
 experimentales}\label{g.15-resultados-experimentales}
 
-\subsection{\texorpdfstring{G.15.1 Equivalencia entre Welch y
-\texttt{spectrogram}}{G.15.1 Equivalencia entre Welch y spectrogram}}\label{g.15.1-equivalencia-entre-welch-y-spectrogram}
+\section{\texorpdfstring{G.15.1 Equivalencia entre Welch y
+\texttt{spectrogram}, y comparación con
+\emph{wavelet}}{G.15.1 Equivalencia entre Welch y spectrogram, y comparación con wavelet}}\label{g.15.1-equivalencia-entre-welch-y-spectrogram-y-comparaciuxf3n-con-wavelet}
 
 Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el
 mismo \texttt{detrend} y el mismo escalado de PSD, Welch y
 \texttt{scipy.signal.spectrogram} produjeron resultados numéricamente
-idénticos. La diferencia máxima observada fue cero tanto en PSD como en
-dB y en las referencias temporales. Por tanto, \texttt{spectrogram} no
-constituyó una metodología espectral distinta en estas condiciones, sino
-otra interfaz para organizar los mismos periodogramas modificados
-descritos en G.6. Se mantuvo la denominación Welch por describir con
-mayor precisión el estimador utilizado.
+idénticos: de las 682 combinaciones de filtro, suavizado, ventana y
+desplazamiento evaluadas en la validación experimental, las 682
+arrojaron exactamente el mismo Pearson, MAE y RMSE para ambas funciones.
+Por tanto, \texttt{spectrogram} no constituyó una metodología espectral
+distinta en estas condiciones, sino otra interfaz para organizar los
+mismos periodogramas modificados descritos en G.6. Se mantuvo la
+denominación Welch por describir con mayor precisión el estimador
+utilizado, coherente con otros trabajos que también implementan el
+análisis espectral del EEG mediante Python mediante estas dos funciones
+equivalentes \citep{Sawa2022}.
 
-\subsection{G.15.2 Resultados de la validación por
-registro}\label{g.15.2-resultados-de-la-validaciuxf3n-por-registro}
+En la misma validación se probó adicionalmente una transformada wavelet
+como alternativa a Welch. Aunque el Pearson obtenido con wavelet resultó
+razonable (hasta 0,69 en su mejor configuración), el error en escala
+física fue muy superior al de Welch: MAE en torno a 18,8 dB y RMSE en
+torno a 19,3 dB, frente a los 3,7 y 5,0 dB de Welch. Esta diferencia tan
+marcada en el error absoluto, pese a una correlación de patrón similar,
+descartó la transformada wavelet como alternativa viable para este
+proyecto.
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, bottomrule=.15mm, bottomtitle=1mm, breakable, colback=white, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, coltitle=black, left=2mm, leftrule=.75mm, opacityback=0, opacitybacktitle=0.6, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Nota}, titlerule=0mm, toprule=.15mm, toptitle=1mm]
+\begin{longtable}[]{@{}lrrr@{}}
+\caption{Comparación de métodos espectrales, mejor configuración de cada
+uno (registro
+\protect\texttt{L03041035})}\label{tbl-metodos-espectrales}\tabularnewline
+\toprule\noalign{}
+Método espectral & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Método espectral & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Welch & 0,726 & 3,72 & 5,02 \\
+\texttt{spectrogram} & 0,726 & 3,72 & 5,02 \\
+Wavelet & 0,690 & 18,75 & 19,26 \\
+\end{longtable}
 
-\textbf{Nota metodológica.} Las métricas de esta sección se obtuvieron
-con una versión anterior del módulo de reconstrucción, cuya máscara de
-calidad incluía el criterio espectral \texttt{umbral\_ceros} (90 \% de
-\emph{bins} nulos) descrito en G.2. La implementación final sustituye
-ese criterio por la detección de pérdida de señal sobre la onda cruda
-(\texttt{umbral\_ceros\_raw}, 50 \%, ver G.9), que actúa en una etapa
-anterior del proceso. Ambos criterios persiguen el mismo objetivo
----detectar segundos sin información fiable---, pero al no ser
-idénticos, el porcentaje de segundos enmascarados y, en consecuencia,
-los valores exactos de Pearson, MAE y RMSE calculados sobre la
-implementación final podrían diferir ligeramente de los aquí
-presentados. Los resultados deben interpretarse como una validación
-orientativa de la estrategia de reconstrucción adoptada, no como una
-medición exacta y actualizada de la versión final del código. Repetir
-esta validación con el pipeline definitivo queda como tarea pendiente
-antes de la entrega, si el tiempo lo permite.
+\section{G.15.2 Comparación de filtrado y tipos de
+suavizado}\label{g.15.2-comparaciuxf3n-de-filtrado-y-tipos-de-suavizado}
 
-\end{tcolorbox}
+La misma validación experimental permitió comparar, sobre el mismo
+registro y con el resto de parámetros fijos, tres decisiones
+metodológicas adoptadas en G.5 y G.10: aplicar o no el filtro pasa-altos
+Butterworth, y qué forma de suavizado temporal usar.
+
+\textbf{Filtro pasa-altos (Butterworth).} Sobre la mejor combinación de
+ventana y desplazamiento en cada caso (suavizado \texttt{rolling},
+ventana 30 s):
+
+\begin{longtable}[]{@{}lrrrr@{}}
+\caption{Efecto del filtro pasa-altos sobre la correspondencia con la
+DSA original}\label{tbl-butterworth-comparacion}\tabularnewline
+\toprule\noalign{}
+Filtro Butterworth & Shift (s) & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Filtro Butterworth & Shift (s) & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Aplicado & 11 & 0,7258 & 3,718 & 5,021 \\
+No aplicado & 11 & 0,7041 & 4,527 & 6,448 \\
+\end{longtable}
+
+Aplicar el filtro reduce el RMSE en más de 1,4 dB (un 22 \% de mejora
+relativa) y el MAE en 0,8 dB, además de mejorar ligeramente el Pearson.
+Esto respalda la decisión de aplicar sistemáticamente el filtro
+pasa-altos antes del cálculo espectral (G.5), y no solo como un ajuste
+opcional.
+
+\textbf{Tipo de suavizado temporal.} Comparando, para cada tipo de
+suavizado, su mejor combinación de ventana y desplazamiento (con filtro
+Butterworth aplicado):
+
+\begin{longtable}[]{@{}lrrrrr@{}}
+\caption{Comparación de estrategias de suavizado
+temporal}\label{tbl-suavizado-comparacion}\tabularnewline
+\toprule\noalign{}
+Suavizado & Ventana (s) & Shift (s) & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Suavizado & Ventana (s) & Shift (s) & Pearson & MAE (dB) & RMSE (dB) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Sin suavizar & --- & 24 & 0,470 & 6,643 & 8,584 \\
+Media móvil causal (\texttt{rolling}) & 30 & 11 & 0,726 & 3,718 &
+5,021 \\
+Media móvil exponencial (\texttt{ewm}) & 30 & 11 & 0,694 & 3,813 &
+5,161 \\
+\end{longtable}
+
+No suavizar la señal deja un RMSE muy superior (8,58 dB) al de
+cualquiera de las dos formas de suavizado probadas, lo que confirma que
+el suavizado temporal es necesario y no una simple opción estética.
+Entre las dos formas de suavizado con memoria, la media móvil causal
+(\texttt{rolling}), adoptada finalmente en el proyecto (G.10), obtuvo
+mejores resultados que la media móvil exponencial en las tres métricas,
+aunque la diferencia entre ambas es más moderada que frente a no
+suavizar en absoluto.
+
+Cabe destacar que, en las tres comparaciones anteriores (Welch frente a
+\emph{wavelet} en G.15.1, Butterworth aplicado o no, y los tres tipos de
+suavizado), la combinación finalmente adoptada por el proyecto ---Welch,
+filtro Butterworth aplicado, suavizado \texttt{rolling}--- coincide en
+los tres casos con la opción de mejor resultado experimental, y no solo
+con una elección razonable a priori.
+
+\section{G.15.3 Resultados de la validación por
+registro}\label{g.15.3-resultados-de-la-validaciuxf3n-por-registro}
 
 La evaluación se realizó sobre tres registros BIS. Los registros
 bilaterales aportaron dos matrices independientes, una por hemisferio,
@@ -3574,14 +3873,14 @@ Enmascarado
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{L03041035} & Unilateral & 10 & 0,7238 & 3,720 & 5,033 & 7,6
+\texttt{L03041035} & Unilateral & 10 & 0,7260 & 3,711 & 5,022 & 7,8
 \% \\
 \texttt{L05141322} & Izquierdo & 6 & 0,9388 & 1,600 & 2,308 & 5,1 \% \\
 \texttt{L05141322} & Derecho & 6 & 0,9455 & 1,746 & 2,387 & 1,0 \% \\
 \texttt{L04301923} & Izquierdo & 6 & 0,9836 & 0,994 & 1,577 & 0,4 \% \\
 \texttt{L04301923} & Derecho & 6 & 0,9830 & 1,022 & 1,598 & 0,4 \% \\
-\textbf{Promedio} & & & \textbf{0,9149} & \textbf{1,816} &
-\textbf{2,581} & \textbf{2,9 \%} \\
+\textbf{Promedio} & & & \textbf{0,9154} & \textbf{1,815} &
+\textbf{2,578} & \textbf{2,9 \%} \\
 \end{longtable}
 
 El registro unilateral presentó resultados inferiores a los bilaterales
@@ -3590,8 +3889,8 @@ refuerza la necesidad de ampliar la validación unilateral y evita
 interpretar el promedio global como una estimación definitiva del
 rendimiento en nuevos pacientes.
 
-\subsection{G.15.3 Configuración
-final}\label{g.15.3-configuraciuxf3n-final}
+\section{G.15.4 Configuración
+final}\label{g.15.4-configuraciuxf3n-final}
 
 \begin{longtable}[]{@{}ll@{}}
 \caption{Configuración final adoptada para la
@@ -3614,6 +3913,7 @@ Rango & 0,5-30 Hz \\
 Bin & 0,5 Hz \\
 Unilateral & Canal 1 \\
 Bilateral & Canal 1 izquierdo, canal 3 derecho \\
+Filtro pasa-altos & Butterworth aplicado (G.15.2) \\
 Suavizado & \texttt{SpSmooth} (media móvil causal) \\
 Máscara previa al suavizado & Sí \\
 Shift unilateral & 10 s \\
@@ -3622,7 +3922,9 @@ Shift bilateral & 6 s \\
 
 Esta configuración ofreció el mejor equilibrio entre correspondencia con
 la DSA exportada, error en escala física, conservación de información y
-simplicidad metodológica.
+simplicidad metodológica; y, como se detalla en G.15.1 y G.15.2,
+coincide en cada una de las decisiones comparadas (método espectral,
+filtro y suavizado) con la opción experimentalmente superior.
 
 \textbf{Limitaciones de la validación.} La selección se obtuvo a partir
 de tres registros y cinco matrices. Aunque los resultados bilaterales
@@ -3631,7 +3933,7 @@ archivo \texttt{.f\_a} válido. Por ello, la configuración debe
 considerarse seleccionada pero todavía sujeta a validación externa con
 un mayor número de registros unilaterales.
 
-\section{G.16 Limitaciones}\label{g.16-limitaciones}
+\chapter{G.16 Limitaciones}\label{g.16-limitaciones}
 
 La reconstrucción no pretende reproducir exactamente el algoritmo
 propietario del monitor BIS, sino generar una aproximación reproducible
@@ -3663,14 +3965,14 @@ distinta y no deben presentarse con el mismo nivel de certeza:
 
 \apendice{Anexo de sostenibilización curricular}
 
-\section{Introducción}\label{introducciuxf3n-2}
+\chapter{Introducción}\label{introducciuxf3n-2}
 
 Este anexo recoge una reflexión personal sobre los aspectos de
 sostenibilidad, en su sentido amplio (social, económico y tecnológico),
 presentes en el desarrollo de este Trabajo Fin de Grado, siguiendo las
 directrices de sostenibilización curricular de la CRUE \citep{CRUE2012}.
 
-\section{Sostenibilidad social: eficiencia y bienestar del personal
+\chapter{Sostenibilidad social: eficiencia y bienestar del personal
 sanitario}\label{sostenibilidad-social-eficiencia-y-bienestar-del-personal-sanitario}
 
 El origen de este proyecto es un problema de sostenibilidad social muy
@@ -3687,26 +3989,25 @@ lo sostienen día a día. Una herramienta que reduce la fragmentación de
 la información, aunque sea a pequeña escala, contribuye a un entorno de
 trabajo más sostenible para el personal clínico.
 
-\section{Responsabilidad ética en el uso de
+\chapter{Responsabilidad ética en el uso de
 datos}\label{responsabilidad-uxe9tica-en-el-uso-de-datos}
 
 Trabajar con datos clínicos reales me ha permitido experimentar de
 primera mano una dimensión de la sostenibilidad que no había abordado
 tan de cerca en el grado: la responsabilidad en el tratamiento de la
-información. La necesidad de tramitar y obtener la aprobación del Comité
-de Bioética antes de poder usar datos reales, y de mantener en todo
-momento la separación entre archivos originales y derivados, la
-trazabilidad de las fuentes y la ausencia de identificadores directos
-del paciente, me ha hecho entender que la innovación tecnológica en
-salud solo es sostenible si se construye sobre una base de confianza y
-de respeto a los derechos de las personas cuyos datos se utilizan. Esta
-experiencia ha reforzado mi conciencia de que no toda mejora técnica es
-deseable si no se acompaña de garantías éticas adecuadas, y que el
-tiempo dedicado a estos aspectos (que en ocasiones puede parecer que
-ralentiza el desarrollo) es, en realidad, parte imprescindible de un
-proyecto responsable.
+información. La necesidad de tramitar y obtener la aprobación del CEIm
+antes de poder usar datos reales, y de mantener en todo momento la
+separación entre archivos originales y derivados, la trazabilidad de las
+fuentes y la ausencia de identificadores directos del paciente, me ha
+hecho entender que la innovación tecnológica en salud solo es sostenible
+si se construye sobre una base de confianza y de respeto a los derechos
+de las personas cuyos datos se utilizan. Esta experiencia ha reforzado
+mi conciencia de que no toda mejora técnica es deseable si no se
+acompaña de garantías éticas adecuadas, y que el tiempo dedicado a estos
+aspectos (que en ocasiones puede parecer que ralentiza el desarrollo)
+es, en realidad, parte imprescindible de un proyecto responsable.
 
-\section{Sostenibilidad tecnológica y
+\chapter{Sostenibilidad tecnológica y
 económica}\label{sostenibilidad-tecnoluxf3gica-y-econuxf3mica}
 
 El proyecto se ha construido íntegramente con herramientas de software
@@ -3725,7 +4026,23 @@ responde a un criterio de sostenibilidad del propio conocimiento
 generado: cualquier persona que continúe este trabajo en el futuro puede
 hacerlo sin depender de que yo esté disponible para explicarlo.
 
-\section{Reflexión final}\label{reflexiuxf3n-final}
+A esto se añade una dimensión de sostenibilidad que valoro
+especialmente: la de evitar que otras personas tengan que repetir desde
+cero un trabajo de exploración ya realizado. La estructura de los
+archivos que exporta el monitor BIS (\texttt{.spa}, \texttt{.f\_a},
+\texttt{.r2a}/\texttt{.r4a}, \texttt{.h\_a}, \texttt{.t\_a}, entre
+otros) estaba muy poco documentada de forma accesible antes de este
+trabajo; la exploración detallada que ha exigido este proyecto, recogida
+en el Anexo F, puede ahorrar ese mismo esfuerzo a quien continúe esta
+línea de trabajo en el futuro. De manera similar, la metodología de
+reconstrucción de la matriz espectral (Anexo G) no pretende ser una
+réplica exacta del algoritmo propietario del monitor, sino una
+aproximación validada y documentada que sienta una base sobre la que
+apoyarse: quien quiera mejorarla, adaptarla a otro equipo o compararla
+con nuevas alternativas parte de un punto de partida ya construido, en
+lugar de empezar de cero.
+
+\chapter{Reflexión final}\label{reflexiuxf3n-final}
 
 Este trabajo me ha permitido aplicar competencias de sostenibilidad que
 van más allá de lo puramente técnico: pensar en sistemas complejos

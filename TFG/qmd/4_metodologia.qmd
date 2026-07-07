@@ -62,25 +62,9 @@ Los ejemplos mostrados corresponden a algunas de las variables que han podido se
 
 La matriz de densidad espectral utilizada en la visualización puede proceder de dos vías. Cuando el archivo `.f_a` está disponible y contiene información válida, se emplea como DSA original exportada por el monitor. Cuando este archivo no está disponible, está vacío o se desea comparar la matriz original con una reconstrucción independiente, la DSA se obtiene a partir del procesamiento de la señal EEG cruda almacenada en los archivos `.r2a` o `.r4a`.
 
-La @fig-flujo-dsa resume el flujo seguido para obtener o construir la DSA empleada en la aplicación.
+Como se muestra en la @fig-flujo-dsa, el flujo parte del tratamiento y alineación de los archivos exportados por el BIS y finaliza con la DSA integrada con BIS/ICCA.
 
-```{mermaid}
-%%| label: fig-flujo-dsa
-%%| fig-cap: "Flujo general de obtención o reconstrucción de la DSA. Fuente: elaboración propia."
-%%| fig-width: 3.4
-%%{init: {'flowchart': {'nodeSpacing': 4, 'rankSpacing': 6, 'padding': 1}, 'themeVariables': {'fontSize': '9px'}}}%%
-flowchart TD
-    A["Exportación<br/>BIS"] --> B["Lectura<br/>archivos"]
-    B --> C["Sesión y<br/>tiempos"]
-    C --> D["Timeline común<br/>y máscaras"]
-    D --> E{".f_a<br/>válido?"}
-    E -- "Sí" --> F["Usar<br/>.f_a"]
-    E -- "No" --> G["Reconstruir<br/>EEG crudo"]
-    F --> H["Aplicar<br/>máscaras"]
-    G --> H
-    H --> I["DSA final<br/>+ BIS/ICCA"]
-```
-
+![Flujo general de obtención o reconstrucción de la DSA. Fuente: elaboración propia.](img/diagrama_inicio.png){#fig-flujo-dsa width=60%}
 
 #### Preparación común de los datos BIS
 

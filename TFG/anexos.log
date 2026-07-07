@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.7)  7 JUL 2026 17:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.7)  7 JUL 2026 21:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -827,392 +827,42 @@ Package: memhfixc 2025/09/16 v1.24 hyperref package fixes for memoir class
 \c@memhycontfloat=\count383
 \c@mem@Hpagenote=\count384
 )
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tcolorbox\tcolorbox.s
-ty
-Package: tcolorbox 2025/11/28 version 6.9.0 text color boxes
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pdfpages\pdfpages.sty
+Package: pdfpages 2026/03/30 v0.6h Insert pages of external PDF documents (AM)
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/eso-pic\eso-pic.sty
+Package: eso-pic 2026/05/31 v3.0e eso-pic (RN)
+\ESO@tempdima=\dimen288
+\ESO@tempdimb=\dimen289
+)
+\AM@pagewidth=\dimen290
+\AM@pageheight=\dimen291
+\AM@fboxrule=\dimen292
 
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tik
-z.sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.st
-y
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.
-sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfut
-il-common.tex
-\pgfutil@everybye=\toks37
-\pgfutil@tempdima=\dimen288
-\pgfutil@tempdimb=\dimen289
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pdfpages\pppdftex.def
+File: pppdftex.def 2026/03/30 v0.6h Pdfpages driver for pdfTeX (AM)
 )
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfut
-il-latex.def
-\pgfutil@abb=\box70
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrc
-s.code.tex
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.te
-x)
-Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
-))
-Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcor
-e.sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsy
-s.sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-sys.code.tex
-Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfke
-ys.code.tex
-\pgfkeys@pathtoks=\toks38
-\pgfkeys@temptoks=\toks39
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfke
-yslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks40
-))
-\pgf@x=\dimen290
-\pgf@y=\dimen291
-\pgf@xa=\dimen292
-\pgf@ya=\dimen293
-\pgf@xb=\dimen294
-\pgf@yb=\dimen295
-\pgf@xc=\dimen296
-\pgf@yc=\dimen297
-\pgf@xd=\dimen298
-\pgf@yd=\dimen299
-\w@pgf@writea=\write5
-\r@pgf@reada=\read5
-\c@pgf@counta=\count385
-\c@pgf@countb=\count386
-\c@pgf@countc=\count387
-\c@pgf@countd=\count388
-\t@pgf@toka=\toks41
-\t@pgf@tokb=\toks42
-\t@pgf@tokc=\toks43
-\pgf@sys@id@count=\count389
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-.cfg
-File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
-)
-Driver file for pgf: pgfsys-pdftex.def
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-sys-pdftex.def
-File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-sys-common-pdf.def
-File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
-)))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-syssoftpath.code.tex
-File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfsyssoftpath@smallbuffer@items=\count390
-\pgfsyssoftpath@bigbuffer@items=\count391
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf
-sysprotocol.code.tex
-File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-ore.code.tex
-Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.co
-de.tex
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathuti
-l.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathpar
-ser.code.tex
-\pgfmath@dimen=\dimen300
-\pgfmath@count=\count392
-\pgfmath@box=\box71
-\pgfmath@toks=\toks44
-\pgfmath@stack@operand=\toks45
-\pgfmath@stack@operation=\toks46
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.basic.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.trigonometric.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.random.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.comparison.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.base.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.round.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.misc.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfun
-ctions.integerarithmetics.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcal
-c.code.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathflo
-at.code.tex
-\c@pgfmathroundto@lastzeros=\count393
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.cod
-e.tex)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orepoints.code.tex
-File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@picminx=\dimen301
-\pgf@picmaxx=\dimen302
-\pgf@picminy=\dimen303
-\pgf@picmaxy=\dimen304
-\pgf@pathminx=\dimen305
-\pgf@pathmaxx=\dimen306
-\pgf@pathminy=\dimen307
-\pgf@pathmaxy=\dimen308
-\pgf@xx=\dimen309
-\pgf@xy=\dimen310
-\pgf@yx=\dimen311
-\pgf@yy=\dimen312
-\pgf@zx=\dimen313
-\pgf@zy=\dimen314
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orepathconstruct.code.tex
-File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@path@lastx=\dimen315
-\pgf@path@lasty=\dimen316
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orepathusage.code.tex
-File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@shorten@end@additional=\dimen317
-\pgf@shorten@start@additional=\dimen318
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orescopes.code.tex
-File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfpic=\box72
-\pgf@hbox=\box73
-\pgf@layerbox@main=\box74
-\pgf@picture@serial@count=\count394
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oregraphicstate.code.tex
-File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgflinewidth=\dimen319
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oretransformations.code.tex
-File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@pt@x=\dimen320
-\pgf@pt@y=\dimen321
-\pgf@pt@temp=\dimen322
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orequick.code.tex
-File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oreobjects.code.tex
-File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orepathprocessing.code.tex
-File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orearrows.code.tex
-File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfarrowsep=\dimen323
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oreshade.code.tex
-File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@max=\dimen324
-\pgf@sys@shading@range@num=\count395
-\pgf@shadingcount=\count396
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oreimage.code.tex
-File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oreexternal.code.tex
-File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfexternal@startupbox=\box75
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orelayers.code.tex
-File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-oretransparency.code.tex
-File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orepatterns.code.tex
-File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfc
-orerdf.code.tex
-File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodu
-leshapes.code.tex
-File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfnodeparttextbox=\box76
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodu
-leplot.code.tex
-File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgf
-comp-version-0-65.sty
-Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@nodesepstart=\dimen325
-\pgf@nodesepend=\dimen326
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgf
-comp-version-1-18.sty
-Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.
-sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys
-.sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfke
-ys.code.tex)) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pgf/mat
-h\pgfmath.sty
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.co
-de.tex))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffo
-r.code.tex
-Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
-\pgffor@iter=\dimen327
-\pgffor@skip=\dimen328
-\pgffor@stack=\toks47
-\pgffor@toks=\toks48
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/t
-ikz\tikz.code.tex
-Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgfli
-braryplothandlers.code.tex
-File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@plot@mark@count=\count397
-\pgfplotmarksize=\dimen329
-)
-\tikz@lastx=\dimen330
-\tikz@lasty=\dimen331
-\tikz@lastxsaved=\dimen332
-\tikz@lastysaved=\dimen333
-\tikz@lastmovetox=\dimen334
-\tikz@lastmovetoy=\dimen335
-\tikzleveldistance=\dimen336
-\tikzsiblingdistance=\dimen337
-\tikz@figbox=\box77
-\tikz@figbox@bg=\box78
-\tikz@tempbox=\box79
-\tikz@tempbox@bg=\box80
-\tikztreelevel=\count398
-\tikznumberofchildren=\count399
-\tikznumberofcurrentchild=\count400
-\tikz@fig@count=\count401
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodu
-lematrix.code.tex
-File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfmatrixcurrentrow=\count402
-\pgfmatrixcurrentcolumn=\count403
-\pgf@matrix@numberofcolumns=\count404
-)
-\tikz@expandcount=\count405
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/t
-ikz/libraries\tikzlibrarytopaths.code.tex
-File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/environ\environ.s
-ty
-Package: environ 2014/05/04 v0.3 A new way to define environments
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/trimspaces\trimspaces
-.sty
-Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
-))
-\tcb@titlebox=\box81
-\tcb@upperbox=\box82
-\tcb@lowerbox=\box83
-\tcb@phantombox=\box84
-\c@tcbbreakpart=\count406
-\c@tcblayer=\count407
-\c@tcolorbox@number=\count408
-\l__tcobox_tmpa_box=\box85
-\l__tcobox_tmpa_dim=\dimen338
-\tcb@temp=\box86
-\tcb@temp=\box87
-\tcb@temp=\box88
-\tcb@temp=\box89
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tcolorbox\tcbskins.co
-de.tex
-Library (tcolorbox): 'tcbskins.code.tex' version '6.9.0'
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tikzfill\tikzfill.ima
-ge.sty
-Package: tikzfill.image 2026/04/23 v1.2.0 Image filling library for TikZ
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tikzfill\tikzlibraryf
-ill.image.code.tex
-File: tikzlibraryfill.image.code.tex 2026/04/23 v1.2.0 Image filling library
-\l__tikzfill_tmpa_dim=\dimen339
-\l__tikzfill_tmpb_dim=\dimen340
-\l__tikzfill_img_box=\box90
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tcolorbox\tcbskinsjig
-saw.code.tex
-Library (tcolorbox): 'tcbskinsjigsaw.code.tex' version '6.9.0'
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/tcolorbox\tcbbreakabl
-e.code.tex
-Library (tcolorbox): 'tcbbreakable.code.tex' version '6.9.0'
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pdfcol\pdfcol.sty
-Package: pdfcol 2022-09-21 v1.7 Handle new color stacks for pdfTeX (HO)
-)
-Package pdfcol Info: New color stack `tcb@breakable' = 1 on input line 23.
-\tcb@testbox=\box91
-\tcb@totalupperbox=\box92
-\tcb@totallowerbox=\box93
-))
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/fontawesome5\fontawes
-ome5.sty
-Package: fontawesome5 2022/05/02 v5.15.4 Font Awesome 5
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/l3packages/l3keys2e\l
-3keys2e.sty
-Package: l3keys2e 2025-10-09 LaTeX2e option processing using LaTeX3 keys
-)
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/fontawesome5\fontawes
-ome5-generic-helper.sty
-Package: fontawesome5-generic-helper 2022/05/02 v5.15.4 non-uTeX helper for fon
-tawesome5
-
-(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/fontawesome5\fontawes
-ome5-mapping.def))) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/c
-aption\caption.sty
+\pdfpages@includegraphics@status=\count385
+\AM@pagebox=\box70
+\AM@global@opts=\toks37
+\AM@pagecnt=\count386
+\AM@toc@title=\toks38
+\AM@lof@heading=\toks39
+\c@AM@survey=\count387
+\AM@templatesizebox=\box71
+) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen341
-\captionmargin=\dimen342
-\caption@leftmargin=\dimen343
-\caption@rightmargin=\dimen344
-\caption@width=\dimen345
-\caption@indent=\dimen346
-\caption@parindent=\dimen347
-\caption@hangindent=\dimen348
+\caption@tempdima=\dimen293
+\captionmargin=\dimen294
+\caption@leftmargin=\dimen295
+\caption@rightmargin=\dimen296
+\caption@width=\dimen297
+\caption@indent=\dimen298
+\caption@parindent=\dimen299
+\caption@hangindent=\dimen300
 Package caption Info: memoir document class detected.
 
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption-memoi
@@ -1220,11 +870,11 @@ r.sto
 File: caption-memoir.sto 2023/09/08 v2.2c Adaption of the caption package to th
 e memoir document class (AR)
 ))
-\c@caption@flags=\count409
-\c@continuedfloat=\count410
+\c@caption@flags=\count388
+\c@continuedfloat=\count389
 Package caption Info: changepage package is loaded.
-\caption@adjustwidth@hsize=\dimen349
-\caption@adjustwidth@linewidth=\dimen350
+\caption@adjustwidth@hsize=\dimen301
+\caption@adjustwidth@linewidth=\dimen302
 Package caption Info: hyperref package is loaded.
 Package caption Info: longtable package is loaded.
 
@@ -1234,22 +884,22 @@ Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
 Package caption Info: xtab package is loaded.
 ) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count411
-\float@exts=\toks49
-\float@box=\box94
-\@float@everytoks=\toks50
-\@floatcapt=\box95
+\c@float@type=\count390
+\float@exts=\toks40
+\float@box=\box72
+\@float@everytoks=\toks41
+\@floatcapt=\box73
 )
-\@float@every@codelisting=\toks51
-\c@codelisting=\count412
+\@float@every@codelisting=\toks42
+\c@codelisting=\count391
 
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/caption\subcaption.st
 y
 Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
 Package caption Info: New subtype `subfigure' on input line 238.
-\c@subfigure=\count413
+\c@subfigure=\count392
 Package caption Info: New subtype `subtable' on input line 238.
-\c@subtable=\count414
+\c@subtable=\count393
 )
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
@@ -1258,58 +908,58 @@ Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
 ef
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO
 )
-\BKM@id=\count415
+\BKM@id=\count394
 )) (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/xurl\xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 382.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 38
-9.
+Package hyperref Info: Option `colorlinks' set `true' on input line 369.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 37
+6.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 No file anexos.aux.
 \openout1 = `anexos.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 389.
-LaTeX Font Info:    ... okay on input line 389.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 376.
+LaTeX Font Info:    ... okay on input line 376.
 
 Class memoir Warning: \addtodef is marked deprecated and will be
 (memoir)              removed in 2026, use instead \patchcmd,
 (memoir)              \pretocmd or \apptocmd from the etoolbox package
-(memoir)              (which is autoloaded by the class) on input line 389.
+(memoir)              (which is autoloaded by the class) on input line 376.
 
 
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.
 mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count416
-\scratchdimen=\dimen351
-\scratchbox=\box96
-\nofMPsegments=\count417
-\nofMParguments=\count418
-\everyMPshowfont=\toks52
-\MPscratchCnt=\count419
-\MPscratchDim=\dimen352
-\MPnumerator=\count420
-\makeMPintoPDFobject=\count421
-\everyMPtoPDFconversion=\toks53
+\scratchcounter=\count395
+\scratchdimen=\dimen303
+\scratchbox=\box74
+\nofMPsegments=\count396
+\nofMParguments=\count397
+\everyMPshowfont=\toks43
+\MPscratchCnt=\count398
+\MPscratchDim=\dimen304
+\MPnumerator=\count399
+\makeMPintoPDFobject=\count400
+\everyMPtoPDFconversion=\toks44
 )
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf
 -base.sty
@@ -1321,13 +971,13 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 .cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-LaTeX Info: Redefining \microtypecontext on input line 389.
-Package microtype Info: Applying patch `item' on input line 389.
-Package microtype Info: Applying patch `toc' on input line 389.
-Package microtype Info: Applying patch `eqnum' on input line 389.
-Package microtype Info: Applying patch `footnote' on input line 389.
-Package microtype Info: Applying patch `verbatim' on input line 389.
-LaTeX Info: Redefining \microtypesetup on input line 389.
+LaTeX Info: Redefining \microtypecontext on input line 376.
+Package microtype Info: Applying patch `item' on input line 376.
+Package microtype Info: Applying patch `toc' on input line 376.
+Package microtype Info: Applying patch `eqnum' on input line 376.
+Package microtype Info: Applying patch `footnote' on input line 376.
+Package microtype Info: Applying patch `verbatim' on input line 376.
+LaTeX Info: Redefining \microtypesetup on input line 376.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
@@ -1342,51 +992,65 @@ Package microtype Info: No adjustment of character kerning.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Info: Redefining \. on input line 389.
-LaTeX Info: Redefining \% on input line 389.
+LaTeX Info: Redefining \. on input line 376.
+LaTeX Info: Redefining \% on input line 376.
 Package babel Info: 'spanish' activates 'spanish' shorthands.
-(babel)             Reported on input line 389.
-Package hyperref Info: Link coloring ON on input line 389.
+(babel)             Reported on input line 376.
+Package hyperref Info: Link coloring ON on input line 376.
+
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape.s
+ty
+Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
+
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape-n
+ometadata.sty
+Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PD
+F (HO)
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/graphics\lscape.sty
+Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
+)
+Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
+))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
-<./img/CabeceraEPS.png, id=6, 1706.375pt x 376.40625pt>
+<./img/CabeceraEPS.png, id=3, 1706.375pt x 376.40625pt>
 File: ./img/CabeceraEPS.png Graphic file (type png)
 <use ./img/CabeceraEPS.png>
-Package pdftex.def Info: ./img/CabeceraEPS.png  used on input line 391.
+Package pdftex.def Info: ./img/CabeceraEPS.png  used on input line 378.
 (pdftex.def)             Requested size: 383.0pt x 84.48097pt.
-<./img/Logo_GIS.png, id=8, 756.8275pt x 478.78876pt>
+<./img/Logo_GIS.png, id=5, 756.8275pt x 478.78876pt>
 File: ./img/Logo_GIS.png Graphic file (type png)
 <use ./img/Logo_GIS.png>
-Package pdftex.def Info: ./img/Logo_GIS.png  used on input line 391.
+Package pdftex.def Info: ./img/Logo_GIS.png  used on input line 378.
 (pdftex.def)             Requested size: 76.59883pt x 48.45152pt.
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3
-91.
+78.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3
-91.
+78.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-391.
+378.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-391.
+378.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 391.
+(Font)              <12> on input line 378.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 391.
+(Font)              <8> on input line 378.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 391.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 391
+(Font)              <6> on input line 378.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 378
 .
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
@@ -1394,7 +1058,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 g
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 391
+LaTeX Font Info:    Trying to load font information for U+msb on input line 378
 .
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1411,17 +1075,17 @@ raEPS.png> <./img/Logo_GIS.png>] [2
 ]
 File: ./img/CabeceraEPS.png Graphic file (type png)
 <use ./img/CabeceraEPS.png>
-Package pdftex.def Info: ./img/CabeceraEPS.png  used on input line 400.
+Package pdftex.def Info: ./img/CabeceraEPS.png  used on input line 387.
 (pdftex.def)             Requested size: 383.0pt x 84.48097pt.
 File: ./img/Logo_GIS.png Graphic file (type png)
 <use ./img/Logo_GIS.png>
-Package pdftex.def Info: ./img/Logo_GIS.png  used on input line 400.
+Package pdftex.def Info: ./img/Logo_GIS.png  used on input line 387.
 (pdftex.def)             Requested size: 76.59883pt x 48.45152pt.
 [1
 
 ] [2]
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 4
-14.
+01.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1431,7 +1095,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.414 \clearpage
+l.401 \clearpage
                  [1
 
 
@@ -1444,7 +1108,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.416 \clearpage
+l.403 \clearpage
                  [2
 
 ]
@@ -1457,7 +1121,7 @@ No file anexos.lot.
 ]
 Ap\'{e}ndice A.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <17.28> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 425.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 412.
 [5] [6
 
 ]
@@ -1466,60 +1130,433 @@ Ap\'{e}ndice B.
 
 ]
 Ap\'{e}ndice C.
-[9] [10
-
-]
-Ap\'{e}ndice D.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 463.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 463.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 463.
-
-Package natbib Warning: Citation `bortolot2005' on page 11 undefined on input l
-ine 463.
-
-[11] [12
-
-]
-Ap\'{e}ndice E.
-[13]
-<img/esquema_arquitectura_ubu.png, id=104, 474.573pt x 266.79675pt>
-File: img/esquema_arquitectura_ubu.png Graphic file (type png)
-<use img/esquema_arquitectura_ubu.png>
-Package pdftex.def Info: img/esquema_arquitectura_ubu.png  used on input line 5
-39.
-(pdftex.def)             Requested size: 344.69748pt x 193.78296pt.
-
-LaTeX Warning: Reference `fig-diseno-despliegue' on page 14 undefined on input 
-line 549.
-
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 5
-64.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 4
+55.
 (C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+Underfull \hbox (badness 1997) in paragraph at lines 460--466
+[]\T1/lmr/bx/n/12 (+20) Consolidación en mó-du-los. \T1/lmr/m/n/12 (+20) Las fu
+n-cio-nes ex-plo-ra-to-rias se
+ []
 
-! LaTeX Error: Unicode character â”œ (U+251C)
-               not set up for use with LaTeX.
+
+Underfull \hbox (badness 10000) in paragraph at lines 460--466
+\T1/lmr/m/n/12 (+20) re-or-ga-ni-za-ron en mó-du-los re-uti-li-za-bles (\T1/lmt
+t/m/n/12 reconstruccion.py\T1/lmr/m/n/12 (+20) ,
+ []
+
+[9]
+LaTeX Info: Redefining \. on input line 491.
+LaTeX Info: Redefining \% on input line 491.
+Package babel Info: 'spanish' activates 'spanish' shorthands.
+(babel)             Reported on input line 491.
+[10]
+Ap\'{e}ndice D.
+<img/planificacion_temporal.png, id=82, 829.29825pt x 479.391pt>
+File: img/planificacion_temporal.png Graphic file (type png)
+<use img/planificacion_temporal.png>
+Package pdftex.def Info: img/planificacion_temporal.png  used on input line 505
+.
+(pdftex.def)             Requested size: 363.85472pt x 210.33287pt.
+
+LaTeX Warning: Reference `fig-planificacion-temporal' on page 11 undefined on i
+nput line 514.
+
+[11
+
+ <./img/planificacion_temporal.png>] [12
+
+]
+Ap\'{e}ndice E.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 5
+56.
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+ignored: Infinite glue shrinkage found in box being split [13{C:/Users/usuario/AppData/
+Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}]
+LaTeX Info: Redefining \. on input line 568.
+LaTeX Info: Redefining \% on input line 568.
+[14]
+Ap\'{e}ndice F.
+[15
+
+] [16
+
+]
+Ap\'{e}ndice G.
+
+LaTeX Warning: Reference `tbl-riesgos' on page 17 undefined on input line 595.
+
+
+ignored: Infinite glue shrinkage found in box being split [17]
+LaTeX Info: Redefining \. on input line 647.
+LaTeX Info: Redefining \% on input line 647.
+[18]
+Ap\'{e}ndice H.
+[19
+
+] [20
+
+]
+Ap\'{e}ndice I.
+[21] [22
+
+]
+Ap\'{e}ndice J.
+[23] [24
+
+]
+Ap\'{e}ndice K.
+[25]
+<img/esquema_arquitectura_hubu.png, id=161, 913.23pt x 518.0445pt>
+File: img/esquema_arquitectura_hubu.png Graphic file (type png)
+<use img/esquema_arquitectura_hubu.png>
+Package pdftex.def Info: img/esquema_arquitectura_hubu.png  used on input line 
+743.
+(pdftex.def)             Requested size: 344.68997pt x 195.53096pt.
+
+LaTeX Warning: Reference `fig-diseno-despliegue' on page 26 undefined on input 
+line 753.
+
+
+Underfull \vbox (badness 5548) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 766.
+LaTeX Info: Redefining \% on input line 766.
+[26 <./img/esquema_arquitectura_hubu.png>]
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
+772.
+(C:\Users\usuario\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmtt.fd
+File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Info: Redefining \. on input line 819.
+LaTeX Info: Redefining \% on input line 819.
+[27]
+ignored: Infinite glue shrinkage found in box being split
+LaTeX Info: Redefining \. on input line 883.
+LaTeX Info: Redefining \% on input line 883.
+[28]
+LaTeX Info: Redefining \. on input line 905.
+LaTeX Info: Redefining \% on input line 905.
+[29] [30
+
+]
+Ap\'{e}ndice L.
+[31] [32
+
+]
+Ap\'{e}ndice M.
+<anexos_files/figure-latex/mermaid-figure-1.png, id=201, 1112.155pt x 1256.695p
+t>
+File: anexos_files/figure-latex/mermaid-figure-1.png Graphic file (type png)
+<use anexos_files/figure-latex/mermaid-figure-1.png>
+Package pdftex.def Info: anexos_files/figure-latex/mermaid-figure-1.png  used o
+n input line 920.
+(pdftex.def)             Requested size: 433.61992pt x 488.53668pt.
+
+Overfull \hbox (50.61992pt too wide) in paragraph at lines 920--921
+ [][] 
+ []
+
+[33]
+LaTeX Info: Redefining \. on input line 929.
+LaTeX Info: Redefining \% on input line 929.
+[34 <./anexos_files/figure-latex/mermaid-figure-1.png (PNG copy)>]
+Ap\'{e}ndice N.
+
+Underfull \hbox (badness 10000) in paragraph at lines 960--960
+[]|\T1/lmr/bx/n/12 (+20) Requisitos
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 960--960
+[][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 988--988
+[]|\T1/lmr/bx/n/12 (+20) Requisitos
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 988--988
+[][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1017--1017
+[]|\T1/lmr/bx/n/12 (+20) Requisitos
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1017--1017
+[][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1045--1045
+[]|\T1/lmr/bx/n/12 (+20) Requisitos
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1045--1045
+[][] 
+ []
+
+[35
+
+]
+LaTeX Info: Redefining \. on input line 1049.
+LaTeX Info: Redefining \% on input line 1049.
+[36]
+LaTeX Info: Redefining \. on input line 1049.
+LaTeX Info: Redefining \% on input line 1049.
+[37]
+LaTeX Info: Redefining \. on input line 1049.
+LaTeX Info: Redefining \% on input line 1049.
+[38]
+LaTeX Info: Redefining \. on input line 1049.
+LaTeX Info: Redefining \% on input line 1049.
+[39] [40
+
+]
+Ap\'{e}ndice \~N.
+
+LaTeX Warning: Reference `fig-inicio-organizador' on page 41 undefined on input
+ line 1061.
+
+
+LaTeX Warning: Reference `fig-revision-paciente' on page 41 undefined on input 
+line 1064.
+
+<img/capturas_app_organizador/cap_inicio_organizador.png, id=261, 1145.4795pt x
+ 514.92375pt>
+File: img/capturas_app_organizador/cap_inicio_organizador.png Graphic file (typ
+e png)
+<use img/capturas_app_organizador/cap_inicio_organizador.png>
+Package pdftex.def Info: img/capturas_app_organizador/cap_inicio_organizador.pn
+g  used on input line 1071.
+(pdftex.def)             Requested size: 344.69522pt x 154.94974pt.
+<img/capturas_app_organizador/cap_revision_paciente.png, id=262, 1102.1175pt x 
+517.935pt>
+File: img/capturas_app_organizador/cap_revision_paciente.png Graphic file (type
+ png)
+<use img/capturas_app_organizador/cap_revision_paciente.png>
+Package pdftex.def Info: img/capturas_app_organizador/cap_revision_paciente.png
+  used on input line 1084.
+(pdftex.def)             Requested size: 344.69676pt x 161.98863pt.
+
+LaTeX Warning: Reference `fig-contenido-paciente' on page 41 undefined on input
+ line 1095.
+
+<img/capturas_app_organizador/cap_analisis_contenido_sesion.png, id=263, 645.00
+975pt x 407.72325pt>
+File: img/capturas_app_organizador/cap_analisis_contenido_sesion.png Graphic fi
+le (type png)
+<use img/capturas_app_organizador/cap_analisis_contenido_sesion.png>
+Package pdftex.def Info: img/capturas_app_organizador/cap_analisis_contenido_se
+sion.png  used on input line 1101.
+(pdftex.def)             Requested size: 344.69788pt x 217.89026pt.
+
+LaTeX Warning: Reference `fig-editar-paciente' on page 41 undefined on input li
+ne 1116.
+
+<img/capturas_app_organizador/cap_editar_paciente.png, id=264, 690.78075pt x 54
+0.8205pt>
+File: img/capturas_app_organizador/cap_editar_paciente.png Graphic file (type p
+ng)
+<use img/capturas_app_organizador/cap_editar_paciente.png>
+Package pdftex.def Info: img/capturas_app_organizador/cap_editar_paciente.png  
+used on input line 1122.
+(pdftex.def)             Requested size: 344.70439pt x 269.87318pt.
+
+LaTeX Warning: Reference `fig-visualizador-inicio' on page 41 undefined on inpu
+t line 1135.
+
+
+LaTeX Warning: Reference `fig-visualizador-seleccion' on page 41 undefined on i
+nput line 1137.
+
+<img/capturas_app_visualizador/visual_inicio.png, id=265, 1151.502pt x 384.2355
+pt>
+File: img/capturas_app_visualizador/visual_inicio.png Graphic file (type png)
+<use img/capturas_app_visualizador/visual_inicio.png>
+Package pdftex.def Info: img/capturas_app_visualizador/visual_inicio.png  used 
+on input line 1143.
+(pdftex.def)             Requested size: 344.69774pt x 115.01942pt.
+[41]
+<img/capturas_app_visualizador/visual_paciente_seleccionado.png, id=273, 1149.0
+93pt x 513.117pt>
+File: img/capturas_app_visualizador/visual_paciente_seleccionado.png Graphic fi
+le (type png)
+<use img/capturas_app_visualizador/visual_paciente_seleccionado.png>
+Package pdftex.def Info: img/capturas_app_visualizador/visual_paciente_seleccio
+nado.png  used on input line 1156.
+(pdftex.def)             Requested size: 344.6955pt x 153.92062pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 1178.
+LaTeX Info: Redefining \% on input line 1178.
+[42 <./img/capturas_app_organizador/cap_inicio_organizador.png> <./img/capturas
+_app_organizador/cap_revision_paciente.png>]
+LaTeX Info: Redefining \. on input line 1178.
+LaTeX Info: Redefining \% on input line 1178.
+[43 <./img/capturas_app_organizador/cap_analisis_contenido_sesion.png> <./img/c
+apturas_app_organizador/cap_editar_paciente.png>]
+LaTeX Info: Redefining \. on input line 1178.
+LaTeX Info: Redefining \% on input line 1178.
+[44 <./img/capturas_app_visualizador/visual_inicio.png> <./img/capturas_app_vis
+ualizador/visual_paciente_seleccionado.png>]
+Ap\'{e}ndice O.
+[45
+
+] [46
+
+]
+Ap\'{e}ndice P.
+[47]
+LaTeX Info: Redefining \. on input line 1219.
+LaTeX Info: Redefining \% on input line 1219.
+[48]
+Ap\'{e}ndice Q.
+[49
+
+]
+LaTeX Info: Redefining \. on input line 1289.
+LaTeX Info: Redefining \% on input line 1289.
+[50]
+Ap\'{e}ndice R.
+
+LaTeX Warning: Reference `fig-manual-portal' on page 51 undefined on input line
+ 1295.
+
+<img/capturas_portal/captura_menu_portal.png, id=330, 764.8575pt x 283.65974pt>
+
+File: img/capturas_portal/captura_menu_portal.png Graphic file (type png)
+<use img/capturas_portal/captura_menu_portal.png>
+Package pdftex.def Info: img/capturas_portal/captura_menu_portal.png  used on i
+nput line 1310.
+(pdftex.def)             Requested size: 344.6962pt x 127.83614pt.
+[51
+
+ <./img/capturas_portal/captura_menu_portal.png>]
+
+LaTeX Warning: Reference `fig-inicio-organizador' on page 52 undefined on input
+ line 1349.
+
+
+LaTeX Warning: Reference `fig-revision-paciente' on page 52 undefined on input 
+line 1350.
+
+
+LaTeX Warning: Reference `fig-editar-paciente' on page 52 undefined on input li
+ne 1350.
+
+
+LaTeX Warning: Reference `fig-contenido-paciente' on page 52 undefined on input
+ line 1355.
+
+
+LaTeX Warning: Reference `fig-visualizador-inicio' on page 52 undefined on inpu
+t line 1381.
+
+
+LaTeX Warning: Reference `fig-visualizador-seleccion' on page 52 undefined on i
+nput line 1382.
+
+LaTeX Info: Redefining \. on input line 1396.
+LaTeX Info: Redefining \% on input line 1396.
+[52]
+LaTeX Info: Redefining \. on input line 1401.
+LaTeX Info: Redefining \% on input line 1401.
+[53] [54
+
+]
+Ap\'{e}ndice S.
+[55] [56
+
+]
+Ap\'{e}ndice T.
+[57] [58
+
+]
+Ap\'{e}ndice U.
+[59]
+LaTeX Info: Redefining \. on input line 1487.
+LaTeX Info: Redefining \% on input line 1487.
+[60]
+Ap\'{e}ndice V.
+[61
+
+]
+LaTeX Info: Redefining \. on input line 1556.
+LaTeX Info: Redefining \% on input line 1556.
+[62]
+Ap\'{e}ndice W.
+
+Overfull \hbox (115.37755pt too wide) in paragraph at lines 1564--1567
+[]\T1/lmr/m/n/12 (-20) Las prue-bas del vi-sua-li-za-dor se en-cuen-tran en \T1
+/lmtt/m/n/12 aplicaciones/visualizador_bis_icca/tests/\T1/lmr/m/n/12 (-20) ,
+ []
+
+[63
+
+] [64
+
+]
+Ap\'{e}ndice X.
+
+Overfull \hbox (81.59062pt too wide) in paragraph at lines 1620--1622
+[]|\T1/lmtt/m/n/12 visualizador_bis_icca/src/reconstruccion.py\T1/lmr/m/n/12 (-
+20) , 
+ []
+
+
+Overfull \hbox (106.29063pt too wide) in paragraph at lines 1623--1625
+[]|\T1/lmtt/m/n/12 visualizador_bis_icca/src/visualizacion_icca.py\T1/lmr/m/n/1
+2 (-20) , 
+ []
+
+[65]
+LaTeX Info: Redefining \. on input line 1658.
+LaTeX Info: Redefining \% on input line 1658.
+[66]
+Ap\'{e}ndice Y.
+[67
+
+] [68
+
+]
+Ap\'{e}ndice Z.
+[69] [70
+
+]
+Ap\'{e}ndice \GenericError {               }{LaTeX Error: Counter too large}{Se
+e the LaTeX manual or LaTeX Companion for explanation.}{You've lost some text. 
+ Try typing  <return>  to proceed.\MessageBreak If that doesn't work, type  X <
+return>  to quit.}.
+
+! LaTeX Error: Counter too large.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.566 \NormalTok{â”œâ”€â”€ PACIENTE\_001/}
-                                          
-You may provide a definition with
-\DeclareUnicodeCharacter 
+l.1685 datos}
+             \label{aprobaciuxf3n-uxe9tica-y-marco-de-uso-de-los-datos}
+You've lost some text.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
 
  
 Here is how much of TeX's memory you used:
- 38059 strings out of 467867
- 735043 string characters out of 5417367
- 1220541 words of memory out of 5000000
- 66243 multiletter control sequences out of 15000+600000
- 713754 words of font info for 152 fonts, out of 8000000 for 9000
+ 22762 strings out of 467867
+ 371106 string characters out of 5417367
+ 895847 words of memory out of 5000000
+ 50995 multiletter control sequences out of 15000+600000
+ 690975 words of font info for 154 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 98i,11n,108p,1005b,507s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 85i,11n,93p,1005b,655s stack positions out of 10000i,1000n,20000p,200000b,200000s
 !  ==> Fatal error occurred, no output PDF file produced!

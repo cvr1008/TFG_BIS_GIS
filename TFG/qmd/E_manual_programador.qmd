@@ -12,20 +12,20 @@ El proyecto se organiza en torno a una carpeta principal que contiene las aplica
 
 ```text
 tfg/
-├── aplicaciones/
-│   ├── portal_bis_icca/
-│   ├── organizador_bis_icca/
-│   │   └── requirements.txt
-│   ├── visualizador_bis_icca/
-│   │   └── requirements.txt
-│   ├── requirements.txt
-│   ├── preparar_entorno.ps1
-│   ├── iniciar_aplicaciones.ps1
-│   └── detener_aplicaciones.ps1
-├── datos/
-│   └── pacientes/
-├── README.md
-└── .gitignore
+|-- aplicaciones/
+|   |-- portal_bis_icca/
+|   |-- organizador_bis_icca/
+|   |   `-- requirements.txt
+|   |-- visualizador_bis_icca/
+|   |   `-- requirements.txt
+|   |-- requirements.txt
+|   |-- preparar_entorno.ps1
+|   |-- iniciar_aplicaciones.ps1
+|   `-- detener_aplicaciones.ps1
+|-- datos/
+|   `-- pacientes/
+|-- README.md
+`-- .gitignore
 ```
 
 La carpeta `aplicaciones/` contiene el sistema ejecutable del proyecto, dividido en tres aplicaciones complementarias:
