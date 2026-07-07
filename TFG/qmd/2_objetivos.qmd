@@ -5,7 +5,7 @@
 
 ## Objetivo general
 
-Desarrollar una prueba de concepto para la integración y visualización simultánea de datos procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA, con el fin de facilitar su análisis retrospectivo en el contexto de la unidad de cuidados intensivos.
+Desarrollar una prueba de concepto para la integración y visualización simultánea de datos procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA, con el fin de facilitar su análisis retrospectivo en el contexto de una unidad de cuidados intensivos.
 
 ## Objetivos específicos
 
@@ -14,7 +14,7 @@ Desarrollar una prueba de concepto para la integración y visualización simult�
 3. Recuperar la matriz de densidad espectral proporcionada por el monitor BIS y permitir su reconstrucción a partir de la señal EEG cruda cuando el archivo espectral no exista o no contenga información válida.
 4. Establecer una representación temporal común para la DSA y las variables procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios.
 5. Integrar las variables clínicas procedentes de ICCA correspondientes al intervalo temporal de cada sesión BIS, respetando su resolución temporal y el instante real en el que fueron registradas.
-6. Validar la fidelidad de la matriz de densidad espectral reconstruida frente a la matriz original del monitor, cuando esté disponible, mediante métricas de concordancia (correlación de Pearson, error absoluto medio y raíz del error cuadrático medio).
+6. Validar la fidelidad de la matriz de densidad espectral reconstruida frente a la matriz original del monitor, cuando esté disponible, mediante métricas de concordancia, como la correlación de Pearson, error absoluto medio (MAE) y raíz del error cuadrático medio (RMSE).
 7. Desarrollar un visualizador interactivo que permita consultar registros BIS unilaterales y bilaterales, seleccionar diferentes intervalos temporales y representar conjuntamente la DSA, los parámetros procesados del BIS y la información clínica disponible.
 
 ## Objetivos de aprendizaje

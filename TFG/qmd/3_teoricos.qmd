@@ -6,7 +6,7 @@
 En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo.
 
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
-La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
+La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren de una vigilancia estrecha y soporte continuo.
 
 En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor. En consecuencia, el control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
@@ -17,25 +17,31 @@ El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica
 
 ### Amplitud, frecuencia, potencia, densidad espectral y decibelios.
 En el ámbito del procesamiento de señales, la actividad electroencefalográfica se describe mediante los siguientes conceptos [@Kane2017]: 
+ 
  - Ciclo: oscilación completa de una onda, desde un punto inicial hasta que vuelve a alcanzar el mismo estado tras pasar por un máximo (cresta) y un mínimo (valle).
+ 
  - Amplitud: magnitud de la variación de la señal respecto a un valor de referencia. En el EEG se expresa habitualmente en microvoltios (µV).
+ 
  - Frecuencia: número de ciclos que se producen por segundo. Se expresa en hercios (Hz).
+ 
  - Potencia de la señal: magnitud empleada en procesamiento de señales para cuantificar el valor cuadrático medio de sus oscilaciones. Como la amplitud del EEG se expresa en microvoltios, la potencia de señal se expresa en microvoltios al cuadrado ($\mu\mathrm{V}^2$) [@OppenheimSchafer2014].^[Esta magnitud describe matemáticamente la señal y no debe confundirse con la potencia eléctrica físicamente transferida o consumida, que se expresaría en vatios.]
+ 
  - Densidad espectral de potencia: indica cómo se distribuye la potencia de la señal entre las distintas frecuencias, expresada en µV²/Hz. Al integrar esta densidad dentro de un intervalo de frecuencias se obtiene la potencia contenida en esa banda, expresada en µV².
- - Decibelios (dB): escala logarítmica que expresa la potencia respecto a un valor de referencia. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS indicada por el fabricante (resultando en $10^{-8}$ µV²).
+ 
+ - Decibelios (dB): escala logarítmica que expresa la potencia respecto a un valor de referencia. Para construir la matriz de densidad espectral (DSA), la potencia calculada en cada intervalo frecuencial se transforma a decibelios mediante una comparación logarítmica con una potencia de referencia. Dicha referencia se obtiene elevando al cuadrado la amplitud de 0,0001 µV RMS (Root Mean Square, valor eficaz o cuadrático medio de la señal) [@CovidienSerial2010] indicada por el fabricante (resultando en $10^{-8}$ µV²).
 
 
 ### Espectro y espectrograma
 El EEG puede analizarse tanto en el dominio temporal como en el frecuencial [@Kane2017]. Mientras que en el dominio temporal se observa cómo varía la amplitud de la señal a lo largo del tiempo, el análisis frecuencial permite identificar cómo se distribuye su potencia entre las distintas frecuencias y bandas.
 
-El espectro de potencia representa la potencia contenida en cada frecuencia durante un intervalo determinado. Permite reconocer qué componentes frecuenciales predominan, pero no muestra cómo cambian a lo largo del registro.
+El espectro de potencia representa la potencia contenida en cada frecuencia durante un intervalo de tiempo determinado. Permite reconocer qué componentes frecuenciales predominan, pero no muestra cómo cambian a lo largo del registro.
 
 El espectrograma amplía este análisis calculando sucesivos espectros sobre intervalos temporales consecutivos. El resultado es una representación tiempo-frecuencia en la que un eje muestra el tiempo, otro la frecuencia y el color indica la potencia de la señal. De esta forma, permite observar la evolución del contenido espectral del EEG e identificar cambios en el predominio de determinadas bandas [@Ng2022].
 
 En este trabajo, esta representación constituye la base de la matriz de densidad espectral empleada por el monitor BIS. Su procedimiento concreto de cálculo y reconstrucción se describe en el capítulo de metodología.
 
-### Electroencefalografía cuantitativa (qEEG)
-La qEEG hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales [@Hwang2022]. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
+### Electroencefalografía cuantitativa
+La electroencefalografía cuantitativa (qEEG) hace referencia al conjunto de técnicas que permiten analizar la señal EEG mediante métodos numéricos y computacionales [@Hwang2022]. A diferencia de la interpretación visual convencional del trazado, el qEEG permite extraer parámetros objetivos relacionados con la amplitud, la frecuencia, la potencia o la distribución espectral de la señal.
 
 En el contexto de la monitorización cerebral, estas técnicas permiten resumir grandes volúmenes de señal EEG en variables más interpretables, como la potencia por bandas de frecuencia, la frecuencia de borde espectral, la frecuencia mediana, la tasa de supresión o representaciones tiempo-frecuencia como la matriz de densidad espectral [@Hwang2022; @Ng2022]. Por ello, el qEEG constituye la base técnica de muchos parámetros mostrados por monitores como el BIS.
 
@@ -45,7 +51,7 @@ El análisis frecuencial de una señal se basa en descomponer su evolución temp
 
 En señales digitales, como el EEG registrado por el monitor BIS, no se dispone de una función continua sino de una secuencia finita de muestras. Por ello se emplea la transformada discreta de Fourier (DFT), que calcula un conjunto finito de coeficientes frecuenciales a partir de una ventana de señal. Cada coeficiente es un número complejo cuya magnitud se relaciona con la amplitud de una determinada componente frecuencial, mientras que su ángulo representa la fase [@OppenheimSchafer2014].
 
-En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG durante anestesia, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectrograma [@Sawa2022].
+En la práctica, la DFT suele calcularse mediante la transformada rápida de Fourier (FFT), que no es una transformada diferente, sino un algoritmo eficiente para obtener el mismo resultado con menor coste computacional [@OppenheimSchafer2014]. En el análisis de EEG, este tipo de procesamiento permite calcular los componentes frecuenciales de señales EEG digitalizadas y construir representaciones espectrales como el espectrograma [@Sawa2022].
 
 
 #### Estimación espectral mediante el método de Welch
@@ -57,7 +63,7 @@ El resultado es una estimación de la densidad espectral de potencia menos varia
 
 
 ### Tipos de ondas del EEG
-Para sistematizar la interpretación clínica de este contenido espectral, las oscilaciones del EEG se clasifican habitualmente en distintas bandas estandarizadas según el rango de frecuencias en el que oscilan las ondas que las componen. Las principales bandas y su significado fisiológico general se recogen en la Tabla @tbl-bandas-eeg [@Er2006].
+Para sistematizar la interpretación clínica de este contenido espectral, las oscilaciones del EEG se clasifican habitualmente en distintas bandas estandarizadas según el rango de frecuencias en el que oscilan las ondas que las componen. Las principales bandas y su significado fisiológico general se recogen en la @tbl-bandas-eeg [@Er2006].
 
 | Tipo de onda | Rango de frecuencia (Hz) | Interpretación general |
 |---|---:|---|
@@ -69,18 +75,22 @@ Para sistematizar la interpretación clínica de este contenido espectral, las o
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
-El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. 
-
-El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016]. Por ejemplo, ratio alfa/delta (ADR) es un índice derivado del EEG que compara la potencia de la banda alfa con la de la banda delta; un valor más bajo indica un predominio relativo de actividad lenta, asociado habitualmente a mayor profundidad de sedación o anestesia [@LpezCastruita2023; @Hwang2022].
+El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
 
 
 
 ## Monitor BIS 
 
 ### Monitor e Índice Biespectral (BIS)
-El monitor BIS™ es un sistema avanzado de neuromonitorización diseñado para evaluar de forma continua el estado hipnótico del cerebro mediante la adquisición y el procesamiento de señales electroencefalográficas frontales [@CovidienBISadvanced; @OchoaSolana2025]. Mediante algoritmos que analizan la frecuencia, la potencia y la sincronización de fase del EEG, el sistema genera un índice numérico adimensional comprendido entre 0 y 100, el BIS [@OchoaSolana2025]. Un valor de 100 indica un estado de vigilia completa, mientras que un valor de 0 representa ausencia total de actividad eléctrica cerebral [@CovidienBISadvanced]. 
+El monitor BIS\texttrademark{} es el dispositivo de neuromonitorización, fabricado por Covidien (actualmente Medtronic), que adquiere y procesa de forma continua las señales electroencefalográficas (EEG) frontales del paciente mediante un sensor conectado a un módulo BISx o BISx4 [@CovidienBISadvanced]. Es, por tanto, el equipo físico: la pantalla, el procesador y el módulo de adquisición, no un valor ni una medida en sí mismo.
 
-En el ámbito de la anestesia y los cuidados críticos, el rango objetivo de sedación profunda se sitúa habitualmente entre 40 y 60 [@EscuderoAugusto2005]. Mantener el índice dentro de este margen resulta fundamental para evitar tanto la infrasedación (que incrementa el riesgo de agitación, desadaptación a la ventilación mecánica y despertar intraoperatorio) como la sobresedación (índices consistentemente inferiores a 40), la cual se asocia con un mayor riesgo de depresión respiratoria, hipoxia e inestabilidad hemodinámica [@PuenteBarbas2016].
+En este trabajo se han empleado datos procedentes de dos versiones del equipo, BIS VISTA y BIS Advance, que comparten los mismos fundamentos de adquisición y procesamiento de la señal, aunque presentan diferencias de hardware e interfaz [@CovidienBISadvanced]. La estructura de los archivos exportados por ambos equipos, prácticamente equivalente entre versiones, se detalla en el Anexo F.
+
+![Monitor BIS VISTA. Fuente: Elaboración propia [@CovidienBISadvanced].](img/bis_vista.png){#fig-monitor-vista width=45%}
+
+![Monitor BIS Advance. Fuente: Elaboración propia  [@CovidienBISadvanced].](img/bis_Advance.png){#fig-monitor-advance width=45%}
+
+A partir de la señal EEG adquirida, el monitor calcula y muestra en pantalla un conjunto de parámetros procesados, entre los que se encuentra el índice BIS descrito a continuación, junto con la matriz de densidad espectral (DSA), la frecuencia de borde espectral (SEF), la frecuencia mediana (MEF) y otros parámetros que se describen más adelante en este capítulo.
 
 
 ### Matriz de densidad espectral (DSA)
@@ -89,8 +99,9 @@ La matriz de densidad espectral o Density Spectral Array (DSA) es la representac
 Desde el punto de vista clínico, la DSA facilita la identificación de patrones o «firmas espectrales» asociados a determinados fármacos y estados de consciencia [@LpezCastruita2023]. Por ejemplo, durante la anestesia general con propofol puede observarse actividad lenta entre 0,5 y 1 Hz junto con una concentración de potencia alfa frontal, aproximadamente entre 9 y 12 Hz [@LpezCastruita2023]. No obstante, estos patrones deben interpretarse junto con la situación clínica y el resto de los parámetros disponibles.
 
 
-### SEF y MF
+### Frecuencia del Borde Espectral y Frecuencia Mediana
 Para complementar la información de la DSA, el monitor calcula parámetros que resumen la distribución de la potencia en el dominio frecuencial [@OchoaSolana2025]:
+
 - **Frecuencia del Borde Espectral (SEF, Spectral Edge Frequency):** Representada habitualmente como la SEF95, indica la frecuencia por debajo de la cual se encuentra el 95 % de la potencia total del EEG [@OchoaSolana2025]. En la DSA se dibuja como una línea blanca. 
 
 - **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50 % por encima y 50 % por debajo), trazándose en el espectrograma como una línea púrpura.
@@ -123,7 +134,7 @@ En el contexto de este trabajo, el SQI resulta especialmente relevante porque pe
 
 ICCA es un sistema de información clínica empleado en entornos de cuidados críticos y anestesia para centralizar información generada durante la atención del paciente. Este tipo de sistemas permite reunir datos procedentes de monitores, dispositivos médicos y registros clínicos realizados por el personal sanitario [@Lai2022].
 
-En el contexto de la UCI, esta información resulta especialmente útil para reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos. Además, distintos estudios han utilizado datos extraídos de IntelliSpace Critical Care and Anesthesia para realizar análisis retrospectivos de variables clínicas continuas, como frecuencia cardiaca o presión arterial, en pacientes críticos [@Laichinger2024; @Mengel2025].
+En la UCI, esta información resulta especialmente útil para reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos. Además, distintos estudios han utilizado datos extraídos de ICCA para realizar análisis retrospectivos de variables clínicas continuas, como frecuencia cardiaca o presión arterial, en pacientes críticos [@Laichinger2024; @Mengel2025].
 
 En este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente.
 
@@ -131,9 +142,9 @@ En este trabajo, ICCA se considera la fuente principal de información clínica 
 ## Estado del arte y trabajos relacionados
 
 ### Reconstrucción y visualización de DSA en monitorización EEG/BIS
-La qEEG se ha utilizado en cuidados críticos para transformar registros EEG prolongados en representaciones más compactas e interpretables. Hwang et al. revisan distintas aplicaciones del qEEG en UCI adulta y destacan el uso de representaciones como la CDSA (Color Density Spectral Array) o la aEEG para facilitar la revisión visual de registros extensos, reduciendo la necesidad de analizar de forma continua el EEG crudo [@Hwang2022]. Estas herramientas permiten identificar cambios en el contenido espectral de la señal y resumir la evolución de la actividad cerebral en el tiempo.
+La qEEG ha sido esencial en cuidados críticos para transformar registros EEG prolongados en representaciones más compactas e interpretables. Hwang et al. revisan distintas aplicaciones del qEEG en UCI adulta y destacan el uso de representaciones como la CDSA (Color Density Spectral Array) o la qEEG para facilitar la revisión visual de registros extensos, reduciendo la necesidad de analizar de forma continua el EEG crudo [@Hwang2022]. Estas herramientas permiten identificar cambios en el contenido espectral de la señal y resumir la evolución de la actividad cerebral en el tiempo.
 
-En el ámbito de la anestesia, también se han desarrollado trabajos orientados a analizar el EEG mediante espectros y espectrogramas generados computacionalmente. Por ejemplo, Sawa et al. presentan una aproximación basada en Python para calcular y visualizar el espectro de potencia y el espectrograma del EEG durante anestesia general, mostrando cómo el procesamiento digital permite representar la evolución frecuencial de la señal de forma interpretable [@Sawa2022]. Este tipo de trabajos resulta cercano al presente TFG, ya que la reconstrucción de la DSA requiere transformar señales EEG en representaciones tiempo-frecuencia.
+En el ámbito de la anestesia, también se han desarrollado trabajos orientados a analizar el EEG mediante espectrogramas generados computacionalmente. Por ejemplo, Sawa et al. presentan una aproximación basada en Python para calcular y visualizar el espectro de potencia y el espectrograma del EEG durante anestesia general, mostrando cómo el procesamiento digital permite representar la evolución frecuencial de la señal de forma interpretable [@Sawa2022]. Este tipo de trabajos resulta cercano al presente TFG, ya que la reconstrucción de la DSA requiere transformar señales EEG en representaciones tiempo-frecuencia.
 
 No obstante, gran parte de estos trabajos se centran en el análisis general del EEG o en la interpretación clínica del qEEG, pero no en la reconstrucción práctica de la DSA a partir de archivos exportados por un monitor BIS. En este contexto, el presente trabajo aporta una aplicación orientada a reconstruir, visualizar y explorar registros BIS, incluyendo la DSA, parámetros derivados y diferencias entre registros unilaterales y bilaterales.
 

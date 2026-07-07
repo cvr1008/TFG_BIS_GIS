@@ -16,23 +16,29 @@ El proyecto se ha desarrollado con datos reales procedentes del Hospital Univers
 
 ### Datos BIS
 
-Los datos del monitor BIS proceden de las exportaciones generadas por los equipos BIS VISTA y BIS Advance [@CovidienBISadvanced; @CovidienSerial2010]. En este trabajo se emplean principalmente los archivos `.spa`, `.f_a`, `.r2a` o `.r4a`, `.h_a` y `.t_a`. Todos ellos explicados con detalle en el Anexo F.
- - El archivo `.spa` contiene las variables procesadas por el monitor, como el índice BIS, SEF, MEF, SQI y otros parámetros de configuración. 
- - El archivo `.f_a` contiene la matriz espectral calculada por el propio monitor. Este archivo no siempre está disponible, ya que el equipo BIS VISTA lo exporta vacío.
-- La cabecera `.h_a` proporciona la pendiente y el offset, información de calibración necesaria para convertir los valores crudos a microvoltios. 
- - `.t_a` aporta el instante en el que comienza el BIS a registrar.
- - Los archivos `.r2a` y `.r4a` almacenan el EEG crudo en registros unilaterales y bilaterales, respectivamente. La diferencia entre ambos formatos no se limita al nombre del archivo, sino al número de canales de EEG registrados. Los archivos `.r2a` contienen dos canales de señal cruda, mientras que los archivos `.r4a` contienen cuatro canales. 
+Los datos del monitor BIS proceden de las exportaciones generadas por los equipos BIS VISTA y BIS Advance [@CovidienBISadvanced; @CovidienSerial2010]. En este trabajo se emplean principalmente los archivos `.spa`, `.f_a`, `.r2a` o `.r4a`, `.h_a` y `.t_a`, explicados con detalle en el Anexo F:
+
+- El archivo `.spa` contiene las variables procesadas por el monitor, como el índice BIS, SEF, MEF, SQI y otros parámetros de configuración.
+
+- El archivo `.f_a` contiene la matriz espectral calculada por el propio monitor. Este archivo no siempre está disponible, ya que el equipo BIS VISTA lo exporta vacío.
+
+- La cabecera `.h_a` proporciona la pendiente y el offset, información de calibración necesaria para convertir los valores crudos a microvoltios.
+
+- El archivo `.t_a` aporta el instante en el que comienza el BIS a registrar.
+
+- Los archivos `.r2a` y `.r4a` almacenan el EEG crudo en registros unilaterales y bilaterales, respectivamente. La diferencia entre ambos formatos no se limita al nombre del archivo, sino al número de canales de EEG registrados: los archivos `.r2a` contienen dos canales de señal cruda, mientras que los archivos `.r4a` contienen cuatro canales.
 
 La diferencia entre `.r2a` y `.r4a` condiciona la reconstrucción. Los archivos `.r2a` contienen dos canales de señal cruda y se asocian a registros unilaterales, mientras que los archivos `.r4a` contienen cuatro canales y se asocian a registros bilaterales. En registros unilaterales se emplea el canal 1. En registros bilaterales se procesan de forma separada el canal 1, asociado al hemisferio izquierdo, y el canal 3, asociado al hemisferio derecho. La estructura interna de todos estos archivos y la justificación técnica de la selección de canales se describen con mayor detalle en el Anexo F.
 
 
 ### Datos ICCA
 
-Las variables clínicas procedentes de ICCA se reciben, directamente del HUBU, en forma de plantillas Excel estructuradas. Estas plantillas agrupan la información en hojas diferenciadas: información general del paciente y del ingreso, constantes vitales, resultados analíticos y perfusiones o tratamientos administrados. El detalle completo de los archivos BIS, la estructura de la plantilla ICCA y el significado de las variables principales se recoge en el Anexo F.
+Las variables clínicas se reciben en forma de plantillas Excel estructuradas, exportadas por personal clínico autorizado a partir de la herramienta ICCA que dispone la UCI del HUBU. Estas plantillas agrupan la información en hojas diferenciadas: información general del paciente y del ingreso, constantes vitales, resultados analíticos y perfusiones o tratamientos administrados. El detalle completo de los archivos BIS, la estructura de la plantilla ICCA y el significado de las variables principales se recoge en el Anexo F.
 
 ```{mermaid}
 %%| label: fig-esquema-icca
-%%| fig-cap: "Organización general de las variables clínicas procedentes de ICCA."
+%%| fig-cap: "Organización general de las variables clínicas procedentes de ICCA. Fuente: elaboración propia"
+%%| fig-width: 6
 flowchart TD
     A["Datos ICCA<br/>plantilla Excel"] --> B["Hoja general<br/>contexto clínico"]
     A --> C["Constantes vitales<br/>mediciones temporales"]
@@ -40,8 +46,8 @@ flowchart TD
     A --> E["Perfusiones:<br/>dosis a lo largo del tiempo"]
 
     B --> B1["Ingreso, alta, edad, peso"]
-    C --> C1["FC, PA, SpO₂,<br/>temperatura, FR, PIC"]
-    D --> D1["Hb, Na⁺, K⁺, Cl⁻,<br/>Ca²⁺, glucosa, pO₂, pCO₂"]
+    C --> C1["FC, PA, SpO2,<br/>temperatura, FR, PIC"]
+    D --> D1["Hb, Na⁺, K⁺, Cl⁻,<br/>Ca²⁺, glucosa, pO2, pCO2"]
     E --> E1["Midazolam, propofol, fentanilo,<br/>remifentanilo, cisatracurio, noradrenalina"]
 ```
 
@@ -56,36 +62,23 @@ Los ejemplos mostrados corresponden a algunas de las variables que han podido se
 
 La matriz de densidad espectral utilizada en la visualización puede proceder de dos vías. Cuando el archivo `.f_a` está disponible y contiene información válida, se emplea como DSA original exportada por el monitor. Cuando este archivo no está disponible, está vacío o se desea comparar la matriz original con una reconstrucción independiente, la DSA se obtiene a partir del procesamiento de la señal EEG cruda almacenada en los archivos `.r2a` o `.r4a`.
 
-La Figura @fig-flujo-dsa resume el flujo seguido para obtener o construir la DSA empleada en la aplicación.
+La @fig-flujo-dsa resume el flujo seguido para obtener o construir la DSA empleada en la aplicación.
 
 ```{mermaid}
 %%| label: fig-flujo-dsa
-%%| fig-cap: "Flujo general de obtención o reconstrucción de la DSA."
-flowchart LR
-    A["Exportación<br/>BIS"] --> B["Lectura de<br/>archivos"]
-    B --> C["Identificación<br/>de sesión"]
-    C --> D["Limpieza de líneas<br/>temporales"]
-    D --> E["Timeline<br/>común"]
-    E --> F["Recorte y alineación<br/>de archivos"]
-    F --> G["Máscaras<br/>de calidad"]
-    G --> H{".f_a<br/>válido?"}
-
-    H -- "Sí" --> I["Lectura del archivo<br/>espectral .f_a"]
-    I --> J["Lectura y reescalado<br/>de valores dB"]
-    J --> K["Aplicación de<br/>máscaras"]
-
-    H -- "No" --> N["Reconstrucción<br/>desde EEG crudo"]
-    N --> O["Conversión raw<br/>a µV"]
-    O --> P["Filtrado<br/>Butterworth"]
-    P --> Q["Welch - FFT"]
-    Q --> R["PSD<br/>µV²/Hz"]
-    R --> S["Integración por bin<br/>µV²"]
-    S --> T["Conversión<br/>a dB"]
-    T --> U["Suavizado<br/>+ shift"]
-    U --> K
-
-    K --> L["DSA final<br/>visualización"]
-    L --> M["Integración con<br/>variables BIS e ICCA"]
+%%| fig-cap: "Flujo general de obtención o reconstrucción de la DSA. Fuente: elaboración propia."
+%%| fig-width: 3.4
+%%{init: {'flowchart': {'nodeSpacing': 4, 'rankSpacing': 6, 'padding': 1}, 'themeVariables': {'fontSize': '9px'}}}%%
+flowchart TD
+    A["Exportación<br/>BIS"] --> B["Lectura<br/>archivos"]
+    B --> C["Sesión y<br/>tiempos"]
+    C --> D["Timeline común<br/>y máscaras"]
+    D --> E{".f_a<br/>válido?"}
+    E -- "Sí" --> F["Usar<br/>.f_a"]
+    E -- "No" --> G["Reconstruir<br/>EEG crudo"]
+    F --> H["Aplicar<br/>máscaras"]
+    G --> H
+    H --> I["DSA final<br/>+ BIS/ICCA"]
 ```
 
 
@@ -113,20 +106,20 @@ Cuando el archivo `.f_a` está disponible y contiene información válida, la ap
 
 Como se detalla en los anexos, en registros unilaterales, el archivo `.f_a` contiene una columna temporal y una columna espectral. En registros bilaterales, contiene una columna temporal y dos columnas espectrales, correspondientes a los lados izquierdo y derecho. Cada fila incluye los valores espectrales de 60 bins de frecuencia, desde 0,5 hasta 30 Hz con resolución de 0,5 Hz [@CovidienSerial2010].
 
-Los valores espectrales del `.f_a` se leen como valores numéricos codificados y se reescalan dividiéndolos entre 100 para obtener la matriz en decibelios (`dB`). Posteriormente, la matriz se ajusta a la línea temporal de la sesión. Los segundos presentes en la timeline pero ausentes en la matriz se mantienen como valores no disponibles, de forma que no se genera continuidad artificial.
+Los valores espectrales del `.f_a` se leen como valores numéricos codificados y se reescalan dividiéndolos entre 100 para obtener los valores de la matriz en decibelios (`dB`). Posteriormente, la matriz se ajusta a la línea temporal de la sesión. Los segundos presentes en la timeline pero ausentes en la matriz se mantienen como valores no disponibles, de forma que no se genera continuidad artificial.
 
 La DSA original se representa con una escala visual fija de 49 a 94 dB, equivalente a la escala empleada en la visualización del monitor [@CovidienBISVista; @CovidienVISTABilateral]. Sobre esta matriz se superponen las variables procesadas procedentes del `.spa`, como SEF, MEF, BIS, EMG, SR y, en registros bilaterales, ASYM09.
 
 ```{mermaid}
 %%| label: fig-flujo-fa
-%%| fig-cap: "Flujo de uso de la matriz espectral original del archivo `.f_a`."
-flowchart LR
+%%| fig-cap: "Flujo de uso de la matriz espectral original del archivo `.f_a`. Fuente: elaboración propia."
+%%| fig-width: 4
+%%{init: {'flowchart': {'nodeSpacing': 19, 'rankSpacing': 20, 'padding': 6}, 'themeVariables': {'fontSize': '16px'}}}%%
+flowchart TD
     A["Archivo .f_a"] --> B{"¿DSA válida?"}
     B -- "Sí" --> C["Lectura de matriz espectral"]
-    C --> D["60 bins<br/>0,5-30 Hz"]
-    D --> E["Reescalado<br/>valores / 100"]
-    E --> F["Matriz en dB"]
-    F --> G["Ajuste a timeline común"]
+    C --> D["60 bins, reescalado<br/>y conversión a dB"]
+    D --> G["Ajuste a timeline común"]
     G --> H["Aplicación de máscaras"]
     H --> I["DSA original<br/>para visualización"]
 
@@ -168,7 +161,7 @@ El archivo ICCA auxiliar conserva la organización por hojas definida en la plan
 
 En el caso de las constantes vitales, cuando es necesario para la visualización, puede generarse una serie auxiliar a resolución de un segundo. Estos valores intermedios se consideran sintéticos y se emplean únicamente como apoyo visual, manteniendo siempre la trazabilidad de las mediciones reales. Por tanto, no deben interpretarse como nuevas mediciones clínicas ni utilizarse para validaciones clínicas o correlaciones fuertes con las variables BIS.
 
-Los análisis clínicos no se interpolan, sino que se muestran como eventos puntuales asociados al instante en el que fueron registrados. En el caso de variables sensibles al origen de la muestra, como la pO₂ o la pCO₂, se aplica un criterio conservador: si no puede determinarse con seguridad si la medición es arterial o venosa, el dato se descarta para evitar errores de interpretación. Las perfusiones tampoco se interpolan como valores acumulados, sino que se representan como cambios documentados de dosis o velocidad, manteniendo su comportamiento escalonado.
+Los análisis clínicos no se interpolan, sino que se muestran como eventos puntuales asociados al instante en el que fueron registrados. En el caso de variables sensibles al origen de la muestra, como la pO$_2$ o la pCO$_2$, se aplica un criterio conservador: si no puede determinarse con seguridad si la medición es arterial o venosa, el dato se descarta para evitar errores de interpretación. Las perfusiones tampoco se interpolan como valores acumulados, sino que se representan como cambios documentados de dosis o velocidad, manteniendo su comportamiento escalonado.
 
 
 ## Organización por paciente y sesión

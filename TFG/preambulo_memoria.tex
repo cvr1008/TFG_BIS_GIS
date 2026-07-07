@@ -51,6 +51,9 @@
 \usepackage{graphicx}
 \graphicspath{{./img/}}
 
+% --- Páginas en horizontal (para diagramas anchos)
+\usepackage{pdflscape}
+
 %% Comando \imagen{ruta}{caption}{escala}
 \newcommand{\imagen}[3]{%
   \begin{figure}[!h]
@@ -94,17 +97,20 @@
 \makeatletter
 \newcommand{\tutor}[1]{\def\@tutor{#1}}
 \newcommand{\tutorb}[1]{\def\@tutorb{#1}}
+\newcommand{\tutorc}[1]{\def\@tutorc{#1}}
 \newcommand{\course}[1]{\def\@course{#1}}
 
 % ── EDITAR ESTOS DATOS ──────────────────────────────────────
 \newcommand{\nombre}{Cristina Velázquez Romano}            % Tu nombre completo
 \newcommand{\nombreTutor}{David García García}      % Nombre del tutor/a 1
 \newcommand{\nombreTutorb}{Sergio Ossa Echeverri}     % Nombre del tutor/a 2
+\newcommand{\nombreTutorc}{Rodrigo Albillos Almaraz}     % Nombre del tutor/a 3
 \newcommand{\dni}{71310721A}                       % Tu DNI  
 % ────────────────────────────────────────────────────────────
 
 \tutor{\nombreTutor}
 \tutorb{\nombreTutorb}
+\tutorc{\nombreTutorc}
 
 \def\maketitle{%
   \null
@@ -164,7 +170,7 @@
     \noindent\Large
     \@date{}\\
     \vspace{0.5cm}
-    Tutor: \@tutor{} -- \@tutorb{}\\
+    Tutores: \@tutor{} -- \@tutorb{} -- \@tutorc{}\\
   \end{center}
   \null
   \cleardoublepage

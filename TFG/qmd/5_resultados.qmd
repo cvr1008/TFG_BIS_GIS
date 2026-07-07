@@ -9,92 +9,78 @@ En este capítulo se presentan los principales resultados obtenidos tras el desa
 
 Como resultado global, se ha obtenido un flujo de trabajo que permite organizar registros BIS e información clínica procedente de ICCA por paciente y sesión, generar archivos auxiliares asociados a cada intervalo de monitorización y visualizar de forma conjunta la matriz de densidad espectral, las variables procesadas del monitor BIS y variables clínicas relevantes para el análisis retrospectivo en UCI.
 
-Los resultados experimentales detallados de la reconstrucción de la DSA, incluyendo la comparación entre métodos espectrales, suavizados, desplazamientos temporales y métricas cuantitativas, se recogen en el Anexo G. En este capítulo se resumen los resultados principales necesarios para valorar el cumplimiento de los objetivos del proyecto.
+Los resultados experimentales detallados de la reconstrucción de la DSA, incluyendo la comparación entre métodos espectrales, desplazamientos temporales y métricas cuantitativas, se recogen en el Anexo G. En este capítulo se resumen los resultados principales necesarios para valorar el cumplimiento de los objetivos del proyecto.
 
 ## Organización de los datos BIS e ICCA
 
-Uno de los resultados obtenidos fue la creación de una aplicación de organización de datos que permite agrupar las exportaciones BIS y los archivos clínicos procedentes de ICCA por paciente y sesión. Esta herramienta actúa como punto de entrada al flujo de trabajo desarrollado, preparando los datos antes de su visualización conjunta.
+Uno de los resultados obtenidos fue la creación de una aplicación de organización de datos que permite agrupar las exportaciones BIS y los archivos clínicos procedentes de ICCA por paciente y sesión. Esta herramienta, accesible desde el portal común a las tres aplicaciones (@fig-portal), actúa como punto de entrada al flujo de trabajo desarrollado, preparando los datos antes de su visualización conjunta.
 
-![Portal de entrada a las aplicaciones desarrolladas.](img/capturas_portal/captura_menu_portal.png){#fig-portal width=95%}
+![Portal de entrada a las aplicaciones desarrolladas (organizador y visualizador). Fuente: elaboración propia.](img/capturas_portal/captura_menu_portal.png){#fig-portal width=90%}
 
-La aplicación permite seleccionar los archivos ICCA disponibles y una o varias carpetas correspondientes a sesiones BIS. A partir de esta información, analiza los intervalos temporales de cada fuente y genera una estructura de almacenamiento organizada por paciente.
+La aplicación permite seleccionar los archivos ICCA disponibles y una o varias carpetas correspondientes a sesiones BIS, analiza los intervalos temporales de cada fuente y, tras la revisión y confirmación del usuario, crea una nueva carpeta de paciente organizada por sesiones, tal y como se muestra en la @fig-organizador-contenido-pac (el manejo detallado del resto de pantallas del organizador se recoge en el Anexo D). El resultado de este proceso es una organización jerárquica en la que cada paciente contiene una o varias sesiones BIS, cada una con la exportación BIS original y, cuando existe información clínica compatible, un archivo ICCA auxiliar recortado al intervalo correspondiente.
 
-![Pantalla inicial de la aplicación de organización de datos.](img/capturas_app_organizador/cap_inicio_organizador.png){#fig-inicio-organizador width=95%}
-
-![Creación de un nuevo paciente a partir de archivos BIS e ICCA.](img/capturas_app_organizador/cap_crear_paciente.png){#fig-organizador-crear-pac width=95%}
-
-Antes de confirmar la creación del paciente, la aplicación muestra una revisión de las asignaciones detectadas. Esto permite comprobar qué sesiones BIS se asociarán al paciente y qué archivos ICCA se utilizarán como fuente clínica. Además, la herramienta permite editar asignaciones ya creadas, facilitando la corrección o actualización de la estructura sin modificar los archivos originales.
-
-![Revisión de las asignaciones antes de crear el paciente.](img/capturas_app_organizador/cap_revision_paciente.png){#fig-organizador-revisar-pac width=95%}
-
-![Edición de asignaciones de un paciente ya creado.](img/capturas_app_organizador/cap_editar_paciente.png){#fig-organizador-editar-pac width=95%}
-
-El resultado de este proceso es una organización jerárquica en la que cada paciente contiene una o varias sesiones BIS. Cada sesión conserva la exportación BIS original y, cuando existe información clínica compatible, un archivo ICCA auxiliar recortado al intervalo correspondiente. Esta separación entre datos originales y derivados facilita la trazabilidad y permite repetir el procesamiento si se actualizan los criterios de integración o visualización.
-
-![Contenido generado para una sesión organizada por paciente.](img/capturas_app_organizador/cap_analisis_contenido_sesion.png){#fig-organizador-contenido-pac width=95%}
+![Creación de un nuevo paciente a partir de archivos BIS e ICCA. Fuente: elaboración propia.](img/capturas_app_organizador/cap_crear_paciente.png){#fig-organizador-contenido-pac width=90%}
 
 ## Recuperación y reconstrucción de la DSA
 
-La aplicación de visualización permite consultar las sesiones previamente organizadas. El usuario puede seleccionar un paciente, escoger una sesión BIS concreta y cargar la información neurofisiológica y clínica correspondiente a ese intervalo.
+La aplicación de visualización permite consultar las sesiones previamente organizadas, cargando la información neurofisiológica y clínica correspondiente al intervalo de la sesión seleccionada (el manejo de las pantallas de selección de paciente y sesión se documenta en el Anexo D).
 
-![Pantalla inicial del visualizador.](img/capturas_app_visualizador/visual_inicio.png){#fig-visualizador-inicio width=95%}
+En relación con la matriz de densidad espectral, se consiguió implementar un doble flujo de trabajo. Cuando el archivo `.f_a` está disponible y contiene información válida, la aplicación permite utilizar directamente la matriz espectral exportada por el monitor, tal y como se muestra en la @fig-visualizador-dsa-fa-unilat. En cambio, cuando este archivo no existe o está vacío, la DSA se reconstruye a partir de la señal EEG cruda almacenada en `.r2a` o `.r4a`, según se observa en la @fig-visualizador-dsa-rec-unilat.
 
-![Selección de paciente y sesión BIS en el visualizador.](img/capturas_app_visualizador/visual_paciente_seleccionado.png){#fig-visualizador-seleccionar-pac width=95%}
+![Visualización de una DSA unilateral reconstruida a partir del EEG crudo. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_DSA_reconstruida_unilateral.png){#fig-visualizador-dsa-rec-unilat width=90%}
 
-En relación con la matriz de densidad espectral, se consiguió implementar un doble flujo de trabajo. Cuando el archivo `.f_a` está disponible y contiene información válida, la aplicación utiliza directamente la matriz espectral exportada por el monitor. En cambio, cuando este archivo no existe o está vacío, la DSA se reconstruye a partir de la señal EEG cruda almacenada en `.r2a` o `.r4a`.
+![Visualización de una DSA unilateral obtenida directamente desde el archivo espectral `.f_a`. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_DSA_fa_unilateral.png){#fig-visualizador-dsa-fa-unilat width=90%}
 
-![Visualización de una DSA unilateral reconstruida a partir del EEG crudo.](img/capturas_app_visualizador/visual_DSA_reconstruida_unilateral.png){#fig-visualizador-dsa-rec-unilat width=95%}
+Estas dos figuras muestran ambos escenarios en un registro unilateral. Esta doble posibilidad resulta importante porque no todas las sesiones disponibles contienen un archivo `.f_a` válido.
 
-![Visualización de una DSA unilateral obtenida desde el archivo espectral `.f_a`.](img/capturas_app_visualizador/visual_DSA_fa_unilateral.png){#fig-visualizador-dsa-fa-unilat width=95%}
+También se comprobó el funcionamiento del sistema en registros procedentes de BIS VISTA sin información clínica ICCA asociada y sin matriz `.f_a` válida: en estos casos, el visualizador carga igualmente la sesión BIS y fuerza la reconstrucción de la DSA a partir de la señal cruda, incluyendo la reconstrucción bilateral cuando el registro dispone de los dos hemisferios, tal y como se muestra en la @fig-visualizador-dsa-rec-bilat.
 
-Las Figuras @fig-visualizador-dsa-rec-unilat y @fig-visualizador-dsa-fa-unilat muestran ambos escenarios en un registro unilateral: la reconstrucción desde el EEG crudo y la visualización de la matriz espectral exportada por el monitor. Esta doble posibilidad resulta importante porque no todas las sesiones disponibles contienen un archivo `.f_a` válido.
+![Reconstrucción bilateral de la DSA en un registro BIS VISTA sin archivo `.f_a` válido y sin información ICCA asociada. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_VISTA_bilat.png){#fig-visualizador-dsa-rec-bilat width=90%}
 
-También se comprobó el funcionamiento del sistema en registros procedentes de BIS VISTA en los que no se dispone de información clínica ICCA asociada y no existe una matriz `.f_a` válida. En estos casos, el visualizador permite cargar igualmente la sesión BIS y fuerza la reconstrucción de la DSA a partir de la señal cruda.
+El sistema distingue automáticamente entre registros unilaterales y bilaterales a partir del archivo de EEG crudo disponible. En los registros unilaterales se genera una única matriz DSA, mientras que en los registros bilaterales se obtienen dos matrices independientes, correspondientes a los hemisferios izquierdo y derecho.
 
-![Selección de una sesión BIS VISTA sin ICCA asociado y sin archivo `.f_a` válido.](img/capturas_app_visualizador/visual_sinICCA_sinFA.png){#fig-visualizador-seleccionar-pac-vista width=95%}
-
-![Reconstrucción bilateral de la DSA en un registro BIS VISTA sin archivo `.f_a` válido.](img/capturas_app_visualizador/visual_VISTA_bilat.png){#fig-visualizador-dsa-rec-bilat width=95%}
-
-El sistema distingue automáticamente entre registros unilaterales y bilaterales a partir del archivo de EEG crudo disponible. En los registros unilaterales se genera una única matriz DSA, mientras que en los registros bilaterales se obtienen dos matrices independientes, correspondientes a los hemisferios izquierdo y derecho. La Figura @fig-visualizador-dsa-rec-bilat muestra el resultado de esta reconstrucción bilateral.
 
 ## Integración temporal de variables BIS
 
-Además de la DSA, se consiguió representar las principales variables procesadas del monitor BIS dentro de una misma línea temporal. Entre ellas se incluyen el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios.
+Además de la DSA, se consiguió representar las principales variables procesadas del monitor BIS dentro de una misma línea temporal. Entre ellas se incluyen el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios (visibles ya en las capturas anteriores, de la @fig-visualizador-dsa-rec-unilat a la @fig-visualizador-dsa-rec-bilat).
 
-La aplicación aplica criterios de calidad para evitar la representación de intervalos no fiables. Los tramos con baja calidad de señal, ausencia de información espectral o discontinuidades se muestran como periodos no válidos. De este modo, la visualización evita presentar como fisiológicamente interpretables aquellos instantes en los que la señal o la matriz espectral no contienen información suficiente.
+La aplicación incluye criterios de calidad para evitar la representación de intervalos no fiables. Los tramos con baja calidad de señal, ausencia de información espectral o discontinuidades se muestran como periodos no válidos. De este modo, la visualización evita presentar como fisiológicamente interpretables aquellos instantes en los que la señal o la matriz espectral no contienen información suficiente.
 
 ## Integración de variables clínicas ICCA
 
-Las variables clínicas procedentes de ICCA se incorporaron al flujo de visualización mediante plantillas estructuradas. La información se organizó en datos generales, constantes vitales, resultados analíticos y perfusiones. Esta separación permite representar cada tipo de variable de acuerdo con su naturaleza temporal.
+Las variables clínicas procedentes de ICCA se incorporaron al flujo de visualización mediante plantillas estructuradas. La información se organizó en datos generales, constantes vitales, resultados analíticos y perfusiones, representando cada tipo de variable de acuerdo con su naturaleza temporal.
 
-Las constantes vitales se trataron como series temporales asociadas al intervalo de la sesión BIS. Los análisis clínicos se representaron como mediciones puntuales, conservando su instante de registro. Las perfusiones se incorporaron como cambios de dosis activa a lo largo del tiempo, lo que permite estudiar su relación temporal con la evolución del BIS y de la DSA.
+Las constantes vitales se trataron como series temporales asociadas al intervalo de la sesión BIS, tal y como se muestra en la @fig-visualizador-cte-icca.
 
-![Representación de constantes clínicas procedentes de ICCA.](img/capturas_app_visualizador/visual_variables_clinicas.png){#fig-visualizador-cte-icca width=95%}
+![Representación de constantes clínicas procedentes de ICCA, como series temporales asociadas al intervalo de la sesión. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_variables_clinicas.png){#fig-visualizador-cte-icca width=90%}
 
-![Visualización de resultados analíticos asociados a la sesión BIS.](img/capturas_app_visualizador/visual_tarjetas_analisis.png){#fig-visualizador-analisis-icca width=95%}
+Los análisis clínicos se representaron como mediciones puntuales, conservando su instante de registro (@fig-visualizador-analisis-icca).
 
-![Representación de perfusiones y tratamientos durante el intervalo analizado.](img/capturas_app_visualizador/visual_perfusiones_2.png){#fig-visualizador-perfusiones-icca width=95%}
+![Visualización de resultados analíticos asociados a la sesión BIS, como mediciones puntuales. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_tarjetas_analisis.png){#fig-visualizador-analisis-icca width=90%}
+
+Las perfusiones se incorporaron como cambios de dosis activa a lo largo del tiempo, lo que permite estudiar su relación temporal con la evolución del BIS y de la DSA (@fig-visualizador-perfusiones-icca).
+
+![Representación de perfusiones y tratamientos administrados durante el intervalo analizado, como cambios de dosis activa. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_perfusiones_2.png){#fig-visualizador-perfusiones-icca width=90%}
 
 La integración de estas variables permite contextualizar la evolución neurofisiológica del paciente con información clínica relevante, como cambios hemodinámicos, alteraciones analíticas o administración de sedantes, analgésicos, relajantes neuromusculares y fármacos vasoactivos.
 
 ## Visualizador interactivo desarrollado
 
-El resultado final del proyecto es un visualizador interactivo que permite explorar registros BIS unilaterales y bilaterales junto con la información clínica disponible. La interfaz permite seleccionar paciente y sesión, modificar la ventana temporal visible y revisar periodos concretos del registro.
+El resultado final de esta parte del proyecto es un visualizador interactivo que permite explorar registros BIS unilaterales y bilaterales junto con la información clínica disponible, seleccionar paciente y sesión, modificar la ventana temporal visible y revisar periodos concretos del registro (Anexo D). En registros bilaterales, el visualizador muestra de forma diferenciada la información correspondiente a ambos hemisferios, incluyendo las matrices DSA izquierda y derecha, las curvas BIS asociadas y la asimetría bilateral, como ya se ha mostrado en la @fig-visualizador-dsa-rec-bilat.
 
-En registros bilaterales, el visualizador muestra de forma diferenciada la información correspondiente a ambos hemisferios, incluyendo las matrices DSA izquierda y derecha, las curvas BIS asociadas y la asimetría bilateral. Además, permite incorporar variables clínicas seleccionadas para facilitar el análisis retrospectivo de situaciones concretas del paciente crítico.
 
 ## Generación de informe en PDF
 
-Como resultado complementario del visualizador, se incorporó la posibilidad de generar un informe en formato PDF asociado a una sesión BIS concreta. El documento se organiza en tres bloques: una portada con los datos identificativos de la sesión (paciente, sesión BIS, tipo de registro, origen de la DSA, intervalo temporal analizado y disponibilidad de información ICCA), una página con la representación completa de la DSA junto con las variables procesadas del monitor, y un resumen textual de la información clínica ICCA asociada al intervalo (constantes vitales, análisis clínicos y perfusiones), cuando está disponible.
+Como resultado complementario del visualizador, se incorporó la posibilidad de generar un informe en formato PDF asociado a una sesión BIS concreta. El documento se organiza en tres bloques: una portada con los datos identificativos de la sesión, una página con la representación completa de la DSA junto con las variables procesadas del monitor, y un resumen textual de la información clínica ICCA del intervalo, cuando está disponible.
+
+La portada recoge los datos identificativos de la sesión (paciente, sesión BIS, tipo de registro, origen de la DSA, intervalo temporal analizado y disponibilidad de información ICCA).
+
+A continuación, el informe incluye la representación completa de la DSA y las variables procesadas del monitor correspondientes al intervalo mostrado (@fig-informe-dsa-pdf), y finaliza con un resumen textual de la información clínica ICCA disponible para ese mismo intervalo (@fig-informe-analisis-pdf).
+
+![Página de la DSA y las variables procesadas del monitor en el informe PDF. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_informe_2_pdf.png){#fig-informe-dsa-pdf width=90%}
+
+![Resumen de análisis clínicos ICCA en el informe PDF. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_informe_5_pdf.png){#fig-informe-analisis-pdf width=90%}
 
 La generación del PDF resulta útil para conservar una salida estática del análisis realizado en la aplicación interactiva. De este modo, además de explorar los datos dentro del visualizador, el usuario puede obtener un documento resumen que facilite la revisión posterior, la comparación entre sesiones o la incorporación de evidencias visuales a la documentación del proyecto.
-
-Las Figuras @fig-informe-pdf, @fig-informe-dsa-pdf y @fig-informe-analisis-pdf muestran, respectivamente, la portada del informe, la página con la representación de la DSA y el resumen de la información clínica ICCA.
-
-![Portada del informe PDF, con los datos identificativos de la sesión.](img/capturas_app_visualizador/visual_informe_pdf.png){#fig-informe-pdf width=95%}
-
-![Página de la DSA y las variables procesadas del monitor en el informe PDF.](img/capturas_app_visualizador/visual_informe_2_pdf.png){#fig-informe-dsa-pdf width=95%}
-
-![Resumen de análisis clínicos ICCA en el informe PDF.](img/capturas_app_visualizador/visual_informe_5_pdf.png){#fig-informe-analisis-pdf width=95%}
 
 En conjunto, el sistema desarrollado cumple la función propuesta: integrar datos neurofisiológicos y clínicos en una misma línea temporal, mantener la trazabilidad de los archivos originales y ofrecer una herramienta de exploración orientada al análisis retrospectivo en UCI.

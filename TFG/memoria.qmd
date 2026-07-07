@@ -61,15 +61,15 @@ knitr:
 
 \noindent\includegraphics[width=\textwidth]{CabeceraEPS.png}\vspace{1cm}
 
-\noindent D. \nombreTutor, profesor/a del departamento de ~, área de ~.
+\noindent D. \nombreTutor, profesor del departamento de Ingeniería Informática, área de Lenguajes y Sistemas Informáticos; D. Sergio Ossa Echeverri y D. Rodrigo Albillos Almaraz, tutores clínicos de la Unidad de Cuidados Intensivos, Hospital Universitario de Burgos.
 
-\noindent Expone/n:
+\noindent Exponen:
 
-\noindent Que el/la alumno/a D. \nombre, con DNI \dni, ha realizado el Trabajo
-final de Grado en Ingeniería de la Salud titulado titulado \textit{Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI}..
+\noindent Que la alumna Dña. \nombre, con DNI \dni, ha realizado el Trabajo
+Fin de Grado en Ingeniería de la Salud titulado \textit{Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI}.
 
-\noindent Y que dicho trabajo ha sido realizado por el/la alumno/a bajo la
-dirección del/los que suscribe/n.
+\noindent Y que dicho trabajo ha sido realizado por la alumna bajo la
+dirección del que suscribe, en virtud de lo cual se autoriza su presentación y defensa.
 
 \begin{center}
   En Burgos, a {\large \today}
@@ -77,17 +77,21 @@ dirección del/los que suscribe/n.
 
 \vfill\vfill\vfill
 
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.3\textwidth}
   \begin{flushleft}
-    Vº. Bº. del Tutor:\\[2cm]
     D. \nombreTutor
   \end{flushleft}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.3\textwidth}
   \begin{flushleft}
-    Vº. Bº. del Tutor:\\[2cm]
     D. \nombreTutorb
+  \end{flushleft}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+  \begin{flushleft}
+    D. \nombreTutorc
   \end{flushleft}
 \end{minipage}
 
@@ -103,7 +107,7 @@ dirección del/los que suscribe/n.
 
 \renewcommand*\abstractname{Resumen}
 \begin{abstract}
-Este Trabajo Fin de Grado plantea una prueba de concepto orientada a la integración temporal y visualización conjunta de señales procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA en pacientes de la unidad de cuidados intensivos. El objetivo es facilitar el análisis retrospectivo de la evolución del paciente mediante la unificación de diferentes fuentes de información clínica y neurofisiológica en una misma línea temporal. Para ello, se aborda la extracción de datos, su normalización temporal y el desarrollo de un visualizador que permita representar conjuntamente la matriz de densidad espectral, el índice BIS y variables clínicas seleccionadas.
+Este Trabajo Fin de Grado plantea una prueba de concepto orientada a la integración temporal y visualización conjunta de señales procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA en pacientes de la unidad de cuidados intensivos. El objetivo es facilitar el análisis retrospectivo de la evolución del paciente mediante la unificación de diferentes fuentes de información clínica y neurofisiológica en una misma línea temporal. Para ello, se aborda la extracción y organización de los datos por paciente y sesión, su normalización temporal, y el desarrollo de un visualizador interactivo que permita representar conjuntamente la matriz de densidad espectral, el índice BIS y variables clínicas seleccionadas.
 \end{abstract}
 
 \renewcommand*\abstractname{Descriptores}
@@ -115,7 +119,7 @@ BIS, ICCA, unidad de cuidados intensivos, sincronización temporal, análisis re
 
 \renewcommand*\abstractname{Abstract}
 \begin{abstract}
-This Final Degree Project proposes a proof of concept focused on the temporal integration and joint visualization of signals from the BIS monitor and clinical variables extracted from the ICCA system in intensive care patients. The aim is to facilitate retrospective analysis of patient evolution by combining different clinical and neurophysiological data sources on a common timeline. To this end, data extraction, temporal normalization and the development of a visualizer capable of displaying the density spectral array, BIS index and selected clinical variables are addressed.
+This Final Degree Project proposes a proof of concept focused on the temporal integration and joint visualization of signals from the BIS monitor and clinical variables extracted from the ICCA system in intensive care patients. The aim is to facilitate retrospective analysis of patient evolution by combining different clinical and neurophysiological data sources on a common timeline. To this end, the data are extracted and organized by patient and session, temporally normalized, and an interactive visualizer is developed to jointly display the density spectral array, BIS index and selected clinical variables.
 \end{abstract}
 
 \renewcommand*\abstractname{Keywords}

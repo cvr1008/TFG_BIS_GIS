@@ -3,7 +3,7 @@
 \capitulo{1}{Introducción}
 ```
 
-La monitorización de los pacientes críticos en estado de sedación alojados en la Unidad de Cuidados Intensivos (UCI) requiere de la integración de información procedente de múltiples dispositivos de monitorización y otros sistemas clínicos con el fin de facilitar la toma de decisiones, el seguimiento del paciente y el ajuste de la dosis recibida por el mismo.
+La monitorización de los pacientes críticos en estado de sedación ingresados en la Unidad de Cuidados Intensivos (UCI) requiere de la integración de información procedente de múltiples dispositivos de monitorización y otros sistemas clínicos con el fin de facilitar la toma de decisiones, el seguimiento del paciente y el ajuste de la dosis recibida por el mismo.
 
 Entre estas fuentes de información, la monitorización neurofisiológica mediante el índice biespectral o Bispectral Index (BIS) constituye una herramienta de interés para valorar el estado de sedación a partir del procesamiento de la actividad electroencefalográfica.
 
