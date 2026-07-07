@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.7)  7 JUL 2026 20:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.7)  7 JUL 2026 20:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1299,17 +1299,17 @@ Package natbib Warning: Citation `CovidienBISadvanced' on page 12 undefined on
 input line 894.
 
 
-LaTeX Warning: File `img/bis_Advance.png' not found on input line 902.
+LaTeX Warning: File `img/bis_Advance.jpeg' not found on input line 902.
 
 
-! Package pdftex.def Error: File `img/bis_Advance.png' not found: using draft s
-etting.
+! Package pdftex.def Error: File `img/bis_Advance.jpeg' not found: using draft 
+setting.
 
 See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.902 ...ght,keepaspectratio]{img/bis_Advance.png}
+l.902 ...ht,keepaspectratio]{img/bis_Advance.jpeg}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -1317,7 +1317,7 @@ If that doesn't work, type  X <return>  to quit.
  
 Here is how much of TeX's memory you used:
  21382 strings out of 467867
- 346617 string characters out of 5417367
+ 346648 string characters out of 5417367
  857656 words of memory out of 5000000
  49695 multiletter control sequences out of 15000+600000
  722307 words of font info for 199 fonts, out of 8000000 for 9000
