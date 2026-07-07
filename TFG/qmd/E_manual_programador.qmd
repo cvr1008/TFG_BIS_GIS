@@ -93,7 +93,7 @@ Las pruebas del visualizador se encuentran en \ruta{aplicaciones/visualizador_bi
 Para ejecutar las pruebas del visualizador puede utilizarse:
 
 ```powershell
-cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones\visualizador_bis_icca"
+cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones\visualizador_bis_icca" `
 ..\.venv\Scripts\python.exe -m unittest
 ```
 
@@ -107,11 +107,13 @@ Para ampliar el sistema se recomienda mantener la separación entre organizació
 
 | Área de modificación | Archivos principales |
 |---|---|
-| Reconstrucción de la DSA | `visualizador_bis_icca/src/reconstruccion.py`, `alineacion_temporal.py`, `figuras.py` |
-| Variables clínicas ICCA | `visualizador_bis_icca/src/visualizacion_icca.py`, `pacientes_icca.py` |
-| Organización de pacientes | `organizador_bis_icca/src/` |
+| Reconstrucción de la DSA | `reconstruccion.py`<br>`alineacion_temporal.py`<br>`figuras.py` |
+| Variables clínicas ICCA | `visualizacion_icca.py`<br>`pacientes_icca.py` |
+| Organización de pacientes | Carpeta `organizador_bis_icca/src/` |
 
 : Ubicación de las modificaciones más habituales {#tbl-modificaciones-desarrollador}
+
+Salvo que se indique lo contrario, los archivos del visualizador se encuentran en `aplicaciones/visualizador_bis_icca/src/`.
 
 Se recomienda no modificar directamente los datos originales exportados del monitor BIS ni los archivos ICCA originales. Cualquier procesamiento adicional debe generar archivos auxiliares identificables dentro de la carpeta del paciente o de la sesión correspondiente.
 

@@ -81,3 +81,11 @@ El proyecto se ha desarrollado con datos clínicos procedentes del Hospital Univ
 El trabajo se limita a la organización, integración temporal y visualización retrospectiva de los datos recibidos. La extracción de las variables clínicas procedentes de ICCA fue realizada por personal autorizado, y la aplicación desarrollada no accede directamente a la base de datos hospitalaria ni modifica los datos originales.
 
 Esta aprobación ampara el desarrollo y la prueba de concepto descritos en este trabajo, pero no constituye una validación clínica de la herramienta ni autoriza su uso como apoyo a la toma de decisiones asistenciales. El sistema debe entenderse como una herramienta experimental orientada al análisis retrospectivo y a la exploración de datos.
+
+## Repositorio GitHub del proyecto
+
+El proyecto se encuentra gestionado mediante GitHub en el siguiente repositorio:
+
+<https://github.com/cvr1008/TFG_BIS_GIS>
+
+El repositorio contiene el código fuente de las aplicaciones, los scripts de preparación y ejecución, la documentación del proyecto y los archivos auxiliares necesarios para reproducir el entorno de trabajo.

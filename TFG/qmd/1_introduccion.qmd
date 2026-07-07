@@ -36,3 +36,12 @@ La presente memoria se organiza en varios capítulos:
 **Conclusiones**: se recogen las principales aportaciones del proyecto y el grado de cumplimiento de los objetivos planteados.
 
 **Líneas futuras**: una vez finalizado el proyecto, se proponen posibles mejoras y ampliaciones para futuros desarrollos.
+
+
+### Repositorio de gestión del proyecto
+
+El código fuente, la documentación auxiliar y el historial de desarrollo del proyecto se gestionaron mediante un repositorio GitHub disponible en:
+
+<https://github.com/cvr1008/TFG_BIS_GIS>
+
+El acceso al repositorio puede realizarse desde la dirección web anterior. En caso de que el repositorio se mantenga privado, el acceso deberá solicitarse a la autora o a los tutores del trabajo.
