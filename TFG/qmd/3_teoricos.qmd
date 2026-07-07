@@ -88,7 +88,7 @@ En este trabajo se han empleado datos procedentes de dos versiones del equipo, B
 
 ![Monitor BIS VISTA. Fuente: Elaboración propia [@CovidienBISadvanced].](img/bis_vista.png){#fig-monitor-vista width=45%}
 
-![Monitor BIS Advance. Fuente: Elaboración propia  [@CovidienBISadvanced].](img/bis_Advance.jpeg){#fig-monitor-advance width=45%}
+![Monitor BIS Advance. Fuente: Elaboración propia  [@CovidienBISadvanced].](img/bis_Advanced.jpeg){#fig-monitor-advance width=45%}
 
 A partir de la señal EEG adquirida, el monitor calcula y muestra en pantalla un conjunto de parámetros procesados, entre los que se encuentra el índice BIS descrito a continuación, junto con la matriz de densidad espectral (DSA), la frecuencia de borde espectral (SEF), la frecuencia mediana (MEF) y otros parámetros que se describen más adelante en este capítulo.
 
