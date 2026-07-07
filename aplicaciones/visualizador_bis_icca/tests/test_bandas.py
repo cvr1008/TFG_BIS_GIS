@@ -5,6 +5,7 @@ import numpy as np
 from src.bandas import (
     BANDAS_EEG,
     calcular_densidad_espectral_media_bandas,
+    lineas_densidad_bandas,
 )
 
 
@@ -74,6 +75,13 @@ class TestDensidadEspectralMediaBandas(unittest.TestCase):
             resumen["ratio_alpha_delta"],
             2.4 / 5.4,
         )
+
+    def test_recuadro_muestra_solo_ratio_alpha_delta(self):
+        resumen = {"ratio_alpha_delta": 0.425}
+
+        lineas = lineas_densidad_bandas(resumen)
+
+        self.assertEqual(lineas, ["ADR alfa/delta: 0.425"])
 
     def test_rechaza_forma_incompatible(self):
         frecuencias = np.arange(0.5, 30.0 + 0.5, 0.5)

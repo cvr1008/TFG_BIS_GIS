@@ -23,7 +23,6 @@ PARAMETROS_RECONSTRUCCION = {
     "modo_welch": "densidad",
     "tiempo_referencia": "centro",
     "umbral_sqi": 15,
-    "umbral_ceros": 0.9,
     "aplicar_mascara_ceros_raw": True,
     "umbral_ceros_raw": 0.5,
     "excluir_invalidos_suavizado": True,
@@ -156,6 +155,9 @@ def _extraer_suavizado_spsmooth(df_spa):
 
 
 def _extraer_filtro_lofilter(df_spa, valor_predeterminado):
+    """
+    Leer el código real que hay en la columna LoFilter del .spa. 
+    """
     if "LoFilter" not in df_spa.columns:
         return None, float(valor_predeterminado), "predeterminado"
 
@@ -476,29 +478,93 @@ def _convertir_potencia_a_db(potencia, parametros):
 
 
 def _filtrar_pasa_altos_causal(señal, fs, frecuencia_hz, orden):
+    """
+    Aplica un filtro Butterworth pasa-altos causal a una señal temporal.
+
+    El filtro atenúa las componentes por debajo de 'frecuencia_hz' antes de la aplicación de la FFT:
+     - deriva lenta de la línea base
+     - componentes de muy baja frecuencia
+    
+    La señal se procesa de forma causal mediante 'sosfilt', usa solamente muestras presentes y anteriores.
+    Los valores no finitos (NaN e inf) no se filtran. Se mantienen los huecos y divide la señal en bloques válidos para evitar que el filtro propague discontinuidades a través de zonas sin datos. 
+
+    Parámetros:
+     - señal: array-like
+              señal electroencefalográfica digital temporal, representada como una secuencia de muestras discretas en microvoltios.
+     - fs:  float
+            frecuencia de muestreo de la señal, en Hz.
+     - frecuencia_hz: float
+                      frecuencia de corte del filtro pasa - alta, en Hz.
+                      Si es <=0 no se filtra la señal y se devuelve una copia de la misma.
+                      En el proyecto esta frecuencia viene de LoFilter: 0,25, 1, 2 o 2,5 Hz.
+     - orden: int
+              orden del filtro Butterworth. 
+              Controla lo abruptas que son las transiciones entre las frecuencias que se atenúan y las que se conservan.
+              Un filtro de primer orden tiene una transición suave: no elimina de golpe todo lo que queda por debajo del corte, sino que lo atenúa progresivamente.
+
+    Devuelve:
+     - salida: ndarray
+               Señal filtrada, con la misma longitud que la señal de entrada y expresada también en microvoltios. Las muestras no válidas permanecen como huecos.
+    """
+
+    # Convierte la entrada a un array NumPy en coma flotante. 
+    # Para representar decimales y NaN.
     señal = np.asarray(señal, dtype=np.float64)
+
+    # Si la frecuencia de corte es 0 o negativa, no tiene sentido aplicar un pasa-altos. 
+    # Devuelve la señal sin modificar.
     if frecuencia_hz <= 0:
         return señal.copy()
 
-    sos = butter(
+    """
+    Diseño del filtro Butterworth:
+     - int(orden): orden del filtro Butterworth. Aquí el orden es 1. 
+     - float(frecuencia_hz): las componentes por debajo de esta frecuencia se atenúan y las componentes por encima se conservan más.
+     - btype="highpass": el filtro es pasa-altos
+     - fs=float(fs): frecuencia de muestro de la señal en Hz. Permite que la frecuencia de corte se interprete en Hz.
+     - output="sos": formato en el que SciPy devuelve el filtro. Significa secciones de segundo orden (second-order sections). 
+                     
+    """
+    sos = butter( 
         int(orden),
         float(frecuencia_hz),
         btype="highpass",
         fs=float(fs),
         output="sos",
     )
+
+    # Crea una salida llena de NaN. 
+    # Por defecto, todo lo que no pueda filtrarse se mantiene como ausente.
     salida = np.full_like(señal, np.nan)
+
+    # Busca las posiciones donde la señal tiene valores válidos.
     indices_validos = np.flatnonzero(np.isfinite(señal))
+
+    # Si no hay ningún dato válido, devuelve todo NaN
     if not indices_validos.size:
         return salida
 
+    # Detecta saltos entre índices válidos. Separa la señal en bloques continuos (antes y después de un tramo en NaN)
     cortes = np.flatnonzero(np.diff(indices_validos) > 1) + 1
+
+    # Se filtra cada bloque válido por separado
     for bloque in np.split(indices_validos, cortes):
-        if not bloque.size:
-            continue
+        
+        if not bloque.size: # bloque.size indica cuántos elementos tiene ese bloque
+            continue # si el bloque está vacío, se salta y pasa al siguiente
+
+        # toma las muestras válidas del bloque
         segmento = señal[bloque]
+
+        # Calcula el estado inicial del filtro suponiendo que antes del bloque
+        # la señal era constante e igual a la primera muestra del segmento.
         zi = sosfilt_zi(sos) * segmento[0]
+
+        # Aplica el filtro causal al segmento. Devuelve la señal filtrada y
+        # el estado final del filtro (que aquí ignoramos porque filtramos los bloques independientemente)
         filtrado, _ = sosfilt(sos, segmento, zi=zi)
+
+        # Inserta el segmento filtrado en la señal de salida en las mismas posiciones que en la señal de entrada
         salida[bloque] = filtrado
     return salida
 
@@ -533,30 +599,6 @@ def _alinear_spa(timeline_spa, df_spa):
         validate="one_to_one",
     )
 
-
-def _crear_mascara(
-    tiempo,
-    dsa,
-    sqi,
-    totpow,
-    umbral_sqi,
-    umbral_ceros,
-):
-    sqi = pd.to_numeric(sqi, errors="coerce").reset_index(drop=True)
-    totpow = pd.to_numeric(totpow, errors="coerce").reset_index(drop=True)
-    tiempo = pd.to_datetime(pd.Series(tiempo), errors="coerce")
-    dsa = dsa.reset_index(drop=True)
-
-    mask_spa = (sqi < umbral_sqi) | totpow.isna()
-    mask_ceros = (dsa == 0).mean(axis=1) > umbral_ceros
-    mask_saltos = tiempo.diff().dt.total_seconds().gt(1).fillna(False)
-    mask_nan = dsa.isna().all(axis=1)
-    return (
-        mask_spa
-        | mask_ceros.reset_index(drop=True)
-        | mask_saltos.reset_index(drop=True)
-        | mask_nan.reset_index(drop=True)
-    )
 
 
 def _calcular_tiempos_ventanas(

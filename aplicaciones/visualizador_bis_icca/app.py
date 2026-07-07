@@ -19,6 +19,7 @@ from src.figuras import (
     crear_figura_dsa_unilateral_interactiva,
 )
 from src.figuras_estaticas import crear_panoramica_estatica
+from src.informe_pdf import crear_informe_pdf, nombre_archivo_informe
 from src.lectura_fa import (
     cargar_fa_bilateral_completo_desde_ruta,
     cargar_fa_unilateral_desde_ruta,
@@ -49,6 +50,7 @@ ESTILO_PANTALLA = {
     "margin": "0 auto",
     "padding": "24px",
     "fontFamily": "Arial, sans-serif",
+    "backgroundColor": "white",
 }
 
 ESTILO_BOTON_PRINCIPAL = {
@@ -63,7 +65,7 @@ ESTILO_BOTON_PRINCIPAL = {
 
 CONFIGURACION_GRAFICO = {
     "displaylogo": False,
-    "scrollZoom": True,
+    "scrollZoom": False,
     "modeBarButtonsToAdd": ["drawline", "eraseshape"],
 }
 
@@ -103,6 +105,8 @@ def _env_int(nombre, valor_por_defecto):
 RUTA_PACIENTES_FIJA = _env_bool("TFG_RUTA_PACIENTES_FIJA")
 HOST_DASH = os.environ.get("TFG_DASH_HOST", "127.0.0.1")
 PUERTO_VISUALIZADOR = _env_int("TFG_VISUALIZADOR_PORT", 8050)
+URL_PORTAL = os.environ.get("TFG_PORTAL_URL", "http://127.0.0.1:8040/")
+URL_ORGANIZADOR = os.environ.get("TFG_ORGANIZADOR_URL", "http://127.0.0.1:8060/")
 
 ESTILO_CONTROLES_TRAMO = {
     "display": "grid",
@@ -114,6 +118,13 @@ ESTILO_CONTROLES_TRAMO = {
     "backgroundColor": "#f7f9fb",
     "borderRadius": "8px",
 }
+
+
+def _id_disparado():
+    identificador = ctx.triggered_id
+    if isinstance(identificador, dict):
+        return identificador
+    return None
 
 
 def _crear_spinner_visualizador():
@@ -163,7 +174,7 @@ def _badge(texto, fondo, color):
     )
 
 
-def _crear_tarjeta_sesion(sesion):
+def _crear_tarjeta_sesion(sesion, seleccionada=False):
     estado_icca = sesion.get("estado_icca")
     if estado_icca == "completa":
         badges = [_badge("ICCA disponible para toda la sesión", "#e7f5ea", "#225c2e")]
@@ -222,7 +233,7 @@ def _crear_tarjeta_sesion(sesion):
                         ]
                     ),
                     html.Button(
-                        "Seleccionar sesión",
+                        "Sesión seleccionada" if seleccionada else "Seleccionar sesión",
                         id={
                             "type": "seleccionar-sesion",
                             "index": sesion.get("nombre_carpeta"),
@@ -255,7 +266,11 @@ def _crear_tarjeta_sesion(sesion):
             if error_bis
             else None,
         ],
-        className="tarjeta-sesion-paciente",
+        className=(
+            "tarjeta-sesion-paciente tarjeta-sesion-seleccionada"
+            if seleccionada
+            else "tarjeta-sesion-paciente"
+        ),
     )
 
 
@@ -586,23 +601,46 @@ app.layout = html.Div(
         dcc.Store(id="carpeta-detectada", storage_type="memory"),
         dcc.Store(id="sesiones-paciente", storage_type="memory"),
         dcc.Store(id="sesion-seleccionada", storage_type="memory"),
+        dcc.Download(id="descarga-informe-pdf"),
         html.Div(
             id="pantalla-archivos",
             children=[
-                html.H1("Visualizador BIS-ICCA"),
-                html.P(
-                    id="texto-introduccion",
-                    children=(
-                        "Selecciona la carpeta que contiene los pacientes organizados, "
-                        "elige un paciente y después una de sus sesiones BIS."
-                    ),
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H1("Visualizador BIS-ICCA"),
+                                html.P(
+                                    "Selecciona un paciente y una sesión BIS para consultar la matriz.",
+                                ),
+                            ],
+                            className="cabecera-visualizador-texto",
+                        ),
+                        html.Div(
+                            [
+                                html.A(
+                                    "Menú principal",
+                                    href=URL_PORTAL,
+                                    className="boton-nav-visualizador",
+                                ),
+                                html.A(
+                                    "Ir al organizador",
+                                    href=URL_ORGANIZADOR,
+                                    className=(
+                                        "boton-nav-visualizador "
+                                        "boton-nav-visualizador-primario"
+                                    ),
+                                ),
+                            ],
+                            className="navegacion-visualizador",
+                        ),
+                    ],
+                    className="cabecera-visualizador",
                 ),
                 html.Div(
                     children=[
                         html.Label(
-                            "Repositorio de pacientes"
-                            if RUTA_PACIENTES_FIJA
-                            else "Carpeta que contiene los pacientes",
+                            "Ubicación de pacientes",
                             style={
                                 "display": "block",
                                 "fontWeight": "bold",
@@ -838,8 +876,23 @@ app.layout = html.Div(
                         ),
                         html.H1(
                             id="titulo-matriz",
-                            children="Matriz DSA",
+                            children="BIS - ICCA",
                             style={"margin": "0"},
+                        ),
+                        html.Button(
+                            "Exportar informe PDF",
+                            id="boton-exportar-pdf",
+                            n_clicks=0,
+                            style={
+                                "marginLeft": "auto",
+                                "padding": "9px 16px",
+                                "border": "1px solid #1f5f99",
+                                "borderRadius": "6px",
+                                "backgroundColor": "#1f5f99",
+                                "color": "white",
+                                "fontSize": "0.95rem",
+                                "cursor": "pointer",
+                            },
                         ),
                     ],
                     style={
@@ -858,6 +911,7 @@ app.layout = html.Div(
                         "borderRadius": "6px",
                     },
                 ),
+                html.Div(id="estado-informe-pdf", style={"display": "none"}),
                 html.Div(id="aviso-icca-matriz", style={"display": "none"}),
                 html.Div(
                     id="parametros-matriz",
@@ -915,6 +969,16 @@ app.layout = html.Div(
                     ],
                     style={"display": "none"},
                 ),
+                html.P(
+                    id="descripcion-matriz",
+                    children="DSA - Matriz de Densidad Espectral",
+                    style={
+                        "margin": "0 0 14px",
+                        "fontSize": "1.08rem",
+                        "fontWeight": "700",
+                        "color": "#20384f",
+                    },
+                ),
                 html.Div(
                     id="error-vista",
                     style={
@@ -938,16 +1002,6 @@ app.layout = html.Div(
                     "también puedes hacer zoom directamente sobre la matriz.",
                     style={"color": "#555", "fontSize": "0.92rem"},
                 ),
-                html.P(
-                    id="descripcion-matriz",
-                    children=(
-                        "El color representa la potencia espectral de las 60 "
-                        "frecuencias entre 0,5 y 30 Hz. El cuadro del cursor muestra "
-                        "la hora y los valores SEF, MEF, BIS y SR correspondientes a "
-                        "ese segundo; el EMG se representa como una gráfica alineada."
-                    ),
-                    style={"display": "none"},
-                ),
             ],
             style={**ESTILO_PANTALLA, "display": "none"},
         ),
@@ -964,8 +1018,15 @@ app.index_string = """
     {%css%}
     <style>
       body { margin: 0; background: #ffffff; }
+      .cabecera-visualizador { width: 100vw; margin: -24px calc(50% - 50vw) 24px; padding: 24px 30px; box-sizing: border-box; background: #1f5f99; color: white; display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap; }
+      .cabecera-visualizador h1 { margin: 0; }
+      .cabecera-visualizador p { margin: 12px 0 0; font-weight: 700; }
+      .navegacion-visualizador { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+      .boton-nav-visualizador { display: inline-block; border: 1px solid rgba(255,255,255,.72); border-radius: 6px; padding: 9px 13px; color: white; text-decoration: none; font-weight: 700; }
+      .boton-nav-visualizador-primario { background: white; color: #1f5f99; }
       .lista-sesiones { display: grid; gap: 14px; margin-bottom: 18px; }
       .tarjeta-sesion-paciente { border: 1px solid #d8e0e7; border-radius: 10px; padding: 16px; background: #ffffff; box-shadow: 0 2px 8px rgba(31, 95, 153, .06); }
+      .tarjeta-sesion-seleccionada { border-color: #8bbce8; background: #eef7ff; box-shadow: 0 2px 12px rgba(31, 95, 153, .14); }
       .sesion-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
       .sesion-etiqueta { text-transform: uppercase; letter-spacing: .06em; color: #65727f; font-size: .75rem; font-weight: bold; }
       .sesion-badges { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
@@ -1069,9 +1130,10 @@ def actualizar_selector_pacientes(ruta_pacientes):
     Output("sesiones-paciente", "data"),
     Output("tarjetas-sesiones", "children"),
     Input("selector-paciente", "value"),
+    Input("sesion-seleccionada", "data"),
     State("ruta-carpeta-pacientes", "value"),
 )
-def cargar_sesiones_del_paciente(paciente_id, ruta_pacientes):
+def cargar_sesiones_del_paciente(paciente_id, sesion_seleccionada, ruta_pacientes):
     if not paciente_id:
         return [], html.Div(
             "Selecciona un paciente para consultar sus sesiones BIS.",
@@ -1090,7 +1152,23 @@ def cargar_sesiones_del_paciente(paciente_id, ruta_pacientes):
             "Este paciente todavía no contiene sesiones BIS.",
             className="icca-sin-datos",
         )
-    return sesiones, [_crear_tarjeta_sesion(sesion) for sesion in sesiones]
+    seleccionada = (sesion_seleccionada or {}).get("nombre_carpeta")
+    return sesiones, [
+        _crear_tarjeta_sesion(
+            sesion,
+            seleccionada=sesion.get("nombre_carpeta") == seleccionada,
+        )
+        for sesion in sesiones
+    ]
+
+
+@app.callback(
+    Output("sesion-seleccionada", "data", allow_duplicate=True),
+    Input("selector-paciente", "value"),
+    prevent_initial_call=True,
+)
+def limpiar_sesion_al_cambiar_paciente(_paciente_id):
+    return None
 
 
 @app.callback(
@@ -1100,9 +1178,10 @@ def cargar_sesiones_del_paciente(paciente_id, ruta_pacientes):
     prevent_initial_call=True,
 )
 def seleccionar_sesion(n_clicks, sesiones):
-    if not any(n_clicks or []) or not isinstance(ctx.triggered_id, dict):
+    identificador_disparado = _id_disparado()
+    if not any(n_clicks or []) or not identificador_disparado:
         raise PreventUpdate
-    identificador = ctx.triggered_id.get("index")
+    identificador = identificador_disparado.get("index")
     sesion = next(
         (
             item
@@ -1442,30 +1521,11 @@ def cambiar_pantalla(
                 ),
             )
             parametros = registro["parametros_reconstruccion"]
-            titulo_matriz = (
-                "DSA reconstruida bilateral"
-                if modo_analisis == "bilateral"
-                else "DSA reconstruida unilateral"
-            )
+            titulo_matriz = "BIS - ICCA"
             descripcion = (
-                "Reconstrucción desde la onda cruda mediante Welch. "
-                + (
-                    "En bilateral se reconstruye el dataset izquierdo desde "
-                    "C1 y el derecho desde C3. "
-                    if modo_analisis == "bilateral"
-                    else (
-                        "En unilateral se reconstruye desde C1, el dataset "
-                        "espectral válido exportado por VISTA. "
-                    )
-                )
-                + "Se alinea con la timeline oficial del .spa. La máscara de "
-                "calidad se calcula antes del suavizado para que los segundos "
-                "no válidos no contribuyan a la media móvil, y se conserva "
-                "después como bandas blancas. "
-                "El índice BIS, EMGLOW01 y SR12 se alinean con la misma timeline. "
-                "El recuadro derecho muestra la densidad espectral media de "
-                "cada banda y el ratio alfa-delta calculado mediante la "
-                "potencia absoluta del intervalo seleccionado."
+                "DSA - Matriz de Densidad Espectral Bilateral"
+                if modo_analisis == "bilateral"
+                else "DSA - Matriz de Densidad Espectral Unilateral"
             )
             descripcion_lofilter = (
                 f"LoFilter {parametros['lofilter_codigo']}: "
@@ -1557,17 +1617,8 @@ def cambiar_pantalla(
                 "sr_der": curvas_der["SR12"].to_numpy(dtype=float),
                 "asimetria": np.asarray(asimetria, dtype=float),
             }
-            titulo_matriz = "Matriz DSA bilateral"
-            descripcion = (
-                "Las matrices izquierda y derecha comparten el mismo rango temporal "
-                "y la escala clínica fija de 49 a 94 dB. Entre ambas se muestran "
-                "ASYM09, los índices BIS y el EMG de ambos hemisferios, todos "
-                "alineados segundo a segundo. El cuadro del cursor incluye el SR "
-                "de los últimos 63 segundos. La vista Todo ofrece una panorámica general "
-                "no interactiva cuando el registro es largo. Los recuadros "
-                "derechos resumen la densidad espectral media por bandas y "
-                "el ratio alfa-delta de cada hemisferio."
-            )
+            titulo_matriz = "BIS - ICCA"
+            descripcion = "DSA - Matriz de Densidad Espectral Bilateral"
             texto_parametros = ""
             estilo_parametros = {"display": "none"}
         else:
@@ -1605,17 +1656,8 @@ def cambiar_pantalla(
                 "emg": df_alineado["EMGLOW01"].to_numpy(dtype=float),
                 "sr": df_alineado["SR12"].to_numpy(dtype=float),
             }
-            titulo_matriz = "Matriz DSA unilateral"
-            descripcion = (
-                "El color representa la potencia espectral entre 0,5 y 30 Hz con "
-                "la escala clínica fija de 49 a 94 dB. Debajo se muestra el índice "
-                "BIS y el EMG alineados segundo a segundo; el cuadro del cursor "
-                "incluye el SR de los últimos 63 segundos. La vista Todo ofrece "
-                "una panorámica "
-                "general no interactiva cuando el registro es largo. El recuadro "
-                "derecho resume la densidad espectral media por bandas y el "
-                "ratio alfa-delta del intervalo mostrado."
-            )
+            titulo_matriz = "BIS - ICCA"
+            descripcion = "DSA - Matriz de Densidad Espectral Unilateral"
             texto_parametros = ""
             estilo_parametros = {"display": "none"}
 
@@ -1724,30 +1766,21 @@ def actualizar_vista_temporal(registro_activo, valor_tramo, duracion):
 
         if vista_completa:
             if vista.get("vista_estatica", False):
-                elementos = (
-                    "las dos matrices, SEF, MEF, ASYM09, BIS y EMG"
-                    if vista["modo"] == "bilateral"
-                    else "la matriz, SEF, MEF, BIS y EMG"
-                )
                 intervalo = (
                     f"Vista completa estática: {inicio_texto} - {fin_texto}. "
-                    f"Se representan {elementos} utilizando todos los segundos "
-                    "originales, sin agrupar la DSA. Los recuadros muestran "
-                    "la densidad espectral media y el ratio alfa-delta de los "
-                    "segundos válidos."
+                    "Los recuadros muestran el ratio alfa-delta de los segundos "
+                    "válidos."
                 )
             else:
                 intervalo = (
                     f"Vista completa: {inicio_texto} - {fin_texto}. "
                     "Resolución original: una columna por segundo. Los recuadros "
-                    "muestran la densidad espectral media y el ratio alfa-delta "
-                    "de los segundos válidos."
+                    "muestran el ratio alfa-delta de los segundos válidos."
                 )
         else:
             intervalo = (
                 f"{'Vista estática de 4 h' if vista.get('vista_estatica') else 'Intervalo mostrado'}: {inicio_texto} - {fin_texto}. "
-                "La densidad espectral media por bandas y el ratio alfa-delta "
-                "corresponden a este intervalo."
+                "El ratio alfa-delta corresponde a este intervalo."
             )
 
         return componente, intervalo, "", {"display": "none"}
@@ -1769,6 +1802,70 @@ def actualizar_vista_temporal(registro_activo, valor_tramo, duracion):
 
 
 @app.callback(
+    Output("descarga-informe-pdf", "data"),
+    Output("estado-informe-pdf", "children"),
+    Output("estado-informe-pdf", "style"),
+    Input("boton-exportar-pdf", "n_clicks"),
+    State("registro-activo", "data"),
+    State("selector-tramo", "value"),
+    State("duracion-vista", "value"),
+    prevent_initial_call=True,
+)
+def exportar_informe_pdf(n_clicks, registro_activo, valor_tramo, duracion):
+    if not n_clicks:
+        raise PreventUpdate
+
+    estilo_error = {
+        "display": "block",
+        "padding": "11px 13px",
+        "marginBottom": "10px",
+        "backgroundColor": "#fdecec",
+        "color": "#8a1f1f",
+        "borderRadius": "7px",
+    }
+
+    registro = _obtener_registro(registro_activo)
+    if registro is None:
+        return (
+            no_update,
+            "No se pudo generar el informe: vuelve a seleccionar la sesion.",
+            estilo_error,
+        )
+    if valor_tramo is None:
+        return (
+            no_update,
+            "Selecciona un tramo temporal antes de exportar el informe.",
+            estilo_error,
+        )
+
+    try:
+        vista, inicio, fin, _vista_completa = preparar_vista_temporal(
+            registro,
+            valor_tramo,
+            duracion or "1h",
+        )
+        contenido = crear_informe_pdf(
+            registro,
+            vista,
+            inicio,
+            fin,
+            duracion or "1h",
+        )
+        nombre = nombre_archivo_informe(registro, inicio, fin)
+        return (
+            dcc.send_bytes(lambda buffer: buffer.write(contenido), nombre),
+            "",
+            {"display": "none"},
+        )
+    except Exception as exc:
+        return (
+            no_update,
+            f"No se pudo generar el informe PDF: {exc}",
+            estilo_error,
+        )
+
+
+@app.callback(
     Output("aviso-icca-matriz", "children"),
     Output("aviso-icca-matriz", "style"),
     Input("registro-activo", "data"),
@@ -1779,18 +1876,7 @@ def mostrar_estado_icca_matriz(registro_activo):
         return "", {"display": "none"}
     sesion = registro.get("sesion_paciente") or {}
     if registro.get("icca") is not None:
-        return (
-            "ICCA disponible. Las constantes intermedias son valores sintéticos "
-            "reproducibles; las mediciones reales se conservan marcadas.",
-            {
-                "display": "block",
-                "padding": "11px 13px",
-                "marginBottom": "10px",
-                "backgroundColor": "#fff4cf",
-                "color": "#6d5100",
-                "borderRadius": "7px",
-            },
-        )
+        return "", {"display": "none"}
     if sesion.get("estado_icca") == "ausente":
         texto = "Esta sesión no contiene información ICCA."
     else:

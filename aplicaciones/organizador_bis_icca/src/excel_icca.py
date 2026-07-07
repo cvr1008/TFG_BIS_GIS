@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from openpyxl.styles import Font, PatternFill
@@ -12,13 +12,6 @@ from src.libros import abrir_libro
 
 
 HOJAS_TEMPORALES = ("constantes_vitales", "analisis", "perfusiones")
-COLUMNAS_PERFUSION_CALCULADAS = (
-    "volumen_acumulado_calculado_ml",
-    "dia_clinico_inicio",
-    "acumulado_calculado_origen",
-)
-
-
 def _buscar_hoja(libro, nombre):
     objetivo = nombre.casefold()
     for hoja in libro.worksheets:
@@ -34,28 +27,6 @@ def _cabeceras(hoja):
     ]
 
 
-def _asegurar_columna(hoja, nombre):
-    cabeceras = _cabeceras(hoja)
-    if nombre in cabeceras:
-        return
-
-    columna = len(cabeceras) + 1
-    hoja.cell(3, columna, nombre)
-    if columna > 1:
-        origen = hoja.cell(3, columna - 1)
-        destino = hoja.cell(3, columna)
-        destino._style = copy(origen._style)
-        destino.number_format = origen.number_format
-        destino.alignment = copy(origen.alignment)
-        destino.font = copy(origen.font)
-        destino.fill = copy(origen.fill)
-
-
-def _asegurar_columnas_perfusiones(hoja):
-    for nombre in COLUMNAS_PERFUSION_CALCULADAS:
-        _asegurar_columna(hoja, nombre)
-
-
 def _clave_fila(valores):
     clave = []
     for valor in valores:
@@ -64,116 +35,6 @@ def _clave_fila(valores):
         else:
             clave.append(str(valor) if valor is not None else "")
     return tuple(clave)
-
-
-def _numero(valor):
-    if valor is None:
-        return None
-    if isinstance(valor, (int, float)):
-        return float(valor)
-    texto = str(valor).strip().replace(",", ".")
-    if not texto:
-        return None
-    try:
-        return float(texto)
-    except ValueError:
-        return None
-
-
-def _inicio_dia_clinico(instante):
-    inicio = instante.replace(hour=8, minute=0, second=0, microsecond=0)
-    if instante < inicio:
-        inicio -= timedelta(days=1)
-    return inicio
-
-
-def _integrar_hasta(inicio, fin, velocidad_ml_h, acumulado, dia_clinico):
-    velocidad = float(velocidad_ml_h or 0.0)
-    actual = inicio
-    while actual < fin:
-        siguiente_reset = dia_clinico + timedelta(days=1)
-        tramo_fin = min(fin, siguiente_reset)
-        acumulado += velocidad * max(0.0, (tramo_fin - actual).total_seconds()) / 3600.0
-        actual = tramo_fin
-        if actual == siguiente_reset and actual < fin:
-            dia_clinico = siguiente_reset
-            acumulado = 0.0
-    return acumulado, dia_clinico
-
-
-def _anadir_acumulados_perfusiones(filas, cabeceras):
-    indices = {nombre: indice for indice, nombre in enumerate(cabeceras)}
-    necesarios = {"timestamp", "farmaco", *COLUMNAS_PERFUSION_CALCULADAS}
-    if not necesarios.issubset(indices):
-        return filas
-
-    salida = [list(fila) for fila in filas]
-    grupos = {}
-    for indice, fila in enumerate(salida):
-        instante = _parsear_fecha(fila[indices["timestamp"]])
-        farmaco = str(fila[indices["farmaco"]] or "").strip()
-        if instante is None or not farmaco:
-            continue
-        grupos.setdefault(farmaco.casefold(), []).append((indice, instante))
-
-    indice_velocidad = indices.get("velocidad_bomba_ml_h")
-    indice_acumulado_real = indices.get("volumen_acumulado_24h_ml")
-    indice_calculado = indices["volumen_acumulado_calculado_ml"]
-    indice_dia = indices["dia_clinico_inicio"]
-    indice_origen = indices["acumulado_calculado_origen"]
-
-    for grupo in grupos.values():
-        grupo.sort(key=lambda item: (item[1], item[0]))
-        acumulado = 0.0
-        dia_clinico = None
-        instante_previo = None
-        velocidad_previa = 0.0
-
-        for indice, instante in grupo:
-            fila = salida[indice]
-            dia_actual = _inicio_dia_clinico(instante)
-            if dia_clinico is None:
-                acumulado = 0.0
-                dia_clinico = dia_actual
-                instante_previo = dia_actual
-                velocidad_previa = 0.0
-
-            if instante_previo is not None and instante > instante_previo:
-                acumulado, dia_clinico = _integrar_hasta(
-                    instante_previo,
-                    instante,
-                    velocidad_previa,
-                    acumulado,
-                    dia_clinico,
-                )
-
-            acumulado_real = (
-                _numero(fila[indice_acumulado_real])
-                if indice_acumulado_real is not None
-                else None
-            )
-            if acumulado_real is not None:
-                acumulado = acumulado_real
-                origen = "ICCA acumulado 24h"
-            elif velocidad_previa:
-                origen = "integrado desde mL/h"
-            else:
-                origen = "sin volumen previo; acumulado calculado desde 0"
-
-            fila[indice_calculado] = round(acumulado, 4)
-            fila[indice_dia] = dia_clinico
-            fila[indice_origen] = origen
-
-            velocidad_actual = (
-                _numero(fila[indice_velocidad])
-                if indice_velocidad is not None
-                else None
-            )
-            if velocidad_actual is not None:
-                velocidad_previa = velocidad_actual
-            instante_previo = instante
-
-    return salida
 
 
 def _recoger_filas(rutas, nombre_hoja, cabeceras_destino, inicio, fin, paciente_id, sesion_id):
@@ -323,8 +184,6 @@ def generar_excel_icca_sesion(
             hoja = _buscar_hoja(libro, nombre)
             if hoja is None:
                 continue
-            if nombre == "perfusiones":
-                _asegurar_columnas_perfusiones(hoja)
             cabeceras = _cabeceras(hoja)
             filas = _recoger_filas(
                 rutas_icca,
@@ -335,8 +194,6 @@ def generar_excel_icca_sesion(
                 paciente_id,
                 sesion["sesion_id"],
             )
-            if nombre == "perfusiones":
-                filas = _anadir_acumulados_perfusiones(filas, cabeceras)
             _reemplazar_datos(hoja, filas)
 
         _crear_metadata(libro, paciente_id, sesion, rutas_icca)

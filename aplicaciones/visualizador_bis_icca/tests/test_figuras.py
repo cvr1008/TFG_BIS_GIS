@@ -3,10 +3,23 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from src.figuras import crear_figura_dsa_bilateral_interactiva
+from src.figuras import (
+    crear_figura_dsa_bilateral_interactiva,
+    crear_figura_dsa_unilateral_interactiva,
+)
 
 
 class HoverExactoTest(unittest.TestCase):
+    def _assert_cursor_vertical_compartido(self, figura, ejes_x):
+        self.assertEqual(figura.layout.hovermode, "x unified")
+        self.assertEqual(figura.layout.hoversubplots, "axis")
+        for nombre_eje in ejes_x:
+            eje = getattr(figura.layout, nombre_eje)
+            self.assertTrue(eje.showspikes)
+            self.assertEqual(eje.spikemode, "across")
+            self.assertEqual(eje.spikesnap, "cursor")
+            self.assertEqual(eje.spikedash, "dot")
+
     def test_no_sustituye_un_nan_por_el_valor_del_segundo_vecino(self):
         tiempo = pd.date_range("2026-05-14 13:30:12", periods=2, freq="s")
         frecuencias = np.arange(0.5, 30.5, 0.5)
@@ -70,15 +83,51 @@ class HoverExactoTest(unittest.TestCase):
         resumen = next(
             anotacion
             for anotacion in figura.layout.annotations
-            if "Densidad media izquierda" in anotacion.text
+            if "Ratio alfa-delta izquierdo" in anotacion.text
         )
+        titulos = [anotacion.text for anotacion in figura.layout.annotations]
+        self.assertIn("Asimetría bilateral (ASYM09)", titulos)
+        self.assertIn("Electromiograma frontal (EMGLOW01)", titulos)
         self.assertEqual(resumen.width, 235)
         self.assertEqual(resumen.borderpad, 14)
         self.assertEqual(resumen.x, 1.07)
+        self.assertIn("ADR\xa0alfa/delta", resumen.text)
+        self.assertNotIn("dB/Hz", resumen.text)
+        self.assertNotIn("Delta:", resumen.text)
+        self.assertNotIn("Theta:", resumen.text)
+        self.assertNotIn("Alpha:", resumen.text)
+        self.assertNotIn("Beta:", resumen.text)
         self.assertIn("Consolas", resumen.font.family)
         self.assertEqual(figura.layout.margin.l, 170)
         self.assertEqual(figura.layout.margin.r, 390)
         self.assertEqual(figura.layout.xaxis.rangeselector.to_plotly_json(), {})
+        self._assert_cursor_vertical_compartido(
+            figura,
+            ("xaxis", "xaxis2", "xaxis3", "xaxis4", "xaxis5"),
+        )
+
+    def test_cursor_vertical_unilateral_cubre_dsa_bis_y_emg(self):
+        tiempo = pd.date_range("2026-05-14 13:30:12", periods=3, freq="s")
+        frecuencias = np.arange(0.5, 30.5, 0.5)
+        matriz = np.full((3, len(frecuencias)), 70.0)
+
+        figura = crear_figura_dsa_unilateral_interactiva(
+            tiempo=tiempo,
+            frecuencias=frecuencias,
+            matriz=matriz,
+            sef=np.array([15.0, 15.2, 15.4]),
+            mef=np.array([4.5, 4.7, 4.9]),
+            bis=np.array([60.0, 61.0, 62.0]),
+            emg=np.array([30.0, 31.0, 32.0]),
+            sr=np.array([0.0, 0.0, 0.0]),
+        )
+
+        titulos = [anotacion.text for anotacion in figura.layout.annotations]
+        self.assertIn("Electromiograma frontal (EMGLOW01)", titulos)
+        self._assert_cursor_vertical_compartido(
+            figura,
+            ("xaxis", "xaxis2", "xaxis3"),
+        )
 
 
 

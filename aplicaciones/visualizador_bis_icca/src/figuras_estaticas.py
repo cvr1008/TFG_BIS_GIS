@@ -146,7 +146,7 @@ def _dibujar_emg(ax, tiempo, emg_izq, emg_der=None):
             linewidth=1.2,
             label="EMG derecha",
         )
-    ax.set_title("Electromiograma frontal EMGLOW01")
+    ax.set_title("Electromiograma frontal (EMGLOW01)")
     ax.set_ylabel("EMG (dB)")
     ax.set_ylim(20, 80)
     ax.set_yticks([20, 30, 40, 50, 60, 70, 80])
@@ -254,7 +254,7 @@ def crear_panoramica_estatica(registro):
                 linewidth=0.8,
                 alpha=0.7,
             )
-            ax_asym.set_title("Asimetría bilateral ASYM09")
+            ax_asym.set_title("Asimetría bilateral (ASYM09)")
             ax_asym.set_ylabel("ASYM09")
             ax_asym.grid(True, alpha=0.25)
             ax_asym.legend(loc="upper right")
@@ -300,7 +300,7 @@ def crear_panoramica_estatica(registro):
                     registro["matriz_izq"],
                     frecuencias,
                 ),
-                "Densidad media izquierda",
+                "Ratio alfa-delta izquierdo",
                 0.86,
                 0.78,
             )
@@ -310,7 +310,7 @@ def crear_panoramica_estatica(registro):
                     registro["matriz_der"],
                     frecuencias,
                 ),
-                "Densidad media derecha",
+                "Ratio alfa-delta derecho",
                 0.86,
                 0.43,
             )
@@ -368,7 +368,7 @@ def crear_panoramica_estatica(registro):
                     registro["matriz"],
                     frecuencias,
                 ),
-                "Densidad espectral media",
+                "Ratio alfa-delta",
                 0.86,
                 0.72,
             )

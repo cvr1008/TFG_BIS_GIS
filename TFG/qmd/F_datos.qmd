@@ -166,8 +166,7 @@ El archivo `.h_a` es una cabecera binaria de tamaño reducido que describe cómo
 
 : Campos extraídos de la cabecera `.h_a` mediante desplazamientos de byte fijos {#tbl-header-offsets-f}
 
-El número de canales también funciona como comprobación de consistencia. Un registro unilateral debe indicar dos canales y uno bilateral debe indicar cuatro. Si el valor no coincide con la extensión `.r2a` o `.r4a`, la
-aplicación detiene la reconstrucción para evitar interpretar incorrectamente los bytes.
+El número de canales también funciona como comprobación de consistencia. Un registro unilateral debe indicar dos canales y uno bilateral debe indicar cuatro. Si el valor no coincide con la extensión `.r2a` o `.r4a`, la aplicación detiene la reconstrucción para evitar interpretar incorrectamente los bytes.
 
 La cabecera puede contener además identificadores de versión del algoritmo y otros parámetros internos. Estos campos se conservan como metadatos, pero no son necesarios para la visualización desarrollada.
 

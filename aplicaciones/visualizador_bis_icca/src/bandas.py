@@ -124,47 +124,13 @@ def calcular_densidad_espectral_media_bandas(matriz_db, frecuencias):
 
 
 def lineas_densidad_bandas(resumen, bloques_minimos=4, bloques_maximos=12):
-    """Devuelve líneas breves listas para mostrarse en una figura."""
-    valores_finitos = np.asarray(
-        [
-            resumen["valores_db"][nombre]
-            for nombre, _inferior, _superior in BANDAS_EEG
-            if np.isfinite(resumen["valores_db"][nombre])
-        ],
-        dtype=float,
-    )
-    minimo = np.min(valores_finitos) if valores_finitos.size else np.nan
-    maximo = np.max(valores_finitos) if valores_finitos.size else np.nan
-    intervalo = maximo - minimo
-
-    lineas = []
-    for nombre, _inferior, _superior in BANDAS_EEG:
-        valor = resumen["valores_db"][nombre]
-        if not np.isfinite(valor):
-            lineas.append(f"{nombre}: sin datos")
-            continue
-        proporcion = (
-            (valor - minimo) / intervalo
-            if np.isfinite(intervalo) and intervalo > 0
-            else 1.0
-        )
-        longitud = int(
-            round(
-                bloques_minimos
-                + proporcion * (bloques_maximos - bloques_minimos)
-            )
-        )
-        barra = "■" * longitud
-        etiqueta = f"{nombre}:"
-        lineas.append(f"{etiqueta:<7}{valor:>5.1f} dB/Hz  {barra}")
+    """Devuelve solo el ratio alfa-delta para el recuadro de la figura."""
     ratio_alpha_delta = resumen.get("ratio_alpha_delta", np.nan)
-    lineas.append(
+    return [
         "ADR alfa/delta: "
         + (
             f"{ratio_alpha_delta:.3f}"
             if np.isfinite(ratio_alpha_delta)
             else "sin datos"
         )
-    )
-    lineas.append(f"Válidos: {resumen['segundos_validos']} s")
-    return lineas
+    ]

@@ -19,7 +19,7 @@ from src.pacientes import (
     obtener_fuentes_paciente,
     siguiente_paciente,
 )
-from src.intervalos import descubrir_icca_en_carpeta, descubrir_sesiones_bis_en_carpeta
+from src.intervalos import descubrir_sesiones_bis_en_carpeta
 
 
 # aplicación Dash del organizador
@@ -139,6 +139,8 @@ RUTA_PACIENTES_FIJA = _env_bool("TFG_RUTA_PACIENTES_FIJA")
 # decide dónde se abre la app
 HOST_DASH = os.environ.get("TFG_DASH_HOST", "127.0.0.1")
 PUERTO_ORGANIZADOR = _env_int("TFG_ORGANIZADOR_PORT", 8060)
+URL_PORTAL = os.environ.get("TFG_PORTAL_URL", "http://127.0.0.1:8040/")
+URL_VISUALIZADOR = os.environ.get("TFG_VISUALIZADOR_URL", "http://127.0.0.1:8050/")
 
 # colores para la interfaz
 AZUL = "#1f4e78"
@@ -170,9 +172,9 @@ def _ejecutar_dialogo(codigo, argumento=""):
     return json.loads(salida[-1]) if salida else None
 
 
-def _seleccionar_excel(ruta_inicial=""):
+def _seleccionar_icca(ruta_inicial=""):
     """
-    Abre una ventana para elegir Excel ICCA.
+    Abre una ventana nativa para elegir un unico Excel ICCA.
     """
     codigo = r'''
 import json
@@ -184,17 +186,20 @@ from tkinter import filedialog
 inicial = Path(sys.argv[1]).expanduser() if sys.argv[1] else Path.home()
 if inicial.is_file():
     inicial = inicial.parent
+if not inicial.is_dir():
+    inicial = Path.home()
+
 root = tk.Tk()
 root.withdraw()
 root.attributes("-topmost", True)
-rutas = filedialog.askopenfilenames(
+ruta = filedialog.askopenfilename(
     parent=root,
-    title="Selecciona uno o varios Excel ICCA",
+    title="Selecciona un Excel ICCA",
     initialdir=str(inicial),
-    filetypes=[("Excel", "*.xlsx *.xlsm"), ("Todos", "*.*")],
+    filetypes=[("Excel ICCA", "*.xlsx *.xlsm"), ("Todos", "*.*")],
 )
 root.destroy()
-print(json.dumps(list(rutas), ensure_ascii=False))
+print(json.dumps([ruta] if ruta else [], ensure_ascii=False))
 '''
     return _ejecutar_dialogo(codigo, ruta_inicial) or []
 
@@ -233,6 +238,34 @@ def _opciones(rutas):
     return [
         {"label": f"{Path(ruta).name}  |  {ruta}", "value": ruta}
         for ruta in rutas
+    ]
+
+
+def _id_disparado():
+    identificador = ctx.triggered_id
+    if isinstance(identificador, dict):
+        return identificador
+    if isinstance(identificador, str) and identificador.startswith("{"):
+        try:
+            return json.loads(identificador)
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+def _normalizar_ruta_para_comparar(ruta):
+    try:
+        return str(Path(ruta).expanduser().resolve()).casefold()
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return str(ruta).replace("\\", "/").casefold()
+
+
+def _quitar_ruta(rutas, objetivo):
+    objetivo_normalizado = _normalizar_ruta_para_comparar(objetivo)
+    return [
+        ruta
+        for ruta in (rutas or [])
+        if _normalizar_ruta_para_comparar(ruta) != objetivo_normalizado
     ]
 
 
@@ -461,15 +494,8 @@ def _panel_nuevo_paciente():
                 "disponibles. También puedes crear un paciente solo con sesiones BIS."
             ),
 
-            # Botón de Añadir Excel ICCA
+            # Añadir un Excel ICCA cada vez.
             html.Button("Añadir Excel ICCA", id="anadir-icca", className="boton-secundario"),
-            # Botón de Añadir carpeta ICCA
-            html.Button(
-                "Anadir carpeta ICCA",
-                id="anadir-carpeta-icca",
-                className="boton-secundario",
-                style={"marginLeft": "8px"},
-            ),
             dcc.Dropdown(
                 id="lista-icca",
                 multi=True,
@@ -478,18 +504,11 @@ def _panel_nuevo_paciente():
             ),
             html.Div(id="selecciones-icca", className="lista-selecciones"),
             html.P(
-                "Selecciona una carpeta por cada sesión BIS.",
+                "Selecciona una carpeta BIS o una carpeta madre con varias sesiones BIS.",
                 style={"marginTop": "20px"},
             ),
-            # Añadir carpeta BIS
-            html.Button("Añadir carpeta BIS", id="anadir-bis", className="boton-secundario"),
-            # Añadir carpeta madre BIS
-            html.Button(
-                "Anadir carpeta madre BIS",
-                id="anadir-carpeta-madre-bis",
-                className="boton-secundario",
-                style={"marginLeft": "8px"},
-            ),
+            # Un solo botón: sirve para una sesión BIS o para una carpeta madre BIS.
+            html.Button("Añadir BIS", id="anadir-bis", className="boton-secundario"),
             dcc.Dropdown(
                 id="lista-bis",
                 multi=True,
@@ -552,12 +571,6 @@ def _panel_pacientes():
                                 id="editar-anadir-icca",
                                 className="boton-secundario",
                             ),
-                            html.Button(
-                                "Anadir carpeta ICCA",
-                                id="editar-anadir-carpeta-icca",
-                                className="boton-secundario",
-                                style={"marginLeft": "8px"},
-                            ),
                             dcc.Dropdown(
                                 id="editar-lista-icca",
                                 multi=True,
@@ -571,15 +584,9 @@ def _panel_pacientes():
                             
                             # añadir/quitar BIS
                             html.Button(
-                                "Añadir carpeta BIS",
+                                "Añadir BIS",
                                 id="editar-anadir-bis",
                                 className="boton-secundario",
-                            ),
-                            html.Button(
-                                "Anadir carpeta madre BIS",
-                                id="editar-anadir-carpeta-madre-bis",
-                                className="boton-secundario",
-                                style={"marginLeft": "8px"},
                             ),
                             dcc.Dropdown(
                                 id="editar-lista-bis",
@@ -654,11 +661,26 @@ app.layout = html.Div(
         html.Div(
             # configuración de la cabecera
             [
-                html.H1("Organizador de pacientes BIS-ICCA", style={"margin": 0}),
-                html.P(
-                    "Agrupa sesiones BIS por paciente y, cuando existe ICCA "
-                    "coincidente, genera un Excel auxiliar por sesión.",
-                    style={"marginBottom": 0},
+                html.Div(
+                    [
+                        html.H1("Organizador de pacientes BIS-ICCA", style={"margin": 0}),
+                        html.P(
+                            "Agrupa sesiones BIS por paciente y, cuando existe ICCA "
+                            "coincidente, genera un Excel auxiliar por sesión.",
+                            style={"marginBottom": 0},
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        html.A("Menú principal", href=URL_PORTAL, className="boton-nav"),
+                        html.A(
+                            "Ir al visualizador",
+                            href=URL_VISUALIZADOR,
+                            className="boton-nav boton-nav-claro",
+                        ),
+                    ],
+                    className="navegacion-apps",
                 ),
             ],
             className="cabecera",
@@ -734,7 +756,10 @@ app.index_string = f"""
     {{%css%}}
     <style>
       body {{ margin: 0; background: {FONDO}; }}
-      .cabecera {{ background: {AZUL}; color: white; padding: 24px 30px; }}
+      .cabecera {{ background: {AZUL}; color: white; padding: 24px 30px; display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap; }}
+      .navegacion-apps {{ display: flex; gap: 10px; flex-wrap: wrap; }}
+      .boton-nav {{ display: inline-block; color: white; border: 1px solid rgba(255,255,255,.72); border-radius: 6px; padding: 9px 13px; text-decoration: none; font-weight: 700; }}
+      .boton-nav-claro {{ background: white; color: {AZUL}; }}
       .contenedor {{ max-width: 1250px; margin: 0 auto; padding: 24px; }}
       .panel {{ background: white; border: 1px solid {BORDE}; border-radius: 10px; padding: 22px; margin: 18px 0; }}
       .fila {{ display: flex; gap: 10px; }}
@@ -795,22 +820,14 @@ def examinar_directorio(_n_clicks, actual):
     Output("lista-icca", "options"),
     Output("lista-icca", "value"),
     Input("anadir-icca", "n_clicks"),
-    Input("anadir-carpeta-icca", "n_clicks"),
     State("lista-icca", "value"),
     prevent_initial_call=True,
 )
 # Se ejecuta cuando pulsas: Añadir Excel ICCA
-def anadir_excel_icca(_n_clicks, _n_clicks_carpeta, valores_actuales):
+def anadir_excel_icca(_n_clicks, valores_actuales):
     existentes = list(valores_actuales or [])
     try:
-        if ctx.triggered_id == "anadir-carpeta-icca":
-            carpeta = _seleccionar_carpeta(
-                "Selecciona una carpeta con Excel ICCA",
-                existentes[-1] if existentes else "",
-            )
-            nuevos = descubrir_icca_en_carpeta(carpeta) if carpeta else []
-        else:
-            nuevos = _seleccionar_excel(existentes[-1] if existentes else "")
+        nuevos = _seleccionar_icca(existentes[-1] if existentes else "")
     except Exception:
         return no_update, no_update
     rutas = list(dict.fromkeys(existentes + nuevos))
@@ -835,9 +852,10 @@ def mostrar_selecciones_icca(rutas):
     prevent_initial_call=True,
 )
 def quitar_excel_icca(n_clicks, rutas):
-    if not any(n_clicks or []) or not isinstance(ctx.triggered_id, dict):
+    identificador = _id_disparado()
+    if not any(n_clicks or []) or not identificador:
         raise PreventUpdate
-    restantes = [ruta for ruta in (rutas or []) if ruta != ctx.triggered_id["index"]]
+    restantes = _quitar_ruta(rutas, identificador["index"])
     return _opciones(restantes), restantes
 
 
@@ -845,19 +863,18 @@ def quitar_excel_icca(n_clicks, rutas):
     Output("lista-bis", "options"),
     Output("lista-bis", "value"),
     Input("anadir-bis", "n_clicks"),
-    Input("anadir-carpeta-madre-bis", "n_clicks"),
     State("lista-bis", "value"),
     prevent_initial_call=True,
 )
-def anadir_carpeta_bis(_n_clicks, _n_clicks_carpeta, valores_actuales):
+def anadir_carpeta_bis(_n_clicks, valores_actuales):
     existentes = list(valores_actuales or [])
     inicial = str(Path(existentes[-1]).parent) if existentes else ""
     try:
-        nueva = _seleccionar_carpeta("Selecciona una carpeta con una sesión BIS", inicial)
-        if ctx.triggered_id == "anadir-carpeta-madre-bis":
-            nuevas = descubrir_sesiones_bis_en_carpeta(nueva) if nueva else []
-        else:
-            nuevas = [nueva] if nueva else []
+        nueva = _seleccionar_carpeta(
+            "Selecciona una carpeta BIS o una carpeta madre BIS",
+            inicial,
+        )
+        nuevas = descubrir_sesiones_bis_en_carpeta(nueva) if nueva else []
     except Exception:
         return no_update, no_update
     rutas = list(dict.fromkeys(existentes + nuevas))
@@ -882,9 +899,10 @@ def mostrar_selecciones_bis(rutas):
     prevent_initial_call=True,
 )
 def quitar_carpeta_bis(n_clicks, rutas):
-    if not any(n_clicks or []) or not isinstance(ctx.triggered_id, dict):
+    identificador = _id_disparado()
+    if not any(n_clicks or []) or not identificador:
         raise PreventUpdate
-    restantes = [ruta for ruta in (rutas or []) if ruta != ctx.triggered_id["index"]]
+    restantes = _quitar_ruta(rutas, identificador["index"])
     return _opciones(restantes), restantes
 
 
@@ -975,6 +993,39 @@ def limpiar_estado_creacion(_n_intervals):
 
 
 @callback(
+    Output("lista-icca", "options", allow_duplicate=True),
+    Output("lista-icca", "value", allow_duplicate=True),
+    Output("lista-bis", "options", allow_duplicate=True),
+    Output("lista-bis", "value", allow_duplicate=True),
+    Output("resultado-analisis", "children", allow_duplicate=True),
+    Output("crear-paciente", "disabled", allow_duplicate=True),
+    Input("actualizacion-creacion", "data"),
+    Input("actualizacion-gestion", "data"),
+    prevent_initial_call=True,
+)
+def limpiar_formulario_nuevo_tras_guardar(_creacion, _gestion):
+    return (
+        [],
+        [],
+        [],
+        [],
+        html.Div("Pulsa «Analizar intervalos» después de completar la selección."),
+        True,
+    )
+
+
+def _valor_selector_paciente(opciones, seleccionado, disparador):
+    valores = {opcion["value"] for opcion in opciones}
+    if disparador == "actualizacion-gestion":
+        return None
+    if seleccionado in valores:
+        return seleccionado
+    if disparador == "actualizacion-creacion" and opciones:
+        return opciones[-1]["value"]
+    return None
+
+
+@callback(
     Output("selector-paciente", "options"),
     Output("selector-paciente", "value"),
     Input("directorio-pacientes", "value"),
@@ -994,8 +1045,11 @@ def actualizar_lista_pacientes(directorio, _creacion, _gestion, seleccionado):
         }
         for paciente in pacientes
     ]
-    valores = {opcion["value"] for opcion in opciones}
-    valor = seleccionado if seleccionado in valores else (opciones[-1]["value"] if opciones else None)
+    try:
+        disparador = ctx.triggered_id
+    except Exception:
+        disparador = None
+    valor = _valor_selector_paciente(opciones, seleccionado, disparador)
     return opciones, valor
 
 
@@ -1026,7 +1080,6 @@ def visualizar_paciente(paciente_id, directorio, _creacion, _gestion):
     Input("actualizacion-creacion", "data"),
     Input("actualizacion-gestion", "data"),
     Input("editar-anadir-icca", "n_clicks"),
-    Input("editar-anadir-carpeta-icca", "n_clicks"),
     Input({"type": "editar-quitar-icca", "index": ALL}, "n_clicks"),
     State("directorio-pacientes", "value"),
     State("editar-lista-icca", "value"),
@@ -1036,30 +1089,23 @@ def cargar_o_anadir_icca(
     _creacion,
     _gestion,
     _n_clicks,
-    _n_clicks_carpeta,
     quitar_clicks,
     directorio,
     actuales,
 ):
-    if ctx.triggered_id in {"editar-anadir-icca", "editar-anadir-carpeta-icca"}:
+    if ctx.triggered_id == "editar-anadir-icca":
         existentes = list(actuales or [])
         try:
-            if ctx.triggered_id == "editar-anadir-carpeta-icca":
-                carpeta = _seleccionar_carpeta(
-                    "Selecciona una carpeta con Excel ICCA",
-                    existentes[-1] if existentes else "",
-                )
-                nuevos = descubrir_icca_en_carpeta(carpeta) if carpeta else []
-            else:
-                nuevos = _seleccionar_excel(existentes[-1] if existentes else "")
+            nuevos = _seleccionar_icca(existentes[-1] if existentes else "")
         except Exception:
             return no_update, no_update
         rutas = list(dict.fromkeys(existentes + nuevos))
         return _opciones(rutas), rutas
-    if isinstance(ctx.triggered_id, dict):
+    identificador = _id_disparado()
+    if identificador:
         if not any(quitar_clicks or []):
             raise PreventUpdate
-        rutas = [ruta for ruta in (actuales or []) if ruta != ctx.triggered_id["index"]]
+        rutas = _quitar_ruta(actuales, identificador["index"])
         return _opciones(rutas), rutas
     paciente = _buscar_paciente(directorio, paciente_id) if paciente_id else None
     rutas = obtener_fuentes_paciente(paciente)["icca"] if paciente else []
@@ -1086,7 +1132,6 @@ def mostrar_edicion_icca(rutas):
     Input("actualizacion-creacion", "data"),
     Input("actualizacion-gestion", "data"),
     Input("editar-anadir-bis", "n_clicks"),
-    Input("editar-anadir-carpeta-madre-bis", "n_clicks"),
     Input({"type": "editar-quitar-bis", "index": ALL}, "n_clicks"),
     State("directorio-pacientes", "value"),
     State("editar-lista-bis", "value"),
@@ -1096,28 +1141,28 @@ def cargar_o_anadir_bis(
     _creacion,
     _gestion,
     _n_clicks,
-    _n_clicks_carpeta,
     quitar_clicks,
     directorio,
     actuales,
 ):
-    if ctx.triggered_id in {"editar-anadir-bis", "editar-anadir-carpeta-madre-bis"}:
+    if ctx.triggered_id == "editar-anadir-bis":
         existentes = list(actuales or [])
         inicial = str(Path(existentes[-1]).parent) if existentes else ""
         try:
-            nueva = _seleccionar_carpeta("Selecciona una carpeta con una sesión BIS", inicial)
-            if ctx.triggered_id == "editar-anadir-carpeta-madre-bis":
-                nuevas = descubrir_sesiones_bis_en_carpeta(nueva) if nueva else []
-            else:
-                nuevas = [nueva] if nueva else []
+            nueva = _seleccionar_carpeta(
+                "Selecciona una carpeta BIS o una carpeta madre BIS",
+                inicial,
+            )
+            nuevas = descubrir_sesiones_bis_en_carpeta(nueva) if nueva else []
         except Exception:
             return no_update, no_update
         rutas = list(dict.fromkeys(existentes + nuevas))
         return _opciones(rutas), rutas
-    if isinstance(ctx.triggered_id, dict):
+    identificador = _id_disparado()
+    if identificador:
         if not any(quitar_clicks or []):
             raise PreventUpdate
-        rutas = [ruta for ruta in (actuales or []) if ruta != ctx.triggered_id["index"]]
+        rutas = _quitar_ruta(actuales, identificador["index"])
         return _opciones(rutas), rutas
     paciente = _buscar_paciente(directorio, paciente_id) if paciente_id else None
     rutas = obtener_fuentes_paciente(paciente)["bis"] if paciente else []

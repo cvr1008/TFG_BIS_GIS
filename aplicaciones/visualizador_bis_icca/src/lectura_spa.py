@@ -328,7 +328,6 @@ def preparar_dsa_unilateral_con_spa(
     dsa,
     df_spa,
     umbral_sqi=15,
-    umbral_ceros=0.9,
     mask_comun=None,
     timeline_comun=None,
 ):
@@ -366,14 +365,12 @@ def preparar_dsa_unilateral_con_spa(
     totpow = pd.to_numeric(df_merge["TOTPOW08"], errors="coerce")
 
     mask_spa = (sqi < umbral_sqi) | totpow.isna()
-    mask_ceros = (dsa_plot == 0).mean(axis=1) > umbral_ceros
     mask_saltos = tiempo.diff().dt.total_seconds().gt(1).fillna(False)
     mask_nan = dsa_plot.isna().all(axis=1)
 
     if mask_comun is None:
         mask_total = (
             mask_spa.reset_index(drop=True)
-            | mask_ceros.reset_index(drop=True)
             | mask_saltos.reset_index(drop=True)
             | mask_nan.reset_index(drop=True)
         )
@@ -419,7 +416,6 @@ def _preparar_lado_bilateral(
     df_merge,
     sufijo,
     umbral_sqi,
-    umbral_ceros,
     mask_comun=None,
 ):
     dsa_plot = dsa.copy().astype(float).reset_index(drop=True)
@@ -427,14 +423,12 @@ def _preparar_lado_bilateral(
     totpow = pd.to_numeric(df_merge[f"TOTPOW08_{sufijo}"], errors="coerce")
 
     mask_spa = (sqi < umbral_sqi) | totpow.isna()
-    mask_ceros = (dsa_plot == 0).mean(axis=1) > umbral_ceros
     mask_saltos = tiempo.diff().dt.total_seconds().gt(1).fillna(False)
     mask_nan = dsa_plot.isna().all(axis=1)
 
     if mask_comun is None:
         mask_total = (
             mask_spa.reset_index(drop=True)
-            | mask_ceros.reset_index(drop=True)
             | mask_saltos.reset_index(drop=True)
             | mask_nan.reset_index(drop=True)
         )
@@ -477,7 +471,6 @@ def preparar_dsa_bilateral_con_spa(
     dsa_der,
     df_spa,
     umbral_sqi=15,
-    umbral_ceros=0.9,
     mask_izq_comun=None,
     mask_der_comun=None,
     timeline_comun=None,
@@ -540,7 +533,6 @@ def preparar_dsa_bilateral_con_spa(
         df_merge,
         "izq",
         umbral_sqi,
-        umbral_ceros,
         mask_comun=mask_izq_comun,
     )
     dsa_plot_der, curvas_der, mask_der = _preparar_lado_bilateral(
@@ -549,7 +541,6 @@ def preparar_dsa_bilateral_con_spa(
         df_merge,
         "der",
         umbral_sqi,
-        umbral_ceros,
         mask_comun=mask_der_comun,
     )
 

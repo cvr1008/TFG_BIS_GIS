@@ -11,6 +11,7 @@ from src.intervalos import analizar_seleccion
 
 
 PATRON_PACIENTE = re.compile(r"^PACIENTE_(\d{3,})$")
+SOLAPE_BIS_MAXIMO_TOLERADO_SEGUNDOS = 30
 
 
 def _nombre_seguro(texto):
@@ -175,7 +176,8 @@ def _validar_bis_no_solapados(analisis):
             continue
         inicio_actual = datetime.fromisoformat(sesion["inicio"])
         fin_anterior = datetime.fromisoformat(anterior["fin"])
-        if inicio_actual <= fin_anterior:
+        segundos_solapados = (fin_anterior - inicio_actual).total_seconds()
+        if segundos_solapados >= SOLAPE_BIS_MAXIMO_TOLERADO_SEGUNDOS:
             raise ValueError(
                 "No se pueden asignar dos sesiones BIS solapadas al mismo "
                 "paciente: "

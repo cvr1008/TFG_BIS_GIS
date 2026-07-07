@@ -77,48 +77,53 @@ def _tarjeta(titulo, descripcion, enlace):
 app.layout = html.Main(
     # contenedor principal de la página. Toda la pantalla del portal va aquí.
     [
-        # bloque central del portal-> panel donde están: el título, los botones y la ruta.
+        html.Header(
+            html.Div(
+                [
+                    html.H1("Portal de pacientes BIS-ICCA"),
+                    html.P("Acceso principal a organización y visualización."),
+                ],
+                className="cabecera-contenido",
+            ),
+            className="cabecera-aplicacion",
+        ),
+        # bloque central del portal-> panel donde están los botones y la ruta.
         html.Section(
             [
-                # cabecera
                 html.Div(
                     [
-                        # html.P: párrafo pequeño
-                        html.P("Sistema BIS-ICCA", className="marca"),
-                        # html.H1: título grande.
-                        html.H1("Portal de pacientes"),
+                        html.H2("Ubicación de pacientes"),
+                        html.Div(
+                            [
+                                html.Strong("Ruta configurada"),
+                                html.Code(PACIENTES_DIR),
+                            ],
+                            className="ruta-configurada",
+                        ),
                     ],
-                    className="cabecera-texto",
+                    className="ubicacion-pacientes",
                 ),
                 # crear las dos tarjetas grandes
                 html.Div(
                     [
                         # botón que lleva al organizador
                         _tarjeta(
-                            "Anadir / gestionar pacientes",
+                            "Añadir / gestionar pacientes",
                             "Crear pacientes y asociar sesiones BIS con registros ICCA.",
                             ORGANIZADOR_URL,
                         ),
                         # botón que lleva al visualizador
                         _tarjeta(
                             "Visualizar paciente",
-                            "Consultar sesiones, DSA, reconstruccion e informacion ICCA.",
+                            "Consultar sesiones, DSA, reconstrucción e información ICCA.",
                             VISUALIZADOR_URL,
                         ),
                     ],
                     className="acciones",
                 ),
-                # 
-                html.Div(
-                    [
-                        html.Strong("Repositorio comun"),
-                        html.Code(PACIENTES_DIR),
-                    ],
-                    className="repositorio",
-                ),
             ],
             className="panel",
-        )
+        ),
     ],
     # pone una clase CSS al contenedor principal para poder darle estilo: centrarlo, poner fondo, márgenes, etc.
     className="pantalla",
@@ -144,18 +149,27 @@ app.index_string = """
       }
       * { box-sizing: border-box; }
       body { margin: 0; background: var(--fondo); color: var(--texto); font-family: Arial, sans-serif; }
-      .pantalla { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-      .panel { width: min(980px, 100%); display: grid; gap: 24px; }
-      .cabecera-texto { display: grid; gap: 6px; }
-      .marca { margin: 0; color: var(--azul); font-weight: 700; text-transform: uppercase; font-size: .82rem; }
-      h1 { margin: 0; color: var(--azul-oscuro); font-size: 2rem; }
-      .acciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
-      .tarjeta-accion { display: grid; gap: 8px; min-height: 132px; padding: 22px; border: 1px solid var(--borde); border-radius: 8px; background: white; color: inherit; text-decoration: none; }
+      .pantalla { min-height: 100vh; background: var(--fondo); }
+      .cabecera-aplicacion { background: var(--azul); color: white; padding: 24px 30px; }
+      .cabecera-contenido { width: min(1250px, 100%); margin: 0 auto; }
+      .cabecera-contenido h1 { margin: 0; font-size: clamp(1.8rem, 2.6vw, 2.25rem); }
+      .cabecera-contenido p { margin: 12px 0 0; font-weight: 700; }
+      .panel { width: min(1250px, 100%); margin: 0 auto; padding: 24px; display: grid; gap: 18px; }
+      .ubicacion-pacientes { display: grid; gap: 16px; background: white; border: 1px solid var(--borde); border-radius: 10px; padding: 22px; }
+      .ubicacion-pacientes h2 { margin: 0; font-size: 1.35rem; color: black; }
+      .ruta-configurada { display: grid; gap: 6px; background: #f7f9fb; border: 1px solid var(--borde); border-radius: 8px; padding: 12px; }
+      .ruta-configurada code { overflow-wrap: anywhere; color: #173b59; font-size: .85rem; line-height: 1.35; }
+      .acciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+      .tarjeta-accion { display: grid; align-content: center; gap: 10px; min-height: 150px; padding: 24px; border: 1px solid var(--borde); border-radius: 8px; background: white; color: inherit; text-decoration: none; }
       .tarjeta-accion:hover { border-color: var(--azul); box-shadow: 0 8px 22px rgba(31, 78, 120, .12); }
-      .tarjeta-accion strong { color: var(--azul-oscuro); font-size: 1.08rem; }
+      .tarjeta-accion strong { color: var(--azul-oscuro); font-size: 1.16rem; }
       .tarjeta-accion span { color: #536170; line-height: 1.45; }
-      .repositorio { display: grid; gap: 7px; padding: 14px 16px; border: 1px solid var(--borde); border-radius: 8px; background: white; }
-      .repositorio code { overflow-wrap: anywhere; color: var(--azul-oscuro); }
+      @media (max-width: 760px) {
+        .cabecera-aplicacion { padding: 22px 18px; }
+        .panel { padding: 18px; }
+        .acciones { grid-template-columns: 1fr; }
+        .tarjeta-accion { min-height: 136px; }
+      }
     </style>
   </head>
   <body>

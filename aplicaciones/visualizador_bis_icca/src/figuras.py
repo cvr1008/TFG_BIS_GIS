@@ -145,6 +145,21 @@ def _añadir_hover_exacto(
     )
 
 
+def _aplicar_cursor_vertical_compartido(fig, filas):
+    """Muestra la guia vertical de hover en todas las filas sincronizadas."""
+    for fila in filas:
+        fig.update_xaxes(
+            showspikes=True,
+            spikemode="across",
+            spikesnap="cursor",
+            spikecolor="rgba(32, 56, 79, 0.65)",
+            spikethickness=1,
+            spikedash="dot",
+            row=fila,
+            col=1,
+        )
+
+
 def crear_figura_dsa(tiempo, frecuencias, dsa, titulo="DSA"):
     """Crea una figura DSA horizontal básica."""
     return crear_figura_dsa_plotly(
@@ -275,7 +290,7 @@ def crear_figura_dsa_unilateral_interactiva(
         subplot_titles=(
             titulo or "DSA unilateral",
             "Índice BIS DB13U01",
-            "Electromiograma frontal EMGLOW01",
+            "Electromiograma frontal (EMGLOW01)",
         ),
     )
     fig.add_trace(
@@ -412,7 +427,7 @@ def crear_figura_dsa_unilateral_interactiva(
     _añadir_resumen_bandas(
         fig,
         resumen_bandas,
-        "Densidad espectral media",
+        "Ratio alfa-delta",
         x=1.07,
         y=0.86,
     )
@@ -463,6 +478,7 @@ def crear_figura_dsa_unilateral_interactiva(
         margin={"l": 170, "r": 390, "t": 160, "b": 80},
         plot_bgcolor="white",
         hovermode="x unified",
+        hoversubplots="axis",
         title_x=0.5,
         title_y=0.98,
         legend={
@@ -488,25 +504,16 @@ def crear_figura_dsa_unilateral_interactiva(
         )
 
     fig.update_xaxes(
-        showspikes=True,
-        spikemode="across",
-        spikesnap="cursor",
-        row=1,
-        col=1,
-    )
-    fig.update_xaxes(
         title_text="Tiempo",
         rangeslider={
             "visible": mostrar_controles_tiempo,
             "thickness": 0.09,
             "range": [tiempo_inicio, tiempo_fin],
         },
-        showspikes=True,
-        spikemode="across",
-        spikesnap="cursor",
         row=3,
         col=1,
     )
+    _aplicar_cursor_vertical_compartido(fig, [1, 2, 3])
     fig.update_yaxes(
         title_text="Frecuencia (Hz)",
         title_standoff=105,
@@ -677,9 +684,9 @@ def crear_figura_dsa_bilateral_interactiva(
         vertical_spacing=0.045,
         subplot_titles=(
             "Hemisferio izquierdo",
-            "Asimetría bilateral ASYM09",
+            "Asimetría bilateral (ASYM09)",
             "Índice BIS",
-            "Electromiograma frontal EMGLOW01",
+            "Electromiograma frontal (EMGLOW01)",
             "Hemisferio derecho",
         ),
     )
@@ -1008,14 +1015,14 @@ def crear_figura_dsa_bilateral_interactiva(
     _añadir_resumen_bandas(
         fig,
         resumen_bandas_izq,
-        "Densidad media izquierda",
+        "Ratio alfa-delta izquierdo",
         x=1.07,
         y=0.93,
     )
     _añadir_resumen_bandas(
         fig,
         resumen_bandas_der,
-        "Densidad media derecha",
+        "Ratio alfa-delta derecho",
         x=1.07,
         y=0.34,
     )
@@ -1095,12 +1102,10 @@ def crear_figura_dsa_bilateral_interactiva(
             "thickness": 0.06,
             "range": [tiempo_inicio, tiempo_fin],
         },
-        showspikes=True,
-        spikemode="across",
-        spikesnap="cursor",
         row=5,
         col=1,
     )
+    _aplicar_cursor_vertical_compartido(fig, [1, 2, 3, 4, 5])
 
     if modo_panoramico:
         fig.update_traces(hoverinfo="skip", hovertemplate=None)

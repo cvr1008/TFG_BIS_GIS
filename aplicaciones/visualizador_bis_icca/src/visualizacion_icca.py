@@ -1,7 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 
 import pandas as pd
@@ -11,8 +10,8 @@ from plotly.subplots import make_subplots
 
 
 AVISO_SINTESIS = (
-    "Constantes vitales simuladas a partir de mediciones intermitentes. "
-    "No aptas para validación clínica ni correlaciones reales con BIS."
+    "Solo se muestran mediciones registradas. Los tramos indican el último "
+    "valor disponible hasta la siguiente medición."
 )
 
 NOMBRES_VARIABLES = {
@@ -37,100 +36,27 @@ RANGOS_REFERENCIA = {
     "glucemia_capilar": (70.0, 100.0),
 }
 
+CONFIGURACION_GRAFICO_ICCA = {"displaylogo": False, "scrollZoom": False}
 
-def _inicio_dia_clinico(instante):
-    inicio = pd.Timestamp(instante).replace(hour=8, minute=0, second=0, microsecond=0)
-    if pd.Timestamp(instante) < inicio:
-        inicio -= pd.Timedelta(days=1)
-    return inicio
-
-
-def _integrar_acumulado_hasta(inicio, fin, velocidad_ml_h, acumulado, dia_clinico):
-    velocidad = float(velocidad_ml_h or 0.0)
-    actual = pd.Timestamp(inicio)
-    fin = pd.Timestamp(fin)
-    while actual < fin:
-        siguiente_reset = dia_clinico + pd.Timedelta(days=1)
-        tramo_fin = min(fin, siguiente_reset)
-        acumulado += velocidad * max(0.0, (tramo_fin - actual).total_seconds()) / 3600.0
-        actual = tramo_fin
-        if actual == siguiente_reset and actual < fin:
-            dia_clinico = siguiente_reset
-            acumulado = 0.0
-    return acumulado, dia_clinico
+COLORES_PERFUSIONES = [
+    "#636EFA",
+    "#EF553B",
+    "#00CC96",
+    "#AB63FA",
+    "#FFA15A",
+    "#19D3F3",
+    "#FF6692",
+    "#B6E880",
+]
 
 
-def _calcular_acumulado_perfusiones(perfusiones):
-    if perfusiones is None or perfusiones.empty:
-        return perfusiones
-    trabajo = perfusiones.copy()
-    if "volumen_acumulado_calculado_ml" in trabajo.columns and trabajo[
-        "volumen_acumulado_calculado_ml"
-    ].notna().any():
-        return trabajo
-
-    for columna in [
-        "volumen_acumulado_calculado_ml",
-        "dia_clinico_inicio",
-        "acumulado_calculado_origen",
-        "velocidad_bomba_ml_h",
-        "volumen_acumulado_24h_ml",
-    ]:
-        if columna not in trabajo.columns:
-            trabajo[columna] = pd.NA
-
-    trabajo["timestamp"] = pd.to_datetime(trabajo["timestamp"], errors="coerce")
-    trabajo["velocidad_bomba_ml_h"] = pd.to_numeric(
-        trabajo["velocidad_bomba_ml_h"], errors="coerce"
-    )
-    trabajo["volumen_acumulado_24h_ml"] = pd.to_numeric(
-        trabajo["volumen_acumulado_24h_ml"], errors="coerce"
-    )
-
-    for _, grupo in trabajo.dropna(subset=["timestamp", "farmaco"]).groupby(
-        "farmaco",
-        sort=True,
-    ):
-        grupo = grupo.sort_values("timestamp", kind="stable")
-        acumulado = 0.0
-        dia_clinico = None
-        instante_previo = None
-        velocidad_previa = 0.0
-        for indice, fila in grupo.iterrows():
-            instante = pd.Timestamp(fila["timestamp"])
-            dia_actual = _inicio_dia_clinico(instante)
-            if dia_clinico is None:
-                acumulado = 0.0
-                dia_clinico = dia_actual
-                instante_previo = dia_actual
-                velocidad_previa = 0.0
-            if instante_previo is not None and instante > instante_previo:
-                acumulado, dia_clinico = _integrar_acumulado_hasta(
-                    instante_previo,
-                    instante,
-                    velocidad_previa,
-                    acumulado,
-                    dia_clinico,
-                )
-
-            acumulado_real = fila.get("volumen_acumulado_24h_ml")
-            if pd.notna(acumulado_real):
-                acumulado = float(acumulado_real)
-                origen = "ICCA acumulado 24h"
-            elif velocidad_previa:
-                origen = "integrado desde mL/h"
-            else:
-                origen = "sin volumen previo; acumulado calculado desde 0"
-
-            trabajo.loc[indice, "volumen_acumulado_calculado_ml"] = round(acumulado, 4)
-            trabajo.loc[indice, "dia_clinico_inicio"] = dia_clinico
-            trabajo.loc[indice, "acumulado_calculado_origen"] = origen
-
-            velocidad_actual = fila.get("velocidad_bomba_ml_h")
-            if pd.notna(velocidad_actual):
-                velocidad_previa = float(velocidad_actual)
-            instante_previo = instante
-    return trabajo
+def _extraer_peso_kg(general):
+    if general is None or general.empty or "peso_kg" not in general:
+        return None
+    valores = pd.to_numeric(general["peso_kg"], errors="coerce").dropna()
+    if valores.empty or float(valores.iloc[0]) <= 0:
+        return None
+    return float(valores.iloc[0])
 
 
 def _normalizar_variable(valor):
@@ -179,6 +105,15 @@ def cargar_datos_icca(ruta_sintetico, ruta_original):
             auditoria_gasometrias = pd.DataFrame()
     constantes["timestamp"] = pd.to_datetime(constantes["timestamp"], errors="coerce")
     try:
+        general = pd.read_excel(
+            original,
+            sheet_name="general",
+            header=2,
+            engine="openpyxl",
+        )
+    except (ValueError, KeyError):
+        general = pd.DataFrame()
+    try:
         analisis = pd.read_excel(
             original,
             sheet_name="analisis",
@@ -222,6 +157,8 @@ def cargar_datos_icca(ruta_sintetico, ruta_original):
     return {
         "constantes": constantes,
         "series": series,
+        "general": general,
+        "peso_kg": _extraer_peso_kg(general),
         "analisis": analisis,
         "perfusiones": perfusiones,
         "ruta_sintetico": str(sintetico),
@@ -244,14 +181,92 @@ def _agrupar_series(metadata):
     return grupos
 
 
+def _mediciones_reales_constante(constantes, clave, columna_valor):
+    if columna_valor not in constantes.columns or "timestamp" not in constantes.columns:
+        return pd.DataFrame(columns=["timestamp", columna_valor])
+
+    validos = constantes[columna_valor].notna()
+    if "series_reales" in constantes.columns:
+        reales = (
+            constantes["series_reales"]
+            .fillna("")
+            .astype(str)
+            .str.split(";")
+            .map(lambda series: clave in series)
+        )
+        validos = validos & reales
+
+    return (
+        constantes.loc[validos, ["timestamp", columna_valor]]
+        .dropna(subset=["timestamp", columna_valor])
+        .sort_values("timestamp", kind="stable")
+        .drop_duplicates(subset=["timestamp"], keep="last")
+    )
+
+
+def _tramo_documentado(mediciones, columna_valor, inicio, fin):
+    mediciones = mediciones.sort_values("timestamp", kind="stable")
+    anteriores = mediciones[mediciones["timestamp"] < inicio].tail(1)
+    dentro = mediciones[mediciones["timestamp"].between(inicio, fin, inclusive="both")]
+    puntos = []
+
+    if not anteriores.empty:
+        puntos.append(
+            {
+                "timestamp": pd.Timestamp(inicio),
+                columna_valor: anteriores.iloc[0][columna_valor],
+            }
+        )
+
+    puntos.extend(dentro[["timestamp", columna_valor]].to_dict("records"))
+    if not puntos:
+        return pd.DataFrame(columns=["timestamp", columna_valor]), dentro
+
+    ultimo = puntos[-1]
+    if pd.Timestamp(ultimo["timestamp"]) < pd.Timestamp(fin):
+        puntos.append(
+            {
+                "timestamp": pd.Timestamp(fin),
+                columna_valor: ultimo[columna_valor],
+            }
+        )
+
+    return pd.DataFrame(puntos), dentro
+
+
+def _etiquetas_hover_tramo_constante(linea, reales_dentro):
+    reales = {
+        pd.Timestamp(timestamp)
+        for timestamp in pd.to_datetime(
+            reales_dentro.get("timestamp", pd.Series(dtype="datetime64[ns]")),
+            errors="coerce",
+        ).dropna()
+    }
+    etiquetas = []
+    for timestamp in linea["timestamp"]:
+        if pd.Timestamp(timestamp) in reales:
+            etiquetas.append("Medición real")
+        else:
+            etiquetas.append("Valor mantenido")
+    return etiquetas
+
+
+def _rango_y_con_margen(valores):
+    serie = pd.to_numeric(pd.Series(valores), errors="coerce").dropna()
+    if serie.empty:
+        return None
+    minimo = float(serie.min())
+    maximo = float(serie.max())
+    amplitud = maximo - minimo
+    margen = max(amplitud * 0.12, abs(maximo) * 0.03, 1.0)
+    return [minimo - margen, maximo + margen]
+
+
 def _crear_figura_constantes(datos, inicio, fin):
     constantes = datos["constantes"]
     metadata = datos["series"]
-    tramo = constantes[
-        constantes["timestamp"].between(inicio, fin, inclusive="both")
-    ].copy()
     grupos = _agrupar_series(metadata)
-    if tramo.empty or not grupos:
+    if constantes.empty or not grupos:
         return None
 
     figura = make_subplots(
@@ -273,63 +288,66 @@ def _crear_figura_constantes(datos, inicio, fin):
     }
 
     for fila_grafica, (variable, filas_metadata) in enumerate(grupos, start=1):
+        valores_fila = []
         for _, metadata_serie in filas_metadata.iterrows():
             clave = metadata_serie["serie"]
             variable_serie = metadata_serie["variable"]
             columna_valor = f"{clave}__valor"
-            if columna_valor not in tramo.columns:
+            mediciones = _mediciones_reales_constante(
+                constantes,
+                clave,
+                columna_valor,
+            )
+            linea, reales_dentro = _tramo_documentado(
+                mediciones,
+                columna_valor,
+                pd.Timestamp(inicio),
+                pd.Timestamp(fin),
+            )
+            if linea.empty and reales_dentro.empty:
                 continue
-            validos = tramo[columna_valor].notna()
-            if not validos.any():
-                continue
-            paso = max(1, math.ceil(int(validos.sum()) / 5000))
-            linea = tramo.loc[validos, ["timestamp", columna_valor]].iloc[::paso]
-            fuente = str(metadata_serie.get("fuente") or "")
             nombre_variable = NOMBRES_VARIABLES.get(variable_serie, variable_serie)
-            nombre = f"{nombre_variable} · {fuente}" if fuente else nombre_variable
+            nombre = nombre_variable
             color = colores_variable.get(variable_serie, "#1f77b4")
-            opciones_relleno = (
-                {"fill": "tonexty", "fillcolor": "rgba(31, 119, 180, 0.10)"}
-                if variable_serie == "pa_diastolica"
-                else {}
-            )
-            figura.add_trace(
-                go.Scattergl(
-                    x=linea["timestamp"],
-                    y=linea[columna_valor],
-                    mode="lines",
-                    name=nombre,
-                    line={"width": 1.4, "color": color},
-                    **opciones_relleno,
-                    hovertemplate=(
-                        "%{x|%d/%m/%Y %H:%M:%S}<br>%{y:.2f} "
-                        + str(metadata_serie.get("unidad") or "")
-                        + "<extra></extra>"
-                    ),
-                ),
-                row=fila_grafica,
-                col=1,
-            )
-            if "series_reales" in tramo.columns:
-                reales = (
-                    tramo["series_reales"]
-                    .fillna("")
-                    .astype(str)
-                    .str.split(";")
-                    .map(lambda series: clave in series)
-                ) & tramo[columna_valor].notna()
+
+            if not linea.empty and len(linea) > 1:
+                valores_fila.extend(linea[columna_valor].dropna().tolist())
                 figura.add_trace(
-                    go.Scattergl(
-                        x=tramo.loc[reales, "timestamp"],
-                        y=tramo.loc[reales, columna_valor],
-                        mode="markers",
-                        name=f"Medición real · {nombre}",
-                        marker={"size": 7, "color": color, "line": {"width": 1, "color": "white"}},
+                    go.Scatter(
+                        x=linea["timestamp"],
+                        y=linea[columna_valor],
+                        mode="lines",
+                        name=nombre,
+                        line={"shape": "hv", "width": 2, "color": color},
+                        customdata=_etiquetas_hover_tramo_constante(
+                            linea,
+                            reales_dentro,
+                        ),
                         hovertemplate=(
-                            "Medición real<br>%{x|%d/%m/%Y %H:%M:%S}<br>%{y:.2f} "
+                            "%{customdata}: %{y:.2f} "
                             + str(metadata_serie.get("unidad") or "")
                             + "<extra></extra>"
                         ),
+                    ),
+                    row=fila_grafica,
+                    col=1,
+                )
+            if not reales_dentro.empty:
+                valores_fila.extend(reales_dentro[columna_valor].dropna().tolist())
+                figura.add_trace(
+                    go.Scatter(
+                        x=reales_dentro["timestamp"],
+                        y=reales_dentro[columna_valor],
+                        mode="markers",
+                        name=nombre,
+                        marker={
+                            "size": 8,
+                            "color": color,
+                            "line": {"width": 1, "color": "white"},
+                        },
+                        cliponaxis=False,
+                        hoverinfo="skip",
+                        showlegend=False,
                     ),
                     row=fila_grafica,
                     col=1,
@@ -339,11 +357,21 @@ def _crear_figura_constantes(datos, inicio, fin):
             (str(valor) for valor in filas_metadata.get("unidad", []) if pd.notna(valor)),
             "",
         )
-        figura.update_yaxes(title_text=unidad, row=fila_grafica, col=1)
+        figura.update_yaxes(
+            title_text=unidad,
+            range=_rango_y_con_margen(valores_fila),
+            title_standoff=24,
+            automargin=True,
+            row=fila_grafica,
+            col=1,
+        )
+
+    if not figura.data:
+        return None
 
     figura.update_layout(
-        height=max(330, 190 * len(grupos)),
-        margin={"l": 170, "r": 390, "t": 80, "b": 80},
+        height=max(360, 220 * len(grupos)),
+        margin={"l": 205, "r": 390, "t": 90, "b": 100},
         hovermode="x unified",
         legend={
             "orientation": "v",
@@ -469,6 +497,114 @@ def _crear_tarjetas_analisis(datos, inicio, fin):
     return html.Div(tarjetas, className="icca-timeline-analisis")
 
 
+def _curva_dosis_farmaco(grupo, inicio, fin):
+    inicio = pd.Timestamp(inicio)
+    fin = pd.Timestamp(fin)
+    grupo = grupo.sort_values("timestamp", kind="stable").copy()
+    if grupo.empty:
+        return (
+            pd.DataFrame(columns=["timestamp", "dosis"]),
+            pd.DataFrame(columns=list(grupo.columns) + ["dosis_evento"]),
+        )
+
+    eventos = grupo[
+        (grupo["timestamp"] <= fin) & grupo["dosis_actual"].notna()
+    ].copy()
+    if eventos.empty:
+        return (
+            pd.DataFrame(columns=["timestamp", "dosis"]),
+            pd.DataFrame(columns=list(grupo.columns) + ["dosis_evento"]),
+        )
+
+    eventos_previos = eventos[eventos["timestamp"] <= inicio]
+    eventos_visibles = eventos[eventos["timestamp"] > inicio]
+    dosis_inicial = (
+        float(eventos_previos["dosis_actual"].iloc[-1])
+        if not eventos_previos.empty
+        else None
+    )
+    puntos = []
+    eventos_marcados = []
+
+    def anadir_punto(instante, valor):
+        instante = pd.Timestamp(instante)
+        if inicio <= instante <= fin:
+            puntos.append({"timestamp": instante, "dosis": float(valor)})
+
+    def marcar_evento(fila):
+        instante = pd.Timestamp(fila["timestamp"])
+        if inicio <= instante <= fin:
+            evento = fila.to_dict()
+            evento["dosis_evento"] = float(fila["dosis_actual"])
+            eventos_marcados.append(evento)
+
+    if dosis_inicial is not None:
+        anadir_punto(inicio, dosis_inicial)
+        for _, fila in eventos_previos[eventos_previos["timestamp"] == inicio].iterrows():
+            marcar_evento(fila)
+
+    for _, fila in eventos_visibles.iterrows():
+        instante = pd.Timestamp(fila["timestamp"])
+        anadir_punto(instante, fila["dosis_actual"])
+        marcar_evento(fila)
+
+    if puntos:
+        ultimo_valor = puntos[-1]["dosis"]
+        if pd.Timestamp(puntos[-1]["timestamp"]) < fin:
+            anadir_punto(fin, ultimo_valor)
+
+    curva = pd.DataFrame(puntos)
+    if curva.empty or curva["dosis"].notna().sum() < 2:
+        curva = pd.DataFrame(columns=["timestamp", "dosis"])
+    return curva, pd.DataFrame(eventos_marcados)
+
+
+def _etiqueta_dosis(unidad):
+    unidad = str(unidad or "").strip()
+    return f"Dosis administrada ({unidad})" if unidad else "Dosis administrada"
+
+
+def _preparar_grupo_perfusion(grupo, inicio, fin):
+    grupo = grupo.sort_values("timestamp", kind="stable").copy()
+    grupo = grupo[grupo["dosis_actual"].notna()].copy()
+    if grupo.empty:
+        return None, None
+
+    unidades = grupo["unidad_dosis"].dropna().astype(str).str.strip()
+    unidades = unidades[unidades != ""]
+    if unidades.empty:
+        return None, None
+    unidad = unidades.iloc[0]
+
+    grupo = grupo[
+        grupo["unidad_dosis"].fillna("").astype(str).str.strip().eq(unidad)
+    ].copy()
+    if grupo.empty:
+        return None, None
+    return grupo, {
+        "unidad": unidad,
+        "etiqueta": _etiqueta_dosis(unidad),
+    }
+
+
+def _texto_hover_eventos_perfusion(grupo, configuracion):
+    textos = []
+    for _, fila in grupo.iterrows():
+        lineas = []
+        dosis = fila.get("dosis_actual")
+        if pd.notna(dosis):
+            unidad = fila.get("unidad_dosis")
+            sufijo = f" {unidad}" if pd.notna(unidad) and str(unidad).strip() else ""
+            lineas.append(f"Dosis desde este instante: {float(dosis):.2f}{sufijo}")
+        velocidad = fila.get("velocidad_bomba_ml_h")
+        if pd.notna(velocidad):
+            lineas.append(f"Bomba documentada: {float(velocidad):.2f} mL/h")
+        if not lineas:
+            lineas.append("Registro real documentado")
+        textos.append("<br>".join(lineas))
+    return textos
+
+
 def _crear_figura_perfusiones(datos, inicio, fin):
     perfusiones = datos.get("perfusiones")
     if (
@@ -487,212 +623,121 @@ def _crear_figura_perfusiones(datos, inicio, fin):
     for columna in [
         "dosis_actual",
         "velocidad_bomba_ml_h",
-        "volumen_acumulado_24h_ml",
-        "volumen_acumulado_calculado_ml",
     ]:
         if columna not in trabajo:
             trabajo[columna] = pd.NA
         trabajo[columna] = pd.to_numeric(trabajo[columna], errors="coerce")
-    trabajo = _calcular_acumulado_perfusiones(trabajo)
-    trabajo = trabajo[
-        trabajo[
-            [
-                "dosis_actual",
-                "velocidad_bomba_ml_h",
-                "volumen_acumulado_calculado_ml",
-            ]
-        ].notna().any(axis=1)
-    ].sort_values(["farmaco", "timestamp"], kind="stable")
+    if "unidad_dosis" not in trabajo:
+        trabajo["unidad_dosis"] = ""
+    trabajo = trabajo[trabajo["dosis_actual"].notna()].sort_values(
+        ["farmaco", "timestamp"],
+        kind="stable",
+    )
     trabajo = trabajo.drop_duplicates(
         subset=[
             "timestamp",
             "farmaco",
             "dosis_actual",
+            "unidad_dosis",
             "velocidad_bomba_ml_h",
-            "volumen_acumulado_calculado_ml",
         ],
         keep="last",
     )
     if trabajo.empty:
         return None
 
-    tramos = {}
+    curvas = {}
+    eventos_por_farmaco = {}
+    configuraciones = {}
     for farmaco, grupo in trabajo.groupby("farmaco", sort=True):
-        dentro = grupo[grupo["timestamp"].between(inicio, fin, inclusive="both")]
-        anterior = grupo[grupo["timestamp"] < inicio].tail(1)
-        if dentro.empty and anterior.empty:
+        grupo_preparado, configuracion = _preparar_grupo_perfusion(
+            grupo,
+            inicio,
+            fin,
+        )
+        if grupo_preparado is None:
             continue
-        linea = pd.concat([anterior, dentro], ignore_index=True)
-        linea = linea.sort_values("timestamp", kind="stable")
-        if not anterior.empty:
-            ancla = anterior.copy()
-            ancla["timestamp"] = inicio
-            linea = pd.concat([ancla, dentro], ignore_index=True)
-        linea[["dosis_actual", "velocidad_bomba_ml_h"]] = linea[
-            ["dosis_actual", "velocidad_bomba_ml_h"]
-        ].ffill()
-        ultimo = linea.tail(1).copy()
-        if not ultimo.empty and ultimo.iloc[0]["timestamp"] < fin:
-            ultimo["timestamp"] = fin
-            linea = pd.concat([linea, ultimo], ignore_index=True)
-        tramos[str(farmaco)] = {"linea": linea, "reales": dentro}
+        curva, eventos = _curva_dosis_farmaco(grupo_preparado, inicio, fin)
+        if curva.empty:
+            continue
+        curvas[str(farmaco)] = curva
+        eventos_por_farmaco[str(farmaco)] = eventos
+        configuraciones[str(farmaco)] = configuracion
 
-    if not tramos:
+    if not curvas:
         return None
 
     figura = make_subplots(
-        rows=len(tramos),
+        rows=len(curvas),
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=min(0.08, 0.28 / max(1, len(tramos))),
-        subplot_titles=list(tramos),
-        specs=[[{"secondary_y": True}] for _ in tramos],
+        vertical_spacing=min(0.12, 0.60 / max(1, len(curvas))),
+        subplot_titles=list(curvas),
     )
-    for fila, (farmaco, tramo) in enumerate(tramos.items(), start=1):
-        linea = tramo["linea"]
-        reales = tramo["reales"]
-        unidad_dosis = _primer_texto_no_vacio(
-            *(linea.get("unidad_dosis", pd.Series(dtype=object)).dropna().tolist())
+    for fila, (farmaco, curva) in enumerate(curvas.items(), start=1):
+        color = COLORES_PERFUSIONES[(fila - 1) % len(COLORES_PERFUSIONES)]
+        figura.add_trace(
+            go.Scatter(
+                x=curva["timestamp"],
+                y=curva["dosis"],
+                mode="lines",
+                line={"shape": "hv", "width": 2.4, "color": color},
+                name=f"{farmaco} · {configuraciones[farmaco]['etiqueta']}",
+                hoverinfo="skip",
+            ),
+            row=fila,
+            col=1,
         )
-        if linea["dosis_actual"].notna().any():
+        eventos = eventos_por_farmaco[farmaco]
+        if not eventos.empty:
             figura.add_trace(
                 go.Scatter(
-                    x=linea["timestamp"],
-                    y=linea["dosis_actual"],
-                    mode="lines",
-                    line={"shape": "hv", "width": 2, "color": "#1f5f99"},
-                    name=f"{farmaco} · dosis",
-                    hovertemplate=(
-                        "%{x|%d/%m/%Y %H:%M:%S}<br>%{y:g} "
-                        + unidad_dosis
-                        + "<extra></extra>"
-                    ),
-                ),
-                row=fila,
-                col=1,
-                secondary_y=False,
-            )
-            reales_dosis = reales[reales["dosis_actual"].notna()]
-            figura.add_trace(
-                go.Scatter(
-                    x=reales_dosis["timestamp"],
-                    y=reales_dosis["dosis_actual"],
+                    x=eventos["timestamp"],
+                    y=eventos["dosis_evento"],
                     mode="markers",
-                    marker={"size": 7, "color": "#1f5f99"},
-                    name=f"Cambio real · {farmaco} dosis",
-                    hovertemplate=(
-                        "Cambio documentado<br>%{x|%d/%m/%Y %H:%M:%S}<br>%{y:g} "
-                        + unidad_dosis
-                        + "<extra></extra>"
+                    marker={
+                        "size": 7,
+                        "color": color,
+                        "line": {"color": "#1f2d3a", "width": 1.2},
+                    },
+                    cliponaxis=False,
+                    customdata=_texto_hover_eventos_perfusion(
+                        eventos,
+                        configuraciones[farmaco],
                     ),
+                    hovertemplate="%{customdata}<extra></extra>",
+                    name=f"{farmaco} · cambios registrados",
+                    showlegend=False,
                 ),
                 row=fila,
                 col=1,
-                secondary_y=False,
             )
-            figura.update_yaxes(
-                title_text=unidad_dosis or "Dosis",
-                row=fila,
-                col=1,
-                secondary_y=False,
-            )
-        if linea["velocidad_bomba_ml_h"].notna().any():
-            figura.add_trace(
-                go.Scatter(
-                    x=linea["timestamp"],
-                    y=linea["velocidad_bomba_ml_h"],
-                    mode="lines",
-                    line={"shape": "hv", "width": 2, "color": "#e67e22"},
-                    name=f"{farmaco} · bomba",
-                    hovertemplate=(
-                        "%{x|%d/%m/%Y %H:%M:%S}<br>%{y:g} mL/h<extra></extra>"
-                    ),
-                ),
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
-            reales_bomba = reales[reales["velocidad_bomba_ml_h"].notna()]
-            figura.add_trace(
-                go.Scatter(
-                    x=reales_bomba["timestamp"],
-                    y=reales_bomba["velocidad_bomba_ml_h"],
-                    mode="markers",
-                    marker={"size": 7, "color": "#e67e22"},
-                    name=f"Cambio real · {farmaco} bomba",
-                    hovertemplate=(
-                        "Cambio documentado<br>%{x|%d/%m/%Y %H:%M:%S}<br>"
-                        "%{y:g} mL/h<extra></extra>"
-                    ),
-                ),
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
-            figura.update_yaxes(
-                title_text="mL/h / mL",
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
-        if linea["volumen_acumulado_calculado_ml"].notna().any():
-            figura.add_trace(
-                go.Scatter(
-                    x=linea["timestamp"],
-                    y=linea["volumen_acumulado_calculado_ml"],
-                    mode="lines",
-                    line={"shape": "linear", "width": 2.2, "color": "#2ca02c"},
-                    name=f"{farmaco} - acumulado desde 08:00",
-                    hovertemplate=(
-                        "%{x|%d/%m/%Y %H:%M:%S}<br>%{y:.2f} mL acumulados"
-                        "<extra></extra>"
-                    ),
-                ),
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
-            reales_acumulado = reales[
-                reales["volumen_acumulado_calculado_ml"].notna()
-            ]
-            figura.add_trace(
-                go.Scatter(
-                    x=reales_acumulado["timestamp"],
-                    y=reales_acumulado["volumen_acumulado_calculado_ml"],
-                    mode="markers",
-                    marker={"size": 7, "color": "#2ca02c"},
-                    name=f"Acumulado calculado - {farmaco}",
-                    hovertemplate=(
-                        "Registro usado para acumulado<br>%{x|%d/%m/%Y %H:%M:%S}"
-                        "<br>%{y:.2f} mL<extra></extra>"
-                    ),
-                ),
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
-            figura.update_yaxes(
-                title_text="mL/h / mL",
-                row=fila,
-                col=1,
-                secondary_y=True,
-            )
+        figura.update_yaxes(
+            title_text=configuraciones[farmaco]["etiqueta"],
+            range=_rango_y_con_margen(curva["dosis"]),
+            title_standoff=30,
+            automargin=True,
+            row=fila,
+            col=1,
+        )
 
     figura.update_layout(
-        height=max(330, 190 * len(tramos)),
-        margin={"l": 170, "r": 390, "t": 80, "b": 80},
+        height=max(520, 390 * len(curvas)),
+        margin={"l": 210, "r": 70, "t": 110, "b": 125},
         hovermode="x unified",
         legend={
-            "orientation": "v",
+            "orientation": "h",
             "yanchor": "top",
-            "y": 1,
+            "y": -0.18,
             "xanchor": "left",
-            "x": 1.03,
+            "x": 0,
         },
         template="plotly_white",
     )
     figura.update_xaxes(type="date", range=[inicio, fin])
-    figura.update_xaxes(title_text="Tiempo", row=len(tramos), col=1)
+    figura.update_xaxes(title_text="Tiempo", row=len(curvas), col=1)
+    figura.update_xaxes(automargin=True)
+    figura.update_yaxes(automargin=True)
     return figura
 
 
@@ -712,7 +757,7 @@ def crear_panel_icca(datos, inicio, fin):
             (
                 dcc.Graph(
                     figure=figura,
-                    config={"displaylogo": False, "scrollZoom": True},
+                    config=CONFIGURACION_GRAFICO_ICCA,
                 )
                 if figura is not None
                 else html.Div("Sin constantes vitales en este intervalo.", className="icca-sin-datos")
@@ -721,21 +766,20 @@ def crear_panel_icca(datos, inicio, fin):
             _crear_tarjetas_analisis(datos, inicio, fin),
             html.H3("Perfusiones", style={"marginTop": "22px"}),
             html.Div(
-                "La curva verde muestra el volumen acumulado desde el ultimo "
-                "reinicio de las 08:00. Si ICCA trae acumulado real se usa como "
-                "ancla; si no, se integra la velocidad de bomba en mL/h.",
+                "Cada fármaco muestra la dosis activa documentada. La curva se "
+                "mantiene estable hasta que ICCA registra un cambio de dosis.",
                 style={"color": "#526170", "marginBottom": "8px"},
             ),
             html.Div(
-                "Las líneas escalonadas mantienen el último ajuste documentado "
-                "hasta el siguiente cambio. Los marcadores corresponden a "
-                "registros reales de ICCA; no se sintetizan dosis.",
+                "Los saltos indican cambios reales de perfusión; las filas que "
+                "solo contienen velocidad de bomba sin dosis no se representan "
+                "como dosis administrada.",
                 style={"color": "#526170", "marginBottom": "8px"},
             ),
             (
                 dcc.Graph(
                     figure=figura_perfusiones,
-                    config={"displaylogo": False, "scrollZoom": True},
+                    config=CONFIGURACION_GRAFICO_ICCA,
                 )
                 if figura_perfusiones is not None
                 else html.Div(
@@ -746,3 +790,4 @@ def crear_panel_icca(datos, inicio, fin):
         ],
         className="panel-icca",
     )
+

@@ -2,7 +2,7 @@ import json
 import gc
 import tempfile
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from openpyxl import Workbook, load_workbook
@@ -158,11 +158,53 @@ class FlujoOrganizadorTest(unittest.TestCase):
 
     def test_no_permite_bis_solapados_en_mismo_paciente(self):
         salida = self.raiz / "PACIENTES"
+        bis_largo = self.raiz / "BIS_LARGO"
+        crear_spa(bis_largo, self.inicio_bis, segundos=60)
         bis_solapado = self.raiz / "BIS_SOLAPADO"
-        crear_spa(bis_solapado, self.inicio_bis, segundos=4)
+        crear_spa(
+            bis_solapado,
+            self.inicio_bis + timedelta(seconds=29),
+            segundos=4,
+        )
 
         with self.assertRaisesRegex(ValueError, "No se pueden asignar dos sesiones BIS solapadas"):
-            crear_paciente(salida, [self.icca], [self.bis, bis_solapado])
+            crear_paciente(salida, [self.icca], [bis_largo, bis_solapado])
+
+    def test_permite_solape_bis_menor_de_30_segundos(self):
+        salida = self.raiz / "PACIENTES"
+        bis_largo = self.raiz / "BIS_LARGO"
+        crear_spa(bis_largo, self.inicio_bis, segundos=60)
+        bis_solape_pequeno = self.raiz / "BIS_SOLAPE_PEQUENO"
+        crear_spa(
+            bis_solape_pequeno,
+            self.inicio_bis + timedelta(seconds=30),
+            segundos=4,
+        )
+
+        manifiesto = crear_paciente(
+            salida,
+            [self.icca],
+            [bis_largo, bis_solape_pequeno],
+        )
+
+        self.assertEqual(len(manifiesto["sesiones"]), 2)
+
+    def test_permite_bis_contiguos_con_mismo_segundo_fin_inicio(self):
+        salida = self.raiz / "PACIENTES"
+        bis_contiguo = self.raiz / "BIS_CONTIGUO"
+        crear_spa(
+            bis_contiguo,
+            self.inicio_bis + timedelta(seconds=3),
+            segundos=4,
+        )
+
+        manifiesto = crear_paciente(salida, [], [self.bis, bis_contiguo])
+
+        self.assertEqual(len(manifiesto["sesiones"]), 2)
+        self.assertEqual(
+            manifiesto["sesiones"][0]["fin_bis"],
+            manifiesto["sesiones"][1]["inicio_bis"],
+        )
 
     def test_crea_paciente_y_recorta_excel(self):
         salida = self.raiz / "PACIENTES"
@@ -188,7 +230,7 @@ class FlujoOrganizadorTest(unittest.TestCase):
         finally:
             libro.close()
 
-    def test_excel_auxiliar_calcula_acumulado_perfusiones_con_reset_8h(self):
+    def test_excel_auxiliar_conserva_dosis_perfusiones_sin_acumulado_calculado(self):
         salida = self.raiz / "PACIENTES"
         icca = self.raiz / "icca_perfusiones.xlsx"
         crear_icca_perfusiones(
@@ -206,14 +248,17 @@ class FlujoOrganizadorTest(unittest.TestCase):
         try:
             hoja = libro["perfusiones"]
             cabeceras = [celda.value for celda in hoja[3]]
-            indice = cabeceras.index("volumen_acumulado_calculado_ml")
+            self.assertNotIn("volumen_acumulado_calculado_ml", cabeceras)
+            self.assertNotIn("dia_clinico_inicio", cabeceras)
+            self.assertNotIn("acumulado_calculado_origen", cabeceras)
+            indice_dosis = cabeceras.index("dosis_actual")
             filas = [
                 fila
                 for fila in hoja.iter_rows(min_row=4, values_only=True)
                 if fila[2] is not None
             ]
-            acumulados = [fila[indice] for fila in filas]
-            self.assertEqual(acumulados, [0, 10, 30])
+            dosis = [fila[indice_dosis] for fila in filas]
+            self.assertEqual(dosis, [1, 1, 1])
         finally:
             libro.close()
 

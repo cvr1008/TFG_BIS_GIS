@@ -2,7 +2,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app import _tarjetas_seleccion, app, visualizar_paciente
+from app import (
+    _quitar_ruta,
+    _tarjetas_seleccion,
+    _valor_selector_paciente,
+    app,
+    visualizar_paciente,
+)
 
 
 def buscar_componente(componente, identificador):
@@ -35,6 +41,10 @@ class InterfazTest(unittest.TestCase):
     def test_layout_contiene_pestanas_y_selector_no_limpiable(self):
         pestanas = buscar_componente(app.layout, "pestanas")
         selector = buscar_componente(app.layout, "selector-paciente")
+        boton_icca = buscar_componente(app.layout, "anadir-icca")
+        boton_icca_antiguo = buscar_componente(app.layout, "anadir-carpeta-icca")
+        boton_bis = buscar_componente(app.layout, "anadir-bis")
+        boton_bis_antiguo = buscar_componente(app.layout, "anadir-carpeta-madre-bis")
         edicion = next(
             componente
             for componente in _recorrer_componentes(app.layout)
@@ -45,6 +55,11 @@ class InterfazTest(unittest.TestCase):
         self.assertEqual(pestanas.value, "nuevo")
         self.assertIsNotNone(selector)
         self.assertFalse(selector.clearable)
+        self.assertIsNotNone(boton_icca)
+        self.assertEqual(boton_icca.children, "Añadir Excel ICCA")
+        self.assertIsNone(boton_icca_antiguo)
+        self.assertIsNotNone(boton_bis)
+        self.assertIsNone(boton_bis_antiguo)
         self.assertFalse(bool(getattr(edicion, "open", False)))
 
     def test_cada_seleccion_tiene_su_boton_para_quitarla(self):
@@ -61,6 +76,13 @@ class InterfazTest(unittest.TestCase):
         self.assertEqual(boton.id, {"type": "quitar-icca", "index": ruta})
         self.assertEqual(boton.children, "×")
 
+    def test_quitar_ruta_tolera_barras_distintas(self):
+        rutas = [r"C:\datos\BIS\sesion_001", r"C:\datos\BIS\sesion_002"]
+
+        restantes = _quitar_ruta(rutas, "C:/datos/BIS/sesion_001")
+
+        self.assertEqual(restantes, [r"C:\datos\BIS\sesion_002"])
+
     def test_sin_seleccion_no_afirma_que_falten_pacientes(self):
         with tempfile.TemporaryDirectory() as temporal:
             carpeta = Path(temporal) / "PACIENTE_001"
@@ -76,6 +98,28 @@ class InterfazTest(unittest.TestCase):
         self.assertEqual(
             resultado.children,
             "Selecciona un paciente para consultar sus sesiones.",
+        )
+
+    def test_selector_paciente_se_limpia_tras_guardar_edicion(self):
+        opciones = [
+            {"label": "PACIENTE_001", "value": "PACIENTE_001"},
+            {"label": "PACIENTE_002", "value": "PACIENTE_002"},
+        ]
+
+        self.assertEqual(
+            _valor_selector_paciente(
+                opciones,
+                None,
+                "actualizacion-creacion",
+            ),
+            "PACIENTE_002",
+        )
+        self.assertIsNone(
+            _valor_selector_paciente(
+                opciones,
+                "PACIENTE_002",
+                "actualizacion-gestion",
+            )
         )
 
     def test_endpoints_dash_responden(self):
