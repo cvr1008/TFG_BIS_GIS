@@ -1586,9 +1586,11 @@ clínicas relevantes para el análisis retrospectivo en UCI.
 
 Los resultados experimentales detallados de la reconstrucción de la DSA,
 incluyendo la comparación entre métodos espectrales, desplazamientos
-temporales y métricas cuantitativas, se recogen en el Anexo G. En este
-capítulo se resumen los resultados principales necesarios para valorar
-el cumplimiento de los objetivos del proyecto.
+temporales y métricas cuantitativas, se recogen en el Anexo G. El
+detalle paso a paso de cómo se maneja cada interfaz (pantallas de
+selección, creación y edición) se documenta en el Anexo D (Manual de
+usuario); en este capítulo se muestran únicamente las capturas
+necesarias para entender los resultados obtenidos.
 
 \section{Organización de los datos BIS e
 ICCA}\label{organizaciuxf3n-de-los-datos-bis-e-icca}
@@ -1690,12 +1692,36 @@ Estas dos figuras muestran ambos escenarios en un registro unilateral.
 Esta doble posibilidad resulta importante porque no todas las sesiones
 disponibles contienen un archivo \texttt{.f\_a} válido.
 
-También se comprobó el funcionamiento del sistema en registros
-procedentes de BIS VISTA sin información clínica ICCA asociada y sin
-matriz \texttt{.f\_a} válida: en estos casos, el visualizador carga
-igualmente la sesión BIS y fuerza la reconstrucción de la DSA a partir
-de la señal cruda, incluyendo la reconstrucción bilateral cuando el
-registro dispone de los dos hemisferios, tal y como se muestra en la
+También se comprobó el funcionamiento del sistema en un registro
+procedente de BIS VISTA sin información clínica ICCA asociada y sin
+matriz \texttt{.f\_a} válida: en concreto, un autorregistro realizado
+por la propia alumna para explorar el formato real de los archivos BIS
+antes de disponer de la aprobación del Comité de Bioética (ver
+Discusión), y que por tanto no tiene un archivo ICCA con el que
+relacionarse. Este caso resulta útil precisamente porque no deja
+alternativa: al no existir ni \texttt{.f\_a} válido ni ICCA asociado, la
+única vía posible es forzar la reconstrucción completa de la DSA desde
+la señal cruda, tal y como se refleja en la selección de la sesión
+(Figura~\ref{fig-visualizador-seleccionar-pac-vista}).
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.9\linewidth,height=\textheight,keepaspectratio]{img/capturas_app_visualizador/visual_sinICCA_sinFA.png}
+
+}
+
+\caption{\label{fig-visualizador-seleccionar-pac-vista}Selección de una
+sesión BIS VISTA (autorregistro) sin ICCA asociado y sin archivo
+\texttt{.f\_a} válido. Fuente: elaboración propia.}
+
+\end{figure}%
+
+El visualizador carga igualmente la sesión BIS y fuerza la
+reconstrucción de la DSA a partir de la señal cruda, incluyendo la
+reconstrucción bilateral cuando el registro dispone de los dos
+hemisferios, tal y como se muestra en la
 Figura~\ref{fig-visualizador-dsa-rec-bilat}.
 
 \begin{figure}
@@ -1833,7 +1859,21 @@ está disponible.
 
 La portada recoge los datos identificativos de la sesión (paciente,
 sesión BIS, tipo de registro, origen de la DSA, intervalo temporal
-analizado y disponibilidad de información ICCA).
+analizado y disponibilidad de información ICCA), tal y como se muestra
+en la Figura~\ref{fig-informe-pdf}.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.9\linewidth,height=\textheight,keepaspectratio]{img/capturas_app_visualizador/visual_informe_pdf.png}
+
+}
+
+\caption{\label{fig-informe-pdf}Portada del informe PDF, con los datos
+identificativos de la sesión. Fuente: elaboración propia.}
+
+\end{figure}%
 
 A continuación, el informe incluye la representación completa de la DSA
 y las variables procesadas del monitor correspondientes al intervalo

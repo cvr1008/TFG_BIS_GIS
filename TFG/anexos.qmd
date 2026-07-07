@@ -73,3 +73,4 @@ knitr:
 {{< include qmd/G_experimental.qmd >}}
 {{< include qmd/H_ODS.qmd >}}
 {{< include qmd/I_prompts.qmd >}}
+{{< include qmd/J_CEIM.qmd >}}
