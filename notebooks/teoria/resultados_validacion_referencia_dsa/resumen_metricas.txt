@@ -1,6 +1,0 @@
- registro       modo       lado  a_pearson  a_mae_db  a_rmse_db  a_sesgo_db  b_pearson  b_mae_db  b_rmse_db  b_sesgo_db  diferencia_a_b_media_db  totpow_pearson  totpow_mae_db  totpow_rmse_db  totpow_sesgo_db
-L03041035 unilateral unilateral     0.7260    3.7113     5.0219      2.9516     0.7260   37.0484    37.2705    -37.0484                     40.0          0.6210         2.6879          3.3945          -1.9856
-L05141322  bilateral  izquierda     0.9397    1.5902     2.2933      0.5219     0.9397   39.4781    39.5412    -39.4781                     40.0          0.7600         4.0316          4.3913          -4.0148
-L05141322  bilateral    derecha     0.9459    1.7373     2.3748      0.8682     0.9459   39.1318    39.1941    -39.1318                     40.0          0.7975         3.8093          4.1634          -3.8043
-L04301923  bilateral  izquierda     0.9871    0.8624     1.5297     -0.2284     0.9871   40.2285    40.2569    -40.2284                     40.0          0.5918         7.2325          7.3483          -7.2269
-L04301923  bilateral    derecha     0.9802    0.9896     1.7866     -0.0321     0.9802   40.0321    40.0719    -40.0321                     40.0          0.3712         6.5212          6.6921          -6.5203

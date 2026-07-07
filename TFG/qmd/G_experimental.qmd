@@ -26,7 +26,7 @@ Todos los parámetros de la reconstrucción se centralizan en un único dicciona
 | `tiempo_referencia` | centro | La ventana se asigna a su instante central |
 | `umbral_sqi` | 15 | Límite mínimo de calidad de señal (`SQI10`) |
 | `aplicar_mascara_ceros_raw` | True | Activa la detección de pérdidas en el EEG crudo |
-| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si $\geq$50 % de sus muestras son cero |
+| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si el 50 % o más de sus muestras son cero |
 | `excluir_invalidos_suavizado` | True | Los segundos inválidos se excluyen del promedio móvil |
 | `referencia_amplitud_uv_rms` | 0,0001 µV RMS | Referencia usada en la conversión logarítmica a dB |
 | `combinacion_unilateral` | canal 1 | Canal físico usado en unilateral |
@@ -220,7 +220,7 @@ Un segundo de la timeline común se considera no válido cuando se cumple alguno
 | Máscara | Criterio |
 |---|---|
 | Calidad `.spa` | `SQI10 < 15` o `TOTPOW08` ausente |
-| Pérdida de señal cruda | $\geq$50 % de las muestras del segundo, en el canal correspondiente, son exactamente cero |
+| Pérdida de señal cruda | El 50 % o más de las muestras del segundo, en el canal correspondiente, son exactamente cero |
 | Segundo incompleto | La alineación no dispuso del conjunto completo de 128 muestras crudas para ese segundo (p. ej. en los bordes del registro) |
 | Discontinuidades | Segundo ausente en la timeline del `.spa` o, si existe, del `.f_a` |
 | Sin ventana Welch | No existe ninguna ventana de Welch cuyo instante central caiga en ese segundo (ocurre en el margen inicial que exige la ventana de 2 s) |
@@ -329,13 +329,13 @@ La misma validación experimental permitió comparar, sobre el mismo registro y 
 
 Aplicar el filtro reduce el RMSE en más de 1,4 dB (un 22 % de mejora relativa) y el MAE en 0,8 dB, además de mejorar ligeramente el Pearson. Esto respalda la decisión de aplicar sistemáticamente el filtro pasa-altos antes del cálculo espectral (G.5), y no solo como un ajuste opcional.
 
-**Tipo de suavizado temporal.** Comparando, para cada tipo de suavizado, su mejor combinación de ventana y desplazamiento (con filtro Butterworth aplicado):
+**Tipo de suavizado temporal.** Comparando, para cada tipo de suavizado, su mejor combinación de ventana y desplazamiento (con filtro Butterworth aplicado). Se compararon tres estrategias: señal sin suavizar, media móvil causal (`rolling`) y media móvil exponencial (`ewm`).
 
-| Suavizado | Ventana (s) | Shift (s) | Pearson | MAE (dB) | RMSE (dB) |
+| Estrategia | Vent. (s) | Shift (s) | Pearson | MAE | RMSE |
 |---|---:|---:|---:|---:|---:|
-| Sin suavizar | — | 24 | 0,470 | 6,643 | 8,584 |
-| Media móvil causal (`rolling`) | 30 | 11 | 0,726 | 3,718 | 5,021 |
-| Media móvil exponencial (`ewm`) | 30 | 11 | 0,694 | 3,813 | 5,161 |
+| Sin suavizar | -- | 24 | 0,470 | 6,643 | 8,584 |
+| Media móvil causal | 30 | 11 | 0,726 | 3,718 | 5,021 |
+| Media móvil exponencial | 30 | 11 | 0,694 | 3,813 | 5,161 |
 
 : Comparación de estrategias de suavizado temporal {#tbl-suavizado-comparacion}
 

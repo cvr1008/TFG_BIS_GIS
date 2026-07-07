@@ -11,7 +11,7 @@ En este apéndice se incluye la documentación relativa a la solicitud y aprobac
 \includepdf[
   pages=-,
   pagecommand={\thispagestyle{plain}}
-]{documentos_CEIM/Solicitud_Aprobacion_CEIM_proyecto_integracion.pdf}
+]{documentos_CEIM/Solicitud_Aprobacion_CEIM.pdf}
 
 \clearpage
 \includepdf[

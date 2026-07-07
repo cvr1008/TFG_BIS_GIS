@@ -49,7 +49,7 @@ El proyecto está desarrollado en Python y utiliza Dash para la construcción de
 La primera vez que se utilice el sistema, debe abrirse una terminal de PowerShell en la carpeta de aplicaciones:
 
 ```powershell
-cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones"
+cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones"
 ```
 
 A continuación, se prepara el entorno local:
@@ -65,7 +65,9 @@ La carpeta `aplicaciones/` contiene un archivo `requirements.txt` general, utili
 Para iniciar las tres aplicaciones se ejecuta:
 
 ```powershell
-.\iniciar_aplicaciones.ps1 -PacientesDir "..\datos\pacientes" -RutaPacientesFija
+.\iniciar_aplicaciones.ps1 `
+  -PacientesDir "..\datos\pacientes" `
+  -RutaPacientesFija
 ```
 
 Una vez iniciado el sistema, las aplicaciones quedan disponibles en las siguientes direcciones locales:
@@ -86,7 +88,7 @@ En un despliegue hospitalario, la ruta local `datos/pacientes` puede sustituirse
 
 Durante el desarrollo se incluyeron pruebas automáticas para comprobar partes críticas del sistema. Estas pruebas se centran en la lectura y validación de archivos BIS, la alineación temporal, la reconstrucción de la DSA, el cálculo de bandas espectrales, la integración de datos ICCA y la generación de informes.
 
-Las pruebas del visualizador se encuentran en `aplicaciones/visualizador_bis_icca/tests/`, y las del organizador en `aplicaciones/organizador_bis_icca/tests/`.
+Las pruebas del visualizador se encuentran en \ruta{aplicaciones/visualizador_bis_icca/tests/}, y las del organizador en \ruta{aplicaciones/organizador_bis_icca/tests/}.
 
 Para ejecutar las pruebas del visualizador puede utilizarse:
 

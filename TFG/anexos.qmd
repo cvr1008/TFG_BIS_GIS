@@ -25,6 +25,7 @@ format:
     biblio-style: apalike
     bibliography: bibliografiaAnexos.bib
     lang: es
+    top-level-division: section
 
 knitr:
   opts_chunk:

@@ -4,7 +4,7 @@
 %% ══════════════════════════════════════════════════════
 ```
 
-\apendice{Documentación de usuario}
+\apendice{Manual de usuario}
 
 ## Requisitos software y hardware para ejecutar el proyecto
 
@@ -32,13 +32,15 @@ La aplicación puede ejecutarse en dos escenarios: en local durante el desarroll
 Para ejecutar la aplicación en local, se debe abrir una terminal de PowerShell y situarse en la carpeta del proyecto:
 
 ```powershell
-cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones"
+cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones"
 ```
 
 A continuación, se lanza el script de inicio:
 
 ```powershell
-.\iniciar_aplicaciones.ps1 -PacientesDir "..\datos\pacientes" -RutaPacientesFija
+.\iniciar_aplicaciones.ps1 `
+  -PacientesDir "..\datos\pacientes" `
+  -RutaPacientesFija
 ```
 
 Una vez iniciado el sistema, se accede desde el navegador a la siguiente dirección:
