@@ -6,12 +6,111 @@
 
 \apendice{Documentación de usuario}
 
+## Requisitos software y hardware para ejecutar el proyecto
 
-# Requisitos software y hardware para ejecutar el proyecto.
-Se detallarán los requisitos mínimos de software y hardware necesarios para ejecutar correctamente el proyecto.
+Para utilizar la aplicación BIS-ICCA es necesario disponer de un equipo con sistema operativo Windows y un navegador web moderno. La aplicación se ha desarrollado en Python utilizando Dash, por lo que su ejecución se realiza desde un entorno Python previamente configurado.
 
-# Instalación / Puesta en marcha
-Se describirá el proceso de instalación y ejecución del sistema de forma clara y ordenada, indicando los pasos necesarios para su correcta puesta en funcionamiento.
+Los requisitos mínimos recomendados son:
 
-# Manuales y/o Demostraciones prácticas
-Se incluirán instrucciones de uso del sistema y ejemplos prácticos que faciliten su comprensión por parte del usuario final.
+- Sistema operativo: Windows 10 o superior.
+- Memoria RAM: al menos 8 GB, recomendable 16 GB si se trabaja con sesiones BIS largas.
+- Procesador: de 64 bits.
+- Navegador web: Google Chrome, Microsoft Edge o Mozilla Firefox.
+- Python: versión 3.12 o compatible.
+- Espacio en disco suficiente para almacenar las sesiones BIS, los registros ICCA y los informes generados.
+
+No es necesario instalar una base de datos externa, ya que el sistema organiza la información mediante una estructura de carpetas y archivos (Anexo B). Cada paciente dispone de su propia carpeta, donde se guardan las sesiones BIS, los registros ICCA asociados y los archivos auxiliares generados por la aplicación.
+
+Para la simulación del entorno hospitalario se emplean máquinas virtuales: una para ejecutar la aplicación y otra para almacenar los datos de pacientes mediante una carpeta compartida por red (ver diseño de despliegue en el Anexo B).
+
+## Instalación y puesta en marcha
+
+La aplicación puede ejecutarse en dos escenarios: en local durante el desarrollo, y en un entorno virtualizado para simular su funcionamiento dentro de una intranet hospitalaria.
+
+### Ejecución local
+
+Para ejecutar la aplicación en local, se debe abrir una terminal de PowerShell y situarse en la carpeta del proyecto:
+
+```powershell
+cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones"
+```
+
+A continuación, se lanza el script de inicio:
+
+```powershell
+.\iniciar_aplicaciones.ps1 -PacientesDir "..\datos\pacientes" -RutaPacientesFija
+```
+
+Una vez iniciado el sistema, se accede desde el navegador a la siguiente dirección:
+
+```text
+http://127.0.0.1:8040
+```
+
+Esta dirección abre el portal principal de la aplicación, desde el que se puede acceder al organizador de pacientes o al visualizador. El proceso de instalación del entorno (creación del entorno virtual e instalación de dependencias) se detalla en el Anexo E.
+
+### Ejecución en entorno con máquinas virtuales
+
+Para simular el funcionamiento en un entorno hospitalario, se plantea una arquitectura con dos máquinas virtuales:
+
+- Una **máquina virtual de aplicación**, donde se ejecuta el sistema BIS-ICCA.
+- Una **máquina virtual de datos**, donde se almacenan los pacientes en una ubicación común.
+
+La máquina de datos comparte la carpeta de pacientes mediante Samba/SMB. Desde la máquina de aplicación, esta carpeta se monta como una unidad de red, por ejemplo:
+
+```text
+P:\Pacientes
+```
+
+De esta forma, la aplicación trabaja siempre sobre una ruta fija y el usuario no tiene que seleccionar manualmente dónde guardar o buscar los pacientes.
+
+## Manuales y demostraciones prácticas
+
+### Acceso al portal principal
+
+Al abrir la aplicación desde el navegador, aparece el portal principal (@fig-manual-portal). Desde esta pantalla se puede elegir entre dos opciones:
+
+- Añadir / gestionar pacientes.
+- Visualizar paciente.
+
+![Portal principal de acceso al sistema. Fuente: elaboración propia.](img/capturas_portal/captura_menu_portal.png){#fig-manual-portal width=90%}
+
+El portal funciona como punto de entrada común y permite separar claramente las tareas de organización de pacientes de las tareas de consulta o visualización.
+
+### Añadir o gestionar pacientes
+
+La opción de añadir o gestionar pacientes permite crear nuevos pacientes a partir de registros ICCA y sesiones BIS. El flujo general es el siguiente:
+
+1. Seleccionar uno o varios archivos Excel ICCA, si están disponibles.
+2. Seleccionar una carpeta BIS o una carpeta madre que contenga varias sesiones BIS.
+3. Analizar los intervalos temporales.
+4. Comprobar que las sesiones se asignan correctamente.
+5. Crear la carpeta del paciente.
+
+Las capturas de las pantallas correspondientes a este flujo (pantalla inicial del organizador, revisión de asignaciones y edición de un paciente ya creado) se muestran en el Anexo C, apartado de prototipos de interfaz (@fig-inicio-organizador, @fig-revision-paciente y @fig-editar-paciente).
+
+La aplicación genera una estructura de carpetas organizada, en la que se almacenan las sesiones BIS, los registros ICCA originales y los archivos auxiliares necesarios para la visualización posterior (@fig-contenido-paciente, Anexo C).
+
+### Visualizar paciente
+
+La opción de visualizar paciente permite consultar los pacientes ya creados. El flujo general es el siguiente:
+
+1. Seleccionar un paciente de la lista.
+2. Seleccionar una sesión BIS asociada.
+3. Elegir el tramo temporal que se desea visualizar.
+4. Consultar la matriz DSA, el índice BIS, la señal EMG y la información clínica ICCA disponible.
+5. Exportar un informe en PDF si se desea conservar o imprimir la visualización del caso.
+
+Las capturas de la pantalla inicial del visualizador y de la selección de paciente y sesión se muestran en el Anexo C (@fig-visualizador-inicio y @fig-visualizador-seleccion). El resultado de la carga (DSA, variables BIS e información ICCA) se muestra en el capítulo de Resultados de la memoria.
+
+### Exportación de informe PDF
+
+El visualizador permite generar un informe PDF del intervalo seleccionado. Este informe incluye una portada con los datos identificativos de la sesión, la representación de la DSA junto con las variables procesadas del monitor, y un resumen de la información clínica ICCA disponible para ese intervalo (constantes vitales, análisis clínicos y perfusiones). El resultado de este proceso se muestra en el capítulo de Resultados de la memoria.
+
+El informe está pensado como documento auxiliar para revisión o impresión, pero no sustituye la valoración clínica ni la revisión de los registros originales.
+
+## Consideraciones de uso
+
+Todos los usuarios acceden a la misma ubicación común de pacientes. La aplicación no distingue entre usuarios individuales ni incorpora roles de administrador, ya que el objetivo es que los pacientes creados puedan ser consultados por cualquier profesional autorizado dentro del entorno de trabajo.
+
+Se recomienda no modificar manualmente la estructura interna de las carpetas de pacientes, salvo para realizar copias de seguridad o trasladar el repositorio completo.

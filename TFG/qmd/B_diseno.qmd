@@ -6,17 +6,117 @@
 
 \apendice{Manual de especificación de diseño}
 
+## Planos
 
-Si procede.
+No se incluyen planos físicos del sistema, ya que el proyecto no desarrolla hardware propio ni modifica la infraestructura hospitalaria existente. El monitor BIS, los equipos clínicos y la red hospitalaria se consideran elementos externos al desarrollo.
 
-# Planos
+No obstante, sí se incluye un esquema de despliegue lógico para representar cómo se organiza la aplicación y cómo se separa la ejecución del sistema del almacenamiento de los pacientes. Este esquema se describe en el apartado de diseño arquitectónico.
 
-Si procede
+## Diseño arquitectónico
 
-En este apartado se incluirán los planos técnicos del sistema si procede, tales como esquemas de hardware, distribución de dispositivos, flujos físicos o cualquier otro elemento relevante para la comprensión del diseño.
+### Visión general
 
-# Diseño arquitectónico
+El sistema BIS-ICCA se organiza en tres aplicaciones Dash diferenciadas:
 
-Si procede.
+- **Portal BIS-ICCA**: actúa como pantalla inicial y punto de entrada común al sistema.
+- **Organizador de pacientes**: permite crear y gestionar pacientes, asociando sesiones BIS con registros ICCA cuando están disponibles.
+- **Visualizador BIS-ICCA**: permite consultar pacientes ya organizados, visualizar la matriz DSA y revisar la información clínica asociada.
 
-Se describirá la arquitectura general del sistema o solución desarrollada. Puede incluir diagramas de bloques, diagramas de clases, diagramas de despliegue u otros esquemas que faciliten la comprensión del diseño.
+Aunque las aplicaciones se ejecutan como módulos separados, todas trabajan sobre una misma estructura de pacientes. Esta estructura permite que los datos generados por el organizador sean utilizados posteriormente por el visualizador sin necesidad de emplear una base de datos relacional.
+
+### Arquitectura lógica de la aplicación
+
+El portal funciona como una capa superior de acceso. Desde él, el usuario puede acceder al organizador o al visualizador según la tarea que desee realizar.
+
+El organizador prepara la información de los pacientes: analiza intervalos temporales, asocia sesiones BIS con registros ICCA y genera una estructura ordenada de carpetas.
+
+El visualizador utiliza esa estructura para cargar las sesiones disponibles, mostrar la matriz DSA, representar las variables BIS y EMG, incorporar información clínica ICCA y generar informes PDF.
+
+### Diseño de despliegue
+
+Para aproximar el sistema a un posible uso dentro de una intranet hospitalaria, se plantea una arquitectura basada en máquinas virtuales.
+
+La máquina virtual de aplicación ejecuta las aplicaciones Dash y permite el acceso desde un navegador web. La máquina virtual de datos actúa como repositorio común de pacientes. La comunicación entre ambas se realiza mediante una carpeta compartida por red utilizando Samba/SMB.
+
+![Diseño de despliegue mediante máquinas virtuales. Fuente: elaboración propia, generada con apoyo de ChatGPT.](img/esquema_arquitectura_ubu.png){#fig-diseno-despliegue width=90%}
+
+La @fig-diseno-despliegue muestra la separación entre la máquina virtual de aplicación y la máquina virtual de datos.
+
+De esta forma, la aplicación trabaja siempre sobre una ruta fija de pacientes, evitando que el usuario tenga que seleccionar manualmente la carpeta de trabajo.
+
+### Organización de los datos
+
+El sistema no utiliza una base de datos relacional. La información se organiza mediante carpetas y archivos, manteniendo una estructura común para todos los pacientes.
+
+```text
+Pacientes/
+├── PACIENTE_001/
+│   ├── paciente.json
+│   ├── ICCA_ORIGINALES/
+│   └── SESIONES/
+│       ├── SESION_001_...
+│       │   ├── sesion.json
+│       │   ├── BIS/
+│       │   └── ICCA/
+│       └── SESION_002_...
+│           ├── sesion.json
+│           ├── BIS/
+│           └── ICCA/
+└── PACIENTE_002/
+    └── ...
+```
+
+Cada paciente dispone de una carpeta propia, donde se almacenan sus sesiones BIS, los registros ICCA asociados y los archivos auxiliares generados por la aplicación.
+
+### Organización interna del código
+
+El código se divide en aplicaciones independientes y módulos internos agrupados por responsabilidad.
+
+El organizador incluye la lógica necesaria para:
+
+- detectar sesiones BIS;
+- analizar intervalos temporales;
+- asociar registros ICCA;
+- crear la estructura de carpetas de cada paciente;
+- generar archivos auxiliares.
+
+El visualizador incluye la lógica necesaria para:
+
+- leer exportaciones BIS;
+- reconstruir o cargar la matriz DSA;
+- generar vistas temporales;
+- representar la señal BIS, EMG y DSA;
+- cargar y visualizar variables clínicas ICCA;
+- generar informes PDF.
+
+### Principales módulos del sistema
+
+| Módulo | Responsabilidad |
+|---|---|
+| `pacientes.py` | Creación, edición, eliminación y listado de pacientes. |
+| `intervalos.py` | Análisis temporal de sesiones BIS y registros ICCA. |
+| `excel_icca.py` | Lectura y preparación de archivos ICCA. |
+| `libros.py` | Generación de archivos Excel auxiliares. |
+| `carpeta_bis.py` | Detección de exportaciones BIS. |
+| `validacion_bis.py` | Validación de la estructura de una exportación BIS. |
+| `lectura_spa.py` | Lectura de variables procesadas de BIS. |
+| `lectura_fa.py` | Lectura de la matriz DSA original. |
+| `reconstruccion.py` | Reconstrucción de la DSA a partir del EEG crudo. |
+| `alineacion_temporal.py` | Alineación temporal y detección de discontinuidades. |
+| `bandas.py` | Cálculo del ratio alfa-delta. |
+| `vistas_temporales.py` | División del registro en tramos temporales. |
+| `figuras.py` | Generación de figuras interactivas. |
+| `figuras_estaticas.py` | Generación de figuras estáticas para informes. |
+| `visualizacion_icca.py` | Preparación y visualización de variables clínicas ICCA. |
+| `pacientes_icca.py` | Preparación de sesiones con información ICCA. |
+| `informe_pdf.py` | Generación del informe PDF del caso visualizado. |
+
+: Principales módulos del sistema y responsabilidades asociadas {#tbl-modulos-sistema}
+
+### Justificación del diseño
+
+El diseño propuesto responde a las necesidades principales del proyecto: organizar sesiones BIS e información ICCA, permitir su consulta posterior y facilitar una posible adaptación a un entorno hospitalario.
+
+La separación entre organizador y visualizador evita mezclar tareas de preparación de datos con tareas de consulta. A su vez, el uso de una estructura fija de carpetas permite mantener los archivos originales y auxiliares asociados a cada paciente, sin necesidad de implantar una base de datos.
+
+Por último, la arquitectura basada en máquinas virtuales permite simular un escenario de uso en intranet, separando la ejecución de la aplicación del almacenamiento común de los pacientes.

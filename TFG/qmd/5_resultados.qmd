@@ -9,7 +9,7 @@ En este capítulo se presentan los principales resultados obtenidos tras el desa
 
 Como resultado global, se ha obtenido un flujo de trabajo que permite organizar registros BIS e información clínica procedente de ICCA por paciente y sesión, generar archivos auxiliares asociados a cada intervalo de monitorización y visualizar de forma conjunta la matriz de densidad espectral, las variables procesadas del monitor BIS y variables clínicas relevantes para el análisis retrospectivo en UCI.
 
-Los resultados experimentales detallados de la reconstrucción de la DSA, incluyendo la comparación entre métodos espectrales, desplazamientos temporales y métricas cuantitativas, se recogen en el Anexo G. En este capítulo se resumen los resultados principales necesarios para valorar el cumplimiento de los objetivos del proyecto.
+Los resultados experimentales detallados de la reconstrucción de la DSA, incluyendo la comparación entre métodos espectrales, desplazamientos temporales y métricas cuantitativas, se recogen en el Anexo G. El detalle paso a paso de cómo se maneja cada interfaz (pantallas de selección, creación y edición) se documenta en el Anexo D (Manual de usuario); en este capítulo se muestran únicamente las capturas necesarias para entender los resultados obtenidos.
 
 ## Organización de los datos BIS e ICCA
 
@@ -33,12 +33,15 @@ En relación con la matriz de densidad espectral, se consiguió implementar un d
 
 Estas dos figuras muestran ambos escenarios en un registro unilateral. Esta doble posibilidad resulta importante porque no todas las sesiones disponibles contienen un archivo `.f_a` válido.
 
-También se comprobó el funcionamiento del sistema en registros procedentes de BIS VISTA sin información clínica ICCA asociada y sin matriz `.f_a` válida: en estos casos, el visualizador carga igualmente la sesión BIS y fuerza la reconstrucción de la DSA a partir de la señal cruda, incluyendo la reconstrucción bilateral cuando el registro dispone de los dos hemisferios, tal y como se muestra en la @fig-visualizador-dsa-rec-bilat.
+También se comprobó el funcionamiento del sistema en un registro procedente de BIS VISTA sin información clínica ICCA asociada y sin matriz `.f_a` válida: en concreto, un autorregistro realizado por la propia alumna para explorar el formato real de los archivos BIS antes de disponer de la aprobación del Comité de Bioética (ver Discusión), y que por tanto no tiene un archivo ICCA con el que relacionarse. Este caso resulta útil precisamente porque no deja alternativa: al no existir ni `.f_a` válido ni ICCA asociado, la única vía posible es forzar la reconstrucción completa de la DSA desde la señal cruda, tal y como se refleja en la selección de la sesión (@fig-visualizador-seleccionar-pac-vista).
+
+![Selección de una sesión BIS VISTA (autorregistro) sin ICCA asociado y sin archivo `.f_a` válido. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_sinICCA_sinFA.png){#fig-visualizador-seleccionar-pac-vista width=90%}
+
+El visualizador carga igualmente la sesión BIS y fuerza la reconstrucción de la DSA a partir de la señal cruda, incluyendo la reconstrucción bilateral cuando el registro dispone de los dos hemisferios, tal y como se muestra en la @fig-visualizador-dsa-rec-bilat.
 
 ![Reconstrucción bilateral de la DSA en un registro BIS VISTA sin archivo `.f_a` válido y sin información ICCA asociada. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_VISTA_bilat.png){#fig-visualizador-dsa-rec-bilat width=90%}
 
 El sistema distingue automáticamente entre registros unilaterales y bilaterales a partir del archivo de EEG crudo disponible. En los registros unilaterales se genera una única matriz DSA, mientras que en los registros bilaterales se obtienen dos matrices independientes, correspondientes a los hemisferios izquierdo y derecho.
-
 
 ## Integración temporal de variables BIS
 
@@ -68,12 +71,13 @@ La integración de estas variables permite contextualizar la evolución neurofis
 
 El resultado final de esta parte del proyecto es un visualizador interactivo que permite explorar registros BIS unilaterales y bilaterales junto con la información clínica disponible, seleccionar paciente y sesión, modificar la ventana temporal visible y revisar periodos concretos del registro (Anexo D). En registros bilaterales, el visualizador muestra de forma diferenciada la información correspondiente a ambos hemisferios, incluyendo las matrices DSA izquierda y derecha, las curvas BIS asociadas y la asimetría bilateral, como ya se ha mostrado en la @fig-visualizador-dsa-rec-bilat.
 
-
 ## Generación de informe en PDF
 
 Como resultado complementario del visualizador, se incorporó la posibilidad de generar un informe en formato PDF asociado a una sesión BIS concreta. El documento se organiza en tres bloques: una portada con los datos identificativos de la sesión, una página con la representación completa de la DSA junto con las variables procesadas del monitor, y un resumen textual de la información clínica ICCA del intervalo, cuando está disponible.
 
-La portada recoge los datos identificativos de la sesión (paciente, sesión BIS, tipo de registro, origen de la DSA, intervalo temporal analizado y disponibilidad de información ICCA).
+La portada recoge los datos identificativos de la sesión (paciente, sesión BIS, tipo de registro, origen de la DSA, intervalo temporal analizado y disponibilidad de información ICCA), tal y como se muestra en la @fig-informe-pdf.
+
+![Portada del informe PDF, con los datos identificativos de la sesión. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_informe_pdf.png){#fig-informe-pdf width=90%}
 
 A continuación, el informe incluye la representación completa de la DSA y las variables procesadas del monitor correspondientes al intervalo mostrado (@fig-informe-dsa-pdf), y finaliza con un resumen textual de la información clínica ICCA disponible para ese mismo intervalo (@fig-informe-analisis-pdf).
 

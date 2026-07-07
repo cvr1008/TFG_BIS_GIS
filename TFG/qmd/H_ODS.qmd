@@ -6,10 +6,22 @@
 
 \apendice{Anexo de sostenibilización curricular}
 
-# Introducción
-Este anexo incluirá una reflexión personal del alumnado sobre los aspectos de la sostenibilidad que se abordan en el trabajo.
-Se pueden incluir tantas subsecciones como sean necesarias con la intención de explicar las competencias de sostenibilidad adquiridas durante el alumnado y aplicadas al Trabajo de Fin de Grado.
+## Introducción
 
-Más información en el documento de la CRUE \url{https://www.crue.org/wp-content/uploads/2020/02/Directrices_Sosteniblidad_Crue2012.pdf}.
+Este anexo recoge una reflexión personal sobre los aspectos de sostenibilidad, en su sentido amplio (social, económico y tecnológico), presentes en el desarrollo de este Trabajo Fin de Grado, siguiendo las directrices de sostenibilización curricular de la CRUE [@CRUE2012].
 
-Este anexo tendrá una extensión comprendida entre 600 y 800 palabras.
+## Sostenibilidad social: eficiencia y bienestar del personal sanitario
+
+El origen de este proyecto es un problema de sostenibilidad social muy concreto: los profesionales de la UCI del HUBU dedican tiempo y esfuerzo cognitivo a consultar varias plataformas distintas para reconstruir la situación de un paciente crítico, lo que aumenta la carga de trabajo y el riesgo de error en un entorno donde ambos factores tienen consecuencias directas sobre la seguridad del paciente. Trabajar en una herramienta que integra esa información en una misma línea temporal me ha hecho ser consciente de que la sostenibilidad de un sistema sanitario no depende solo de sus recursos económicos o materiales, sino también de cuidar el tiempo, la atención y la carga de trabajo de las personas que lo sostienen día a día. Una herramienta que reduce la fragmentación de la información, aunque sea a pequeña escala, contribuye a un entorno de trabajo más sostenible para el personal clínico.
+
+## Responsabilidad ética en el uso de datos
+
+Trabajar con datos clínicos reales me ha permitido experimentar de primera mano una dimensión de la sostenibilidad que no había abordado tan de cerca en el grado: la responsabilidad en el tratamiento de la información. La necesidad de tramitar y obtener la aprobación del Comité de Bioética antes de poder usar datos reales, y de mantener en todo momento la separación entre archivos originales y derivados, la trazabilidad de las fuentes y la ausencia de identificadores directos del paciente, me ha hecho entender que la innovación tecnológica en salud solo es sostenible si se construye sobre una base de confianza y de respeto a los derechos de las personas cuyos datos se utilizan. Esta experiencia ha reforzado mi conciencia de que no toda mejora técnica es deseable si no se acompaña de garantías éticas adecuadas, y que el tiempo dedicado a estos aspectos (que en ocasiones puede parecer que ralentiza el desarrollo) es, en realidad, parte imprescindible de un proyecto responsable.
+
+## Sostenibilidad tecnológica y económica
+
+El proyecto se ha construido íntegramente con herramientas de software libre y de acceso gratuito: Python, R, Dash, Plotly y Visual Studio Code, entre otras. Esta decisión no ha sido solo técnica, sino que tiene una dimensión de sostenibilidad económica relevante en un contexto como el sanitario público, donde los presupuestos son limitados y la dependencia de licencias privativas puede condicionar la continuidad de un proyecto a largo plazo. Que el sistema pueda ejecutarse, mantenerse y ampliarse sin coste de licencia facilita que, si en algún momento se decide continuar con esta línea de trabajo, no exista una barrera económica añadida a las barreras técnicas o de validación clínica ya existentes. Del mismo modo, haber documentado con detalle la metodología, los parámetros de reconstrucción y las decisiones de diseño responde a un criterio de sostenibilidad del propio conocimiento generado: cualquier persona que continúe este trabajo en el futuro puede hacerlo sin depender de que yo esté disponible para explicarlo.
+
+## Reflexión final
+
+Este trabajo me ha permitido aplicar competencias de sostenibilidad que van más allá de lo puramente técnico: pensar en sistemas complejos (neuromonitorización, información clínica, personas y procesos hospitalarios) en lugar de en componentes aislados; asumir con humildad los límites de una prueba de concepto, evitando presentar como validado lo que todavía no lo está; y colaborar con profesionales de un ámbito distinto al mío, aprendiendo a traducir necesidades clínicas en decisiones de diseño técnico. Considero que estas competencias, más allá de su aplicación concreta en este proyecto, son trasladables a cualquier desarrollo tecnológico futuro en el ámbito de la salud, donde la sostenibilidad del sistema sanitario depende tanto de la innovación técnica como de la responsabilidad con la que esta se introduce.

@@ -4,47 +4,182 @@
 %% ══════════════════════════════════════════════════════
 ```
 
-
 \apendice{Especificación de Requisitos}
 
-Si procede.
+## Diagrama de casos de uso
 
+El sistema distingue dos actores principales: el **usuario clínico**, que organiza pacientes y consulta sus sesiones, y el **administrador**, que gestiona la disponibilidad del repositorio de pacientes en la máquina virtual compartida (Anexo B). En la práctica, ambos roles pueden recaer sobre la misma persona, pero se diferencian porque no todas las acciones requieren privilegios de administración.
 
-# Diagrama de casos de uso
-Se presentará un diagrama de casos de uso que represente las funcionalidades principales del sistema y los actores que interactúan con él.
+```{mermaid}
+%%| label: fig-casos-uso
+%%| fig-cap: "Diagrama de casos de uso principales del sistema. Fuente: elaboración propia."
+%%| fig-width: 6
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 20, 'padding': 6}, 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    UC["Usuario<br/>clínico"] --> CU1["Crear paciente"]
+    UC --> CU2["Editar/eliminar<br/>paciente"]
+    UC --> CU3["Visualizar sesión<br/>BIS-ICCA"]
+    UC --> CU4["Generar informe<br/>PDF"]
+```
 
-# Explicación casos de uso.
+## Explicación de los casos de uso
 
-Se puede describir mediante el uso de tablas o mediante lenguaje natural.    
+A continuación se detallan los cuatro casos de uso principales del sistema.
 
-Una muestra de cómo podría ser una tabla de casos de uso:
-
-% Caso de Uso 1 -> Consultar Experimentos.
+```{=latex}
 \begin{table}[p]
 	\centering
 	\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
 		\toprule
-		\textbf{CU-1}    & \textbf{Ejemplo de caso de uso}\\
+		\textbf{CU-1}    & \textbf{Crear paciente}\\
 		\toprule
 		\textbf{Versión}              & 1.0    \\
-		\textbf{Autor}                & Alumno \\
-		\textbf{Requisitos asociados} & RF-xx, RF-xx \\
-		\textbf{Descripción}          & La descripción del CU \\
-		\textbf{Precondición}         & Precondiciones (podría haber más de una) \\
+		\textbf{Autor}                & Alumna \\
+		\textbf{Requisitos asociados} & RF-01, RF-02, RF-03 \\
+		\textbf{Descripción}          & El usuario selecciona una o varias sesiones BIS y, opcionalmente, uno o varios archivos ICCA compatibles, y la aplicación crea una nueva carpeta de paciente con las copias organizadas y los manifiestos correspondientes. \\
+		\textbf{Precondición}         & Debe seleccionarse al menos una sesión BIS válida (con archivo \texttt{.spa}). \\
 		\textbf{Acciones}             &
 		\begin{enumerate}
 			\def\labelenumi{\arabic{enumi}.}
 			\tightlist
-			\item Pasos del CU
-			\item Pasos del CU (añadir tantos como sean necesarios)
+			\item El usuario selecciona la carpeta o carpetas de sesión BIS.
+			\item El usuario selecciona, si procede, uno o varios archivos ICCA.
+			\item La aplicación analiza los intervalos temporales y el solapamiento entre fuentes.
+			\item El usuario revisa las asignaciones detectadas.
+			\item El usuario confirma la creación del paciente.
 		\end{enumerate}\\
-		\textbf{Postcondición}        & Postcondiciones (podría haber más de una) \\
-		\textbf{Excepciones}          & Excepciones \\
-		\textbf{Importancia}          & Alta o Media o Baja... \\
+		\textbf{Postcondición}        & Se crea la carpeta \texttt{PACIENTE\_NNN} con sus sesiones, manifiestos y, si procede, el Excel ICCA auxiliar de cada sesión. \\
+		\textbf{Excepciones}          & Sesiones BIS solapadas en más de 30 s en el mismo paciente; archivo ICCA o sesión BIS ya asignados a otro paciente; ausencia de sesiones BIS seleccionadas. \\
+		\textbf{Importancia}          & Alta \\
 		\bottomrule
 	\end{tabularx}
-	\caption{CU-1 Nombre del caso de uso.}
+	\caption{CU-1 Crear paciente.}
 \end{table}
+```
 
-# Prototipos de interfaz o interacción con el proyecto.
-Se incluirán bocetos, prototipos o capturas de pantalla que muestren la interacción del usuario con el sistema desarrollado.
+```{=latex}
+\begin{table}[p]
+	\centering
+	\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+		\toprule
+		\textbf{CU-2}    & \textbf{Editar/eliminar paciente}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Alumna \\
+		\textbf{Requisitos asociados} & RF-04, RF-05 \\
+		\textbf{Descripción}          & El usuario modifica las fuentes asignadas a un paciente ya creado (añadiendo o retirando sesiones BIS y archivos ICCA) o elimina por completo un paciente existente. \\
+		\textbf{Precondición}         & Debe existir al menos un paciente ya creado. \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario selecciona un paciente de la lista de gestión.
+			\item El usuario añade o retira sesiones BIS o archivos ICCA.
+			\item La aplicación vuelve a validar los intervalos y solapamientos antes de guardar.
+			\item El usuario confirma la edición, o bien solicita eliminar el paciente con confirmación expresa.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & Se actualiza la carpeta del paciente con las nuevas fuentes, o se elimina por completo si así se solicitó. \\
+		\textbf{Excepciones}          & Los mismos conflictos de solapamiento y reutilización de fuentes que en CU-1; intento de eliminación sin confirmación. \\
+		\textbf{Importancia}          & Media \\
+		\bottomrule
+	\end{tabularx}
+	\caption{CU-2 Editar/eliminar paciente.}
+\end{table}
+```
+
+```{=latex}
+\begin{table}[p]
+	\centering
+	\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+		\toprule
+		\textbf{CU-3}    & \textbf{Visualizar sesión BIS-ICCA}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Alumna \\
+		\textbf{Requisitos asociados} & RF-06, RF-07, RF-08 \\
+		\textbf{Descripción}          & El usuario selecciona un paciente y una de sus sesiones BIS, y la aplicación carga la DSA (original o reconstruida), las variables procesadas del monitor y, si está disponible, la información clínica ICCA asociada al intervalo. \\
+		\textbf{Precondición}         & Debe existir al menos un paciente con una sesión BIS organizada. \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario selecciona un paciente de la lista.
+			\item El usuario selecciona una sesión BIS de ese paciente.
+			\item La aplicación detecta si existe un archivo \texttt{.f\_a} válido o si es necesario reconstruir la DSA.
+			\item La aplicación representa la DSA, las variables BIS y, si existen, las variables ICCA.
+			\item El usuario puede seleccionar un tramo horario y ajustar la duración de la vista.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & Se muestra la visualización conjunta del intervalo seleccionado. \\
+		\textbf{Excepciones}          & Ausencia de archivo \texttt{.f\_a} válido y de señal cruda completa (no es posible reconstruir la DSA); sesión sin información ICCA compatible. \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+	\end{tabularx}
+	\caption{CU-3 Visualizar sesión BIS-ICCA.}
+\end{table}
+```
+
+```{=latex}
+\begin{table}[p]
+	\centering
+	\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+		\toprule
+		\textbf{CU-4}    & \textbf{Generar informe PDF}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Alumna \\
+		\textbf{Requisitos asociados} & RF-09 \\
+		\textbf{Descripción}          & A partir de una sesión ya cargada en el visualizador, el usuario genera un documento PDF con una portada identificativa, la representación de la DSA y un resumen de la información clínica ICCA del intervalo mostrado. \\
+		\textbf{Precondición}         & Debe haberse cargado previamente una sesión en el visualizador (CU-3). \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario solicita la generación del informe desde la sesión visualizada.
+			\item La aplicación construye la portada con los datos identificativos y el intervalo mostrado.
+			\item La aplicación genera la página de la DSA y el resumen ICCA.
+			\item El usuario descarga el archivo PDF resultante.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & Se genera un archivo PDF descargable asociado a la sesión y al intervalo mostrados. \\
+		\textbf{Excepciones}          & Ausencia de información ICCA (el informe se genera igualmente, indicando que no hay datos clínicos disponibles). \\
+		\textbf{Importancia}          & Media \\
+		\bottomrule
+	\end{tabularx}
+	\caption{CU-4 Generar informe PDF.}
+\end{table}
+```
+
+## Prototipos de interfaz o interacción con el proyecto
+
+A continuación se muestran las pantallas más representativas de cada caso de uso. Las capturas correspondientes al resultado final del visualizador (DSA, variables BIS e ICCA) y al informe PDF generado (CU-4) ya se muestran con su contexto de resultado en el capítulo de Resultados de la memoria, por lo que aquí no se duplican.
+
+### CU-1: Crear paciente
+
+La creación de un paciente parte de la pantalla inicial del organizador (@fig-inicio-organizador), donde el usuario aporta las sesiones BIS y los archivos ICCA. Antes de confirmar, la aplicación muestra una revisión de las asignaciones detectadas (@fig-revision-paciente), incluyendo el solapamiento calculado entre cada sesión BIS y las plantillas ICCA compatibles.
+
+![Pantalla inicial de la aplicación de organización de datos. Fuente: elaboración propia.](img/capturas_app_organizador/cap_inicio_organizador.png){#fig-inicio-organizador width=90%}
+
+![Revisión de las asignaciones antes de crear el paciente. Fuente: elaboración propia.](img/capturas_app_organizador/cap_revision_paciente.png){#fig-revision-paciente width=90%}
+
+Una vez confirmada la creación, el contenido generado para el paciente (carpetas de sesión, manifiestos y Excel ICCA auxiliar) queda organizado tal como se muestra en la @fig-contenido-paciente.
+
+![Contenido generado para una sesión organizada por paciente, con la exportación BIS y el Excel ICCA auxiliar. Fuente: elaboración propia.](img/capturas_app_organizador/cap_analisis_contenido_sesion.png){#fig-contenido-paciente width=90%}
+
+### CU-2: Editar/eliminar paciente
+
+La edición de un paciente ya creado permite añadir o retirar sesiones BIS y archivos ICCA sin modificar los originales, tal y como se muestra en la @fig-editar-paciente.
+
+![Edición de asignaciones de un paciente ya creado. Fuente: elaboración propia.](img/capturas_app_organizador/cap_editar_paciente.png){#fig-editar-paciente width=90%}
+
+### CU-3: Visualizar sesión BIS-ICCA
+
+El visualizador parte de una pantalla inicial (@fig-visualizador-inicio) desde la que se accede a la selección de paciente y sesión (@fig-visualizador-seleccion).
+
+![Pantalla inicial del visualizador. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_inicio.png){#fig-visualizador-inicio width=90%}
+
+![Selección de paciente y sesión BIS en el visualizador. Fuente: elaboración propia.](img/capturas_app_visualizador/visual_paciente_seleccionado.png){#fig-visualizador-seleccion width=90%}
+
+El resultado de la carga (DSA, variables BIS e información ICCA) se muestra con su contexto de resultado en el capítulo de Resultados de la memoria.
+
+### CU-4: Generar informe PDF
+
+El resultado de este caso de uso, el propio informe PDF generado, se muestra en el capítulo de Resultados de la memoria.

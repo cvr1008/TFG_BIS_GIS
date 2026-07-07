@@ -4,22 +4,120 @@
 %% ══════════════════════════════════════════════════════
 ```
 
-\apendice{Manual del desarrollador / programador / investigador.} % usar el término que mejor se corresponda.
+\apendice{Manual del desarrollador e investigador}
 
-# Estructura de directorios
+## Estructura de directorios
 
-Descripción de la estructura de carpetas y archivos entregados junto con el proyecto.
+El proyecto se organiza en torno a una carpeta principal que contiene las aplicaciones desarrolladas, los datos de trabajo y los archivos auxiliares necesarios para la ejecución local del sistema. La estructura general es la siguiente:
 
-# Compilación, instalación y ejecución del proyecto
+```text
+tfg/
+├── aplicaciones/
+│   ├── portal_bis_icca/
+│   ├── organizador_bis_icca/
+│   │   └── requirements.txt
+│   ├── visualizador_bis_icca/
+│   │   └── requirements.txt
+│   ├── requirements.txt
+│   ├── preparar_entorno.ps1
+│   ├── iniciar_aplicaciones.ps1
+│   └── detener_aplicaciones.ps1
+├── datos/
+│   └── pacientes/
+├── README.md
+└── .gitignore
+```
 
-En caso necesario, se detallarán los pasos técnicos para compilar, instalar y ejecutar el proyecto.
+La carpeta `aplicaciones/` contiene el sistema ejecutable del proyecto, dividido en tres aplicaciones complementarias:
 
-# Pruebas del sistema
-Esta sección puede ser opcional.
+- `portal_bis_icca/`: pantalla inicial de acceso al sistema.
+- `organizador_bis_icca/`: aplicación encargada de organizar pacientes, asociar sesiones BIS y archivos ICCA, y generar la estructura de carpetas de trabajo.
+- `visualizador_bis_icca/`: aplicación principal de visualización conjunta de DSA, parámetros BIS y variables clínicas ICCA.
 
-Se describirán las pruebas realizadas para validar el correcto funcionamiento del sistema, tales como pruebas unitarias, funcionales o validaciones con usuarios.
+La versión final del proyecto centraliza las tres aplicaciones dentro de la carpeta `aplicaciones/`. Cualquier referencia previa a rutas directas como `tfg/organizador_bis_icca/` corresponde a una estructura anterior del desarrollo, ya sustituida por `tfg/aplicaciones/organizador_bis_icca/`.
 
+Cada aplicación contiene un archivo `app.py`, que define la interfaz Dash y sus *callbacks* principales. Las funciones auxiliares se agrupan en la carpeta `src/` de cada aplicación, mientras que las pruebas automáticas se almacenan en su carpeta `tests/`.
 
-# Instrucciones para la modificación o mejora del proyecto.
+La carpeta `datos/pacientes/` contiene las carpetas generadas para cada paciente durante el uso del sistema, con las sesiones BIS seleccionadas, los archivos ICCA asociados y los archivos auxiliares generados para la visualización. Los archivos originales no se modifican durante este proceso; cuando es necesario, se trabaja sobre copias o archivos derivados.
 
-Se proporcionarán indicaciones y recomendaciones para facilitar futuras ampliaciones o mejoras del trabajo realizado.
+Los directorios como `.venv/`, `.runtime/`, `outputs/`, `tmp/` o carpetas de pruebas temporales no forman parte del código fuente principal y no deben considerarse elementos necesarios para la entrega final.
+
+## Compilación, instalación y ejecución del proyecto
+
+El proyecto está desarrollado en Python y utiliza Dash para la construcción de las interfaces web. No requiere compilación en sentido estricto, pero sí la preparación de un entorno de ejecución con las dependencias necesarias.
+
+La primera vez que se utilice el sistema, debe abrirse una terminal de PowerShell en la carpeta de aplicaciones:
+
+```powershell
+cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones"
+```
+
+A continuación, se prepara el entorno local:
+
+```powershell
+.\preparar_entorno.ps1
+```
+
+Este script crea un entorno virtual de Python en `aplicaciones/.venv/` e instala las dependencias indicadas en `aplicaciones/requirements.txt`.
+
+La carpeta `aplicaciones/` contiene un archivo `requirements.txt` general, utilizado para preparar el entorno común de ejecución de las tres aplicaciones. Además, el organizador y el visualizador conservan cada uno su propio `requirements.txt`, que documenta las dependencias específicas de esa aplicación y permite su ejecución independiente si fuera necesario.
+
+Para iniciar las tres aplicaciones se ejecuta:
+
+```powershell
+.\iniciar_aplicaciones.ps1 -PacientesDir "..\datos\pacientes" -RutaPacientesFija
+```
+
+Una vez iniciado el sistema, las aplicaciones quedan disponibles en las siguientes direcciones locales:
+
+- Portal: <http://127.0.0.1:8040/>
+- Visualizador: <http://127.0.0.1:8050/>
+- Organizador: <http://127.0.0.1:8060/>
+
+Para detener las aplicaciones se utiliza:
+
+```powershell
+.\detener_aplicaciones.ps1
+```
+
+En un despliegue hospitalario, la ruta local `datos/pacientes` puede sustituirse por una ruta compartida definida por el servicio técnico, manteniendo el mismo código de la aplicación.
+
+## Pruebas del sistema
+
+Durante el desarrollo se incluyeron pruebas automáticas para comprobar partes críticas del sistema. Estas pruebas se centran en la lectura y validación de archivos BIS, la alineación temporal, la reconstrucción de la DSA, el cálculo de bandas espectrales, la integración de datos ICCA y la generación de informes.
+
+Las pruebas del visualizador se encuentran en `aplicaciones/visualizador_bis_icca/tests/`, y las del organizador en `aplicaciones/organizador_bis_icca/tests/`.
+
+Para ejecutar las pruebas del visualizador puede utilizarse:
+
+```powershell
+cd "C:\Users\usuario\OneDrive - Universidad de Burgos\Documentos\tfg\aplicaciones\visualizador_bis_icca"
+..\.venv\Scripts\python.exe -m unittest
+```
+
+En caso de ejecutar los tests desde el entorno común de aplicaciones, debe emplearse el intérprete del entorno virtual creado en `aplicaciones/.venv/`.
+
+Además de las pruebas automáticas, se realizaron pruebas funcionales manuales con registros BIS unilaterales y bilaterales. Estas pruebas permitieron comprobar la detección de sesiones, la disponibilidad de matriz original o reconstruida, la visualización por intervalos temporales, la integración de variables ICCA y la exportación de informes en PDF.
+
+## Instrucciones para la modificación o mejora del proyecto
+
+Para ampliar el sistema se recomienda mantener la separación entre organización de datos, procesamiento BIS, procesamiento ICCA y visualización. Esta separación facilita modificar una parte del sistema sin alterar el resto.
+
+| Área de modificación | Archivos principales |
+|---|---|
+| Reconstrucción de la DSA | `visualizador_bis_icca/src/reconstruccion.py`, `alineacion_temporal.py`, `figuras.py` |
+| Variables clínicas ICCA | `visualizador_bis_icca/src/visualizacion_icca.py`, `pacientes_icca.py` |
+| Organización de pacientes | `organizador_bis_icca/src/` |
+
+: Ubicación de las modificaciones más habituales {#tbl-modificaciones-desarrollador}
+
+Se recomienda no modificar directamente los datos originales exportados del monitor BIS ni los archivos ICCA originales. Cualquier procesamiento adicional debe generar archivos auxiliares identificables dentro de la carpeta del paciente o de la sesión correspondiente.
+
+Como líneas futuras de mejora orientadas al desarrollador, se plantean:
+
+- Incorporar nuevos tipos de variables ICCA cuando estén disponibles.
+- Mejorar la validación automática de solapamientos temporales entre sesiones BIS e ICCA.
+- Añadir nuevos criterios de calidad de señal o artefactos.
+- Optimizar la carga de registros de larga duración.
+- Ampliar la exportación de informes con nuevas gráficas o resúmenes clínicos.
+- Preparar una versión desplegable en red hospitalaria con rutas compartidas y control de permisos.
