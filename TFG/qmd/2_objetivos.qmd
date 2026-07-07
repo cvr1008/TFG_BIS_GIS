@@ -3,31 +3,28 @@
 \capitulo{2}{Objetivos}
 ```
 
-**Objetivo general** 
+## Objetivo general
 
 Desarrollar una prueba de concepto para la integración y visualización simultánea de datos procedentes del monitor BIS y de variables clínicas extraídas del sistema ICCA, con el fin de facilitar su análisis retrospectivo en el contexto de la unidad de cuidados intensivos.
 
+## Objetivos específicos
 
-**Objetivos específicos** 
-
-1.	Caracterizar y organizar la información contenida en las diferentes exportaciones del monitor BIS y en las plantillas clínicas procedentes de ICCA, identificando los archivos, variables e intervalos temporales relevantes para el proyecto.
+1. Caracterizar y organizar la información contenida en las diferentes exportaciones del monitor BIS y en las plantillas clínicas procedentes de ICCA, identificando los archivos, variables e intervalos temporales relevantes para el proyecto.
 2. Diseñar una estrategia de organización de datos por paciente y sesión, que permita asociar registros BIS e información clínica correspondiente a un mismo periodo temporal.
 3. Recuperar la matriz de densidad espectral proporcionada por el monitor BIS y permitir su reconstrucción a partir de la señal EEG cruda cuando el archivo espectral no exista o no contenga información válida.
-4.	Establecer una representación temporal común para la DSA y las variables procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios.
+4. Establecer una representación temporal común para la DSA y las variables procesadas del monitor, incluyendo el índice BIS, la frecuencia espectral de borde, la frecuencia mediana y, en los registros bilaterales, la asimetría entre hemisferios.
 5. Integrar las variables clínicas procedentes de ICCA correspondientes al intervalo temporal de cada sesión BIS, respetando su resolución temporal y el instante real en el que fueron registradas.
-6.	Desarrollar un visualizador interactivo que permita consultar registros BIS unilaterales y bilaterales, seleccionar diferentes intervalos temporales y representar conjuntamente la DSA, los parámetros procesados del BIS y la información clínica disponible.
+6. Validar la fidelidad de la matriz de densidad espectral reconstruida frente a la matriz original del monitor, cuando esté disponible, mediante métricas de concordancia (correlación de Pearson, error absoluto medio y raíz del error cuadrático medio).
+7. Desarrollar un visualizador interactivo que permita consultar registros BIS unilaterales y bilaterales, seleccionar diferentes intervalos temporales y representar conjuntamente la DSA, los parámetros procesados del BIS y la información clínica disponible.
 
-
-
-**Objetivos de aprendizaje** 
+## Objetivos de aprendizaje
 
 Además de los objetivos técnicos del proyecto, este trabajo persigue una serie de objetivos formativos relacionados con las competencias propias del Grado en Ingeniería de la Salud. Entre ellos destacan:
 
-
- - Comprender el funcionamiento básico del monitor BIS y la naturaleza de las señales asociadas a la monitorización neurofisiológica.
- - Afianzar los conceptos fundamentales del tratamiento de señales biomédicas, incluyendo la representación temporal de una señal, su análisis en el dominio de la frecuencia y la interpretación de magnitudes como amplitud, frecuencia, potencia y densidad espectral.
- - Profundizar en el análisis del electroencefalograma y en su representación mediante herramientas frecuenciales, como el espectro de potencia y la matriz de densidad espectral.
- - Profundizar en el tratamiento, organización y análisis de datos biomédicos heterogéneos.
- - Aplicar estrategias de sincronización temporal y estructuración de datos clínicos procedentes de distintas fuentes.
- - Desarrollar una prueba de concepto orientada a una necesidad real del entorno clínico.
- - Fortalecer la capacidad de documentación técnica, planificación y desarrollo de proyectos en el ámbito de la ingeniería de la salud.
+- Comprender el funcionamiento básico del monitor BIS y la naturaleza de las señales asociadas a la monitorización neurofisiológica.
+- Afianzar los conceptos fundamentales del tratamiento de señales biomédicas, incluyendo la representación temporal de una señal, su análisis en el dominio de la frecuencia y la interpretación de magnitudes como amplitud, frecuencia, potencia y densidad espectral.
+- Profundizar en el análisis del electroencefalograma y en su representación mediante herramientas frecuenciales, como el espectro de potencia y la matriz de densidad espectral.
+- Profundizar en el tratamiento, organización y análisis de datos biomédicos heterogéneos.
+- Aplicar estrategias de sincronización temporal y estructuración de datos clínicos procedentes de distintas fuentes.
+- Desarrollar una prueba de concepto orientada a una necesidad real del entorno clínico.
+- Fortalecer la capacidad de documentación técnica, planificación y desarrollo de proyectos en el ámbito de la ingeniería de la salud.

@@ -3,9 +3,7 @@
 \capitulo{3}{Conceptos teóricos}
 ```
 
-# Conceptos teóricos básicos
-En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo. 
-
+En esta sección se presentan los conceptos fundamentales necesarios para comprender el contexto clínico y técnico del trabajo.
 
 ## Unidad de cuidados intensivos (UCI) y monitorización del paciente crítico
 La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especializada destinada a la atención de pacientes con patologías graves o con riesgo vital, que requieren vigilancia estrecha y soporte continuo.
@@ -13,7 +11,7 @@ La unidad de cuidados intensivos (UCI) es un área hospitalaria altamente especi
 En este entorno, la inestabilidad fisiológica de los pacientes exige una monitorización continua y exhaustiva de múltiples parámetros clínicos. Dentro del manejo habitual, la administración de fármacos sedantes y analgésicos constituye una práctica frecuente, orientada a reducir el estrés metabólico, facilitar la adaptación a la ventilación mecánica y evitar el dolor. En consecuencia, el control adecuado del nivel de sedación resulta fundamental, ya que una dosificación insuficiente o excesiva puede influir de forma directa en la evolución clínica. En particular, la sobresedación, entendida como la administración de una cantidad de sedantes superior a la estrictamente necesaria, se ha asociado con un aumento de la morbilidad y la mortalidad. Un exceso de sedación puede prolongar el tiempo de ventilación mecánica, retrasar el despertar y aumentar el riesgo de complicaciones asociadas, como la neumonía, contribuyendo además a una mayor estancia en la UCI [@chamorro2008].
 
 
-##  Electroencefalograma (EEG) y ondas
+## Electroencefalograma (EEG) y ondas
 El electroencefalograma (EEG) es una prueba que registra la actividad eléctrica cerebral mediante electrodos colocados sobre el cuero cabelludo [@medlineplusEEG]. La señal obtenida refleja diferencias de potencial entre electrodos, organizadas en canales de registro, y procede principalmente de la actividad sincrónica de grandes poblaciones de neuronas corticales, especialmente de las dendritas de las neuronas piramidales [@Louis2016A1]. Una de las principales ventajas del EEG es su elevada resolución temporal, del orden de milisegundos, lo que permite estudiar cambios rápidos en la actividad cerebral [@Louis2016A2]. 
 
 
@@ -71,7 +69,9 @@ Para sistematizar la interpretación clínica de este contenido espectral, las o
 
 : Bandas de frecuencia del EEG y asociaciones generales. Elaboración propia a partir de @Er2006. {#tbl-bandas-eeg}
 
-El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016].
+El predominio de las distintas bandas y las características del EEG varían según la edad, el estado clínico, el nivel de consciencia, el ciclo sueño-vigilia, la apertura ocular y los fármacos administrados. Además, deben distinguirse los cambios fisiológicos de los artefactos y de posibles alteraciones patológicas. Por ello, el registro de estas ondas no debe interpretarse de manera aislada, sino considerando las condiciones en las que fue obtenido y el contexto clínico del paciente [@Er2006]. 
+
+El análisis asistido por software permite cuantificar la potencia de las distintas bandas y representarla mediante herramientas como la matriz de densidad espectral [@Tatum2016]. Por ejemplo, ratio alfa/delta (ADR) es un índice derivado del EEG que compara la potencia de la banda alfa con la de la banda delta; un valor más bajo indica un predominio relativo de actividad lenta, asociado habitualmente a mayor profundidad de sedación o anestesia [@LpezCastruita2023; @Hwang2022].
 
 
 
@@ -91,9 +91,9 @@ Desde el punto de vista clínico, la DSA facilita la identificación de patrones
 
 ### SEF y MF
 Para complementar la información de la DSA, el monitor calcula parámetros que resumen la distribución de la potencia en el dominio frecuencial [@OchoaSolana2025]:
-- **Frecuencia del Borde Espectral (SEF, Spectral Edge Frequency):** Representada habitualmente como la SEF95, indica la frecuencia por debajo de la cual se encuentra el 95\,\% de la potencia total del EEG [@OchoaSolana2025]. En la DSA se dibuja como una línea blanca. 
+- **Frecuencia del Borde Espectral (SEF, Spectral Edge Frequency):** Representada habitualmente como la SEF95, indica la frecuencia por debajo de la cual se encuentra el 95 % de la potencia total del EEG [@OchoaSolana2025]. En la DSA se dibuja como una línea blanca. 
 
-- **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50\,\% por encima y 50\,\% por debajo), trazándose en el espectrograma como una línea púrpura.
+- **Frecuencia Mediana (MF, Median Frequency):** Indica la frecuencia que divide la potencia del espectro en dos mitades exactas (50 % por encima y 50 % por debajo), trazándose en el espectrograma como una línea púrpura.
 Ambos parámetros permiten resumir el desplazamiento del contenido espectral del EEG, la disminución de los mismos refleja un predominio de frecuencias más lentas, aunque su interpretación depende del fármaco administrado, la profundidad de la sedación y la situación clínica del paciente [@OchoaSolana2025].
 
 
@@ -106,9 +106,9 @@ Clínicamente, un aumento de la actividad muscular interfiere con la captura de 
 ### Supresión de ráfagas (SR)
 El patrón de brote-supresión (burst-suppression) refleja un estado de depresión cortical profunda, caracterizado por ráfagas de actividad eléctrica de alto voltaje seguidas de periodos de supresión del EEG o silencio isoeléctrico casi absoluto [@OchoaSolana2025]. Este patrón surge en contextos de anestesia profunda, hipotermia o daño cerebral severo [@OchoaSolana2025].
 
-El monitor sintetiza este fenómeno mediante la Tasa de Supresión o Suppression Ratio (SR), que expresa el porcentaje de tiempo, dentro de una ventana temporal reciente (de unos 63 segundos), en el que la señal EEG se considera suprimida. 
+El monitor sintetiza este fenómeno mediante la Tasa de Supresión o Suppression Ratio (SR), que expresa el porcentaje de tiempo, dentro de una ventana temporal reciente (de unos 63 segundos) [@CovidienBISadvanced], en el que la señal EEG se considera suprimida.
 
-Una SR elevada indica una presencia  relevante de periodos de supresión y, por tanto, debe interpretarse como un posible marcador de depresión cortical intensa. En el contexto de este trabajo, este parámetro resulta útil para complementar la interpretación del índice BIS y de la DSA, especialmente en registros con sedación profunda o alteraciones neurológicas [@OchoaSolana2025].
+Una SR elevada indica una presencia relevante de periodos de supresión y, por tanto, debe interpretarse como un posible marcador de depresión cortical intensa. En el contexto de este trabajo, este parámetro resulta útil para complementar la interpretación del índice BIS y de la DSA, especialmente en registros con sedación profunda o alteraciones neurológicas [@OchoaSolana2025].
 
 
 ### Calidad de la señal (SQI) y artefactos
@@ -121,20 +121,16 @@ En el contexto de este trabajo, el SQI resulta especialmente relevante porque pe
 
 ## Sistema IntelliSpace Critical Care & Anesthesia (ICCA) y registro de variables clínicas
 
-ICCA es un sistema de información clínica desarrollado por Phillips empleado en entornos de cuidados críticos y anestesia para centralizar la información generada durante la atención del paciente. Este tipo de sistemas permite reunir en un mismo entorno datos procedentes de monitores, dispositivos médicos y registros manuales realizados por el personal sanitario. En una UCI, esta información resulta especialmente relevante a la hora de interpretar la evolución del paciente de forma continua. Estas variables registradas permiten reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos.
+ICCA es un sistema de información clínica empleado en entornos de cuidados críticos y anestesia para centralizar información generada durante la atención del paciente. Este tipo de sistemas permite reunir datos procedentes de monitores, dispositivos médicos y registros clínicos realizados por el personal sanitario [@Lai2022].
 
-De forma general, las variables clínicas procedentes de este tipo de sistemas pueden agruparse en:
- * Constantes vitales: frecuencia cardiaca, presión arterial.
- * Parámetros respiratorios y ventilatorios: fracción inspirada de oxígeno, frecuencia respiratoria.
- * Tratamientos farmacológicos: sedantes, analgésicos, relajantes neuromusculares.
- * Resultados analíticos: hemograma, glucemia.
+En el contexto de la UCI, esta información resulta especialmente útil para reconstruir el contexto clínico en el que se producen determinados cambios fisiológicos o terapéuticos. Además, distintos estudios han utilizado datos extraídos de IntelliSpace Critical Care and Anesthesia para realizar análisis retrospectivos de variables clínicas continuas, como frecuencia cardiaca o presión arterial, en pacientes críticos [@Laichinger2024; @Mengel2025].
 
-En el contexto de este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente, lo que resulta especialmente relevante para diseñar herramientas de visualización orientadas al seguimiento del paciente crítico.
+En este trabajo, ICCA se considera la fuente principal de información clínica complementaria a la neuromonitorización BIS. Estas variables permiten interpretar la señal electroencefalográfica y los parámetros derivados del EEG dentro del contexto clínico real del paciente.
 
 
-# Estado del arte y trabajos relacionados
+## Estado del arte y trabajos relacionados
 
-## Reconstrucción y visualización de DSA en monitorización EEG/BIS
+### Reconstrucción y visualización de DSA en monitorización EEG/BIS
 La qEEG se ha utilizado en cuidados críticos para transformar registros EEG prolongados en representaciones más compactas e interpretables. Hwang et al. revisan distintas aplicaciones del qEEG en UCI adulta y destacan el uso de representaciones como la CDSA (Color Density Spectral Array) o la aEEG para facilitar la revisión visual de registros extensos, reduciendo la necesidad de analizar de forma continua el EEG crudo [@Hwang2022]. Estas herramientas permiten identificar cambios en el contenido espectral de la señal y resumir la evolución de la actividad cerebral en el tiempo.
 
 En el ámbito de la anestesia, también se han desarrollado trabajos orientados a analizar el EEG mediante espectros y espectrogramas generados computacionalmente. Por ejemplo, Sawa et al. presentan una aproximación basada en Python para calcular y visualizar el espectro de potencia y el espectrograma del EEG durante anestesia general, mostrando cómo el procesamiento digital permite representar la evolución frecuencial de la señal de forma interpretable [@Sawa2022]. Este tipo de trabajos resulta cercano al presente TFG, ya que la reconstrucción de la DSA requiere transformar señales EEG en representaciones tiempo-frecuencia.
@@ -142,7 +138,7 @@ En el ámbito de la anestesia, también se han desarrollado trabajos orientados 
 No obstante, gran parte de estos trabajos se centran en el análisis general del EEG o en la interpretación clínica del qEEG, pero no en la reconstrucción práctica de la DSA a partir de archivos exportados por un monitor BIS. En este contexto, el presente trabajo aporta una aplicación orientada a reconstruir, visualizar y explorar registros BIS, incluyendo la DSA, parámetros derivados y diferencias entre registros unilaterales y bilaterales.
 
 
-## Dashboards interactivos e integración de datos clínicos en UCI
+### Dashboards interactivos e integración de datos clínicos en UCI
 
 De forma paralela, distintos trabajos han abordado la necesidad de integrar y visualizar grandes volúmenes de información clínica en UCI. Las revisiones sobre dashboards clínicos señalan que los profesionales deben interpretar simultáneamente constantes vitales, parámetros ventilatorios, tratamientos, analíticas, alarmas y observaciones clínicas, lo que puede aumentar la carga cognitiva y dificultar la identificación rápida de cambios relevantes [@Khairat2018; @Wright2019].
 

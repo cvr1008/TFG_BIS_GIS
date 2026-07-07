@@ -3,130 +3,192 @@
 \capitulo{4}{Metodología}
 ```
 
-# Enfoque general del proyecto
+## Enfoque general del proyecto
 
 El proyecto se plantea como una prueba de concepto orientada a la integración temporal y visualización conjunta de información procedente del monitor BIS y de variables clínicas registradas en ICCA. El objetivo no es desarrollar un producto clínico final ni sustituir la interpretación médica, sino estudiar la viabilidad de organizar, sincronizar y representar ambas fuentes de información para facilitar el análisis retrospectivo de pacientes críticos.
 
 Para ello se diseñaron dos flujos de trabajo complementarios. El primero permite organizar los datos disponibles por paciente y por sesión BIS, asociando a cada registro neurofisiológico la información clínica correspondiente. El segundo permite visualizar de forma conjunta la matriz de densidad espectral, las variables procesadas del monitor BIS y las variables clínicas seleccionadas procedentes de ICCA. 
+
+El proyecto se ha desarrollado con datos reales procedentes del Hospital Universitario de Burgos (HUBU), cuyo uso fue autorizado por el Comité de Bioética correspondiente. El detalle de esta aprobación y de las condiciones bajo las que se ha tratado la información se recoge en el Anexo F.
+
+
+## Fuentes de datos utilizadas
+
+### Datos BIS
+
+Los datos del monitor BIS proceden de las exportaciones generadas por los equipos BIS VISTA y BIS Advance [@CovidienBISadvanced; @CovidienSerial2010]. En este trabajo se emplean principalmente los archivos `.spa`, `.f_a`, `.r2a` o `.r4a`, `.h_a` y `.t_a`. Todos ellos explicados con detalle en el Anexo F.
+ - El archivo `.spa` contiene las variables procesadas por el monitor, como el índice BIS, SEF, MEF, SQI y otros parámetros de configuración. 
+ - El archivo `.f_a` contiene la matriz espectral calculada por el propio monitor. Este archivo no siempre está disponible, ya que el equipo BIS VISTA lo exporta vacío.
+- La cabecera `.h_a` proporciona la pendiente y el offset, información de calibración necesaria para convertir los valores crudos a microvoltios. 
+ - `.t_a` aporta el instante en el que comienza el BIS a registrar.
+ - Los archivos `.r2a` y `.r4a` almacenan el EEG crudo en registros unilaterales y bilaterales, respectivamente. La diferencia entre ambos formatos no se limita al nombre del archivo, sino al número de canales de EEG registrados. Los archivos `.r2a` contienen dos canales de señal cruda, mientras que los archivos `.r4a` contienen cuatro canales. 
+
+La diferencia entre `.r2a` y `.r4a` condiciona la reconstrucción. Los archivos `.r2a` contienen dos canales de señal cruda y se asocian a registros unilaterales, mientras que los archivos `.r4a` contienen cuatro canales y se asocian a registros bilaterales. En registros unilaterales se emplea el canal 1. En registros bilaterales se procesan de forma separada el canal 1, asociado al hemisferio izquierdo, y el canal 3, asociado al hemisferio derecho. La estructura interna de todos estos archivos y la justificación técnica de la selección de canales se describen con mayor detalle en el Anexo F.
+
+
+### Datos ICCA
+
+Las variables clínicas procedentes de ICCA se reciben, directamente del HUBU, en forma de plantillas Excel estructuradas. Estas plantillas agrupan la información en hojas diferenciadas: información general del paciente y del ingreso, constantes vitales, resultados analíticos y perfusiones o tratamientos administrados. El detalle completo de los archivos BIS, la estructura de la plantilla ICCA y el significado de las variables principales se recoge en el Anexo F.
+
+```{mermaid}
+%%| label: fig-esquema-icca
+%%| fig-cap: "Organización general de las variables clínicas procedentes de ICCA."
+flowchart TD
+    A["Datos ICCA<br/>plantilla Excel"] --> B["Hoja general<br/>contexto clínico"]
+    A --> C["Constantes vitales<br/>mediciones temporales"]
+    A --> D["Análisis clínicos<br/>observaciones puntuales"]
+    A --> E["Perfusiones:<br/>dosis a lo largo del tiempo"]
+
+    B --> B1["Ingreso, alta, edad, peso"]
+    C --> C1["FC, PA, SpO₂,<br/>temperatura, FR, PIC"]
+    D --> D1["Hb, Na⁺, K⁺, Cl⁻,<br/>Ca²⁺, glucosa, pO₂, pCO₂"]
+    E --> E1["Midazolam, propofol, fentanilo,<br/>remifentanilo, cisatracurio, noradrenalina"]
+```
+
+Esta organización permite incorporar las variables clínicas a la sesión BIS respetando su naturaleza temporal: la hoja general aporta contexto, las constantes vitales se representan como mediciones temporales, los análisis como observaciones puntuales y las perfusiones como tratamientos mantenidos o modificados a lo largo del tiempo.
+
+Los ejemplos mostrados corresponden a algunas de las variables que han podido ser recogidas de pacientes reales.
+
+
+## Tratamiento de los datos BIS
+
+### Flujo de obtención y reconstrucción de la DSA
+
+La matriz de densidad espectral utilizada en la visualización puede proceder de dos vías. Cuando el archivo `.f_a` está disponible y contiene información válida, se emplea como DSA original exportada por el monitor. Cuando este archivo no está disponible, está vacío o se desea comparar la matriz original con una reconstrucción independiente, la DSA se obtiene a partir del procesamiento de la señal EEG cruda almacenada en los archivos `.r2a` o `.r4a`.
+
+La Figura @fig-flujo-dsa resume el flujo seguido para obtener o construir la DSA empleada en la aplicación.
+
+```{mermaid}
+%%| label: fig-flujo-dsa
+%%| fig-cap: "Flujo general de obtención o reconstrucción de la DSA."
+flowchart LR
+    A["Exportación<br/>BIS"] --> B["Lectura de<br/>archivos"]
+    B --> C["Identificación<br/>de sesión"]
+    C --> D["Limpieza de líneas<br/>temporales"]
+    D --> E["Timeline<br/>común"]
+    E --> F["Recorte y alineación<br/>de archivos"]
+    F --> G["Máscaras<br/>de calidad"]
+    G --> H{".f_a<br/>válido?"}
+
+    H -- "Sí" --> I["Lectura del archivo<br/>espectral .f_a"]
+    I --> J["Lectura y reescalado<br/>de valores dB"]
+    J --> K["Aplicación de<br/>máscaras"]
+
+    H -- "No" --> N["Reconstrucción<br/>desde EEG crudo"]
+    N --> O["Conversión raw<br/>a µV"]
+    O --> P["Filtrado<br/>Butterworth"]
+    P --> Q["Welch - FFT"]
+    Q --> R["PSD<br/>µV²/Hz"]
+    R --> S["Integración por bin<br/>µV²"]
+    S --> T["Conversión<br/>a dB"]
+    T --> U["Suavizado<br/>+ shift"]
+    U --> K
+
+    K --> L["DSA final<br/>visualización"]
+    L --> M["Integración con<br/>variables BIS e ICCA"]
+```
+
+
+#### Preparación común de los datos BIS
+
+El tratamiento de la DSA parte de una fase común de lectura, comprobación y alineación temporal de los archivos BIS. Esta fase se aplica tanto cuando se utiliza la matriz espectral original del archivo `.f_a` como cuando la DSA debe reconstruirse a partir de la señal EEG cruda.
+
+Los archivos exportados por el monitor no son perfectos y se puede perder información (saltos temporales, registros duplicados) por razones como movimientos del paciente, sudor, mala colocación de los sensores, etc. Para evitar que esto interfiera en la visualización de la información, antes de reconstruir o comparar matrices espectrales se realiza una alineación temporal de los archivos:
+ - se ordenan los registros cronológicamente, 
+ - se unifica el formato de las marcas temporales (DD/MM/AAAA HH:MM:SS), 
+ - en los archivos `.spa` y `.f_a` se eliminan aquellos segundos duplicados y se conserva la última aparición de los mismos. En ellos también se detectan los huecos temporales causados por pérdida de registros.
+ - se detectan los posibles segundos incompletos en el final del archivo de señal cruda.
+
+   
+Con esta información se construye una línea temporal común con resolución de un segundo. Esta línea temporal se obtiene a partir del intervalo compartido por las fuentes disponibles, evitando prolongar artificialmente ningún archivo fuera de su cobertura real. Los datos del `.spa`, la DSA original del `.f_a` o la DSA reconstruida se ajustan posteriormente a este intervalo.
+
+Esta línea común permite alinear la DSA, las variables procesadas del archivo `.spa` y, posteriormente, las variables clínicas procedentes de ICCA. Los archivos se recortan o ajustan al intervalo de la sesión BIS, pero los huecos detectados no se eliminan de forma silenciosa: se conservan como instantes sin información válida para poder identificarlos mediante máscaras.
+
+Esta normalización temporal permite revisar qué ocurría en el ámbito neurológico del paciente mientras se aporta su contexto clínico durante un periodo de tiempo concreto.
+
+
+### Uso de la DSA original del archivo `.f_a`
+
+Cuando el archivo `.f_a` está disponible y contiene información válida, la aplicación permite utilizar la matriz espectral exportada por el monitor como DSA original. En este caso no se realiza una reconstrucción espectral desde la señal cruda, sino que se lee directamente la matriz calculada por el dispositivo.
+
+Como se detalla en los anexos, en registros unilaterales, el archivo `.f_a` contiene una columna temporal y una columna espectral. En registros bilaterales, contiene una columna temporal y dos columnas espectrales, correspondientes a los lados izquierdo y derecho. Cada fila incluye los valores espectrales de 60 bins de frecuencia, desde 0,5 hasta 30 Hz con resolución de 0,5 Hz [@CovidienSerial2010].
+
+Los valores espectrales del `.f_a` se leen como valores numéricos codificados y se reescalan dividiéndolos entre 100 para obtener la matriz en decibelios (`dB`). Posteriormente, la matriz se ajusta a la línea temporal de la sesión. Los segundos presentes en la timeline pero ausentes en la matriz se mantienen como valores no disponibles, de forma que no se genera continuidad artificial.
+
+La DSA original se representa con una escala visual fija de 49 a 94 dB, equivalente a la escala empleada en la visualización del monitor [@CovidienBISVista; @CovidienVISTABilateral]. Sobre esta matriz se superponen las variables procesadas procedentes del `.spa`, como SEF, MEF, BIS, EMG, SR y, en registros bilaterales, ASYM09.
+
+```{mermaid}
+%%| label: fig-flujo-fa
+%%| fig-cap: "Flujo de uso de la matriz espectral original del archivo `.f_a`."
+flowchart LR
+    A["Archivo .f_a"] --> B{"¿DSA válida?"}
+    B -- "Sí" --> C["Lectura de matriz espectral"]
+    C --> D["60 bins<br/>0,5-30 Hz"]
+    D --> E["Reescalado<br/>valores / 100"]
+    E --> F["Matriz en dB"]
+    F --> G["Ajuste a timeline común"]
+    G --> H["Aplicación de máscaras"]
+    H --> I["DSA original<br/>para visualización"]
+
+    B -- "No" --> J["Reconstrucción<br/>desde EEG crudo"]
+```
+
+
+### Máscaras de calidad
+
+Para evitar que la visualización sugiera continuidad o fiabilidad en tramos problemáticos, se genera una máscara de calidad sobre la timeline común. Un segundo se considera no válido cuando se cumple alguno de los siguientes criterios:
+
+- **Pérdida de señal cruda.** Dentro de las 128 muestras que forman un segundo en un canal, si el 50 % o más son exactamente cero, ese segundo se invalida por completo. Este criterio se basa en que, ante la pérdida de paquetes de EEG, el propio equipo rellena las muestras ausentes con ceros para mantener la continuidad temporal [@CovidienSerial2010]. Los ceros aislados y esporádicos, que no alcanzan ese 50 %, no invalidan el segundo.
+- **Huecos temporales rellenados artificialmente.** Cuando la alineación temporal detecta un salto entre los archivos `.spa`/`.f_a` (por ejemplo, si se dispone del segundo 14 y del segundo 16 pero falta el 15), el segundo intermedio se añade de forma artificial para completar la timeline común. Al tratarse de un valor generado y no de un dato real, ese segundo también se invalida.
+- **Calidad de señal o potencia insuficiente**, según los criterios ya descritos en el Anexo F: `SQI10` inferior a 15 o `TOTPOW08` ausente o con valor centinela.
+- **Primer segundo del array reconstruido.** Al emplear una ventana de Welch de 2 segundos, existe sistemáticamente un desfase de un segundo entre el array del archivo `.f_a` y el array de la DSA reconstruida; por este motivo, el primer segundo de la reconstrucción se invalida siempre, con independencia de la calidad de la señal.
+- **Propagación desde el EEG crudo.** Cuando un segundo del archivo crudo ha sido invalidado por el criterio de pérdida de señal, cualquier ventana de Welch que incorpore esas muestras no puede calcularse, ya que la estimación espectral no admite valores ausentes (NaN). En consecuencia, la invalidación de un segundo del EEG crudo se propaga a todas las ventanas espectrales que dependen de él.
+
+La máscara se aplica al final de todo el procesamiento, tanto si la DSA procede de la reconstrucción —una vez aplicados el suavizado y el desplazamiento temporal— como si procede directamente del archivo `.f_a`. No obstante, los segundos inválidos están presentes como valores ausentes (NaN) durante todos los pasos intermedios: no se suavizan, no se filtran ni se incluyen en el cálculo de Welch como si fuesen datos reales. Únicamente al final del proceso se representan en blanco en la visualización.
+
+En registros bilaterales, la máscara se calcula de forma independiente para cada hemisferio. Las variables asociadas a cada lado, como SEF, MEF, BIS, EMG y SR, se enmascaran siguiendo la máscara correspondiente a su hemisferio. En el caso de `ASYM09`, el valor se considera no válido cuando falta información válida en cualquiera de los dos hemisferios.
+
+La aplicación de esta máscara permite conservar la estructura temporal del registro sin representar como válidos tramos en los que la información disponible —ya sea por pérdida de señal, huecos temporales o límites del propio método de estimación— no permite una interpretación fiable.
+
+
+### Reconstrucción desde EEG crudo
+
+Cuando el archivo `.f_a` no existe, está vacío o se desea comparar la matriz exportada con una reconstrucción independiente, la DSA se reconstruye a partir de la señal EEG cruda almacenada en `.r2a` o `.r4a`. Esta reconstrucción incluye la conversión de la señal cruda a microvoltios, el filtrado previo, la estimación espectral mediante Welch y FFT, la conversión a decibelios, el suavizado, el ajuste temporal y la aplicación de máscaras.
+
+Dado que esta parte constituye el bloque metodológico más experimental del trabajo, su desarrollo detallado se recoge en el Anexo G. En dicho anexo se describen los parámetros empleados, las pruebas realizadas, el suavizado, el desplazamiento temporal y la validación frente a la DSA original cuando el archivo `.f_a` está disponible.
+
+
+## Integración temporal de los datos ICCA
+
+Los datos clínicos procedentes de ICCA no se tratan como señales continuas equivalentes al EEG, sino como información clínica contextual asociada a la sesión BIS. Por ello, el tratamiento aplicado se centra en su estructuración, recorte temporal y representación, respetando la naturaleza de cada tipo de variable.
+
+Para cada sesión BIS se genera, cuando existe información clínica disponible, un archivo ICCA auxiliar recortado al intervalo temporal de dicha sesión. De este modo, si un archivo ICCA contiene información de varios días, pero la sesión BIS corresponde únicamente a un tramo concreto, la aplicación conserva solo los datos clínicos relevantes para ese intervalo. Los archivos originales no se modifican, sino que se mantienen separados de los derivados generados durante el proceso.
+
+El archivo ICCA auxiliar conserva la organización por hojas definida en la plantilla clínica: información general, constantes vitales, análisis clínicos y perfusiones. Esta separación permite representar cada grupo de variables de acuerdo con su significado temporal. Las constantes vitales se muestran como variables evolutivas; los análisis clínicos se consideran mediciones puntuales; y las perfusiones se representan como cambios de dosis activa en el tiempo.
+
+En el caso de las constantes vitales, cuando es necesario para la visualización, puede generarse una serie auxiliar a resolución de un segundo. Estos valores intermedios se consideran sintéticos y se emplean únicamente como apoyo visual, manteniendo siempre la trazabilidad de las mediciones reales. Por tanto, no deben interpretarse como nuevas mediciones clínicas ni utilizarse para validaciones clínicas o correlaciones fuertes con las variables BIS.
+
+Los análisis clínicos no se interpolan, sino que se muestran como eventos puntuales asociados al instante en el que fueron registrados. En el caso de variables sensibles al origen de la muestra, como la pO₂ o la pCO₂, se aplica un criterio conservador: si no puede determinarse con seguridad si la medición es arterial o venosa, el dato se descarta para evitar errores de interpretación. Las perfusiones tampoco se interpolan como valores acumulados, sino que se representan como cambios documentados de dosis o velocidad, manteniendo su comportamiento escalonado.
 
 
 ## Organización por paciente y sesión
 
 La unidad básica de análisis del proyecto es la sesión BIS. Cada sesión corresponde a un intervalo temporal concreto de monitorización neurofisiológica y se asocia, cuando está disponible, a los datos clínicos del mismo paciente procedentes de ICCA.
 
-Para mantener la trazabilidad, los datos se organizan en carpetas por paciente. Dentro de cada paciente se generan sesiones independientes, cada una de ellas formada por una copia de la exportación BIS original y un archivo ICCA auxiliar (una copia del original recortada para adaptarse al intervalo de la sesión), todo ello sin modificar los archivos originales. Durante la organización de los datos, la aplicación genera automáticamente archivos de metadatos en formato JSON (paciente.json y sesion.json). Estos archivos actúan como manifiestos de procedencia, ya que registran las fuentes originales utilizadas, el modo de monitorización BIS, los intervalos temporales detectados y los archivos auxiliares generados.
+Para mantener la trazabilidad, los datos se organizan en carpetas por paciente. Dentro de cada paciente se generan sesiones independientes, formadas por una copia de la exportación BIS original y, en su caso, un archivo ICCA auxiliar recortado al intervalo temporal correspondiente. Esta organización permite trabajar con sesiones concretas sin modificar los archivos originales.
 
-Esta normalización temporal permite revisar, qué ocurría en el ámbito neurológico del paciente mientras se aporta su contexto clínico durante un periodo de tiempo concreto.
-
-
-## Visualización de la información clínica
-
-### Fuentes de datos utilizadas
-
-#### Datos BIS
-
----------------------meter:
-Aquí hay que explicar lo necesario, sin convertirlo en anexo F:
-Archivos de señal cruda: .r2a y .r4a.
-Archivos espectrales: .f_a.
-Archivos de cabecera/calibración: .h_a.
-Archivos temporales o de variables procesadas: .t_a, .spa u otros que uses.
-Diferencia entre registro unilateral y bilateral.
-En unilateral: reconstrucción desde canal 1.
-En bilateral: canal 1 para hemisferio izquierdo y canal 3 para hemisferio derecho.
-El detalle completo de estructura de archivos, columnas y bytes va al Anexo F.
----------------------------------
-
-Los datos del monitor BIS proceden de las exportaciones generadas por los equipos BIS VISTA y BIS Advance. En este trabajo se emplean principalmente los archivos `.spa`, `.f_a`, `.r2a` o `.r4a`, `.h_a` y `.t_a`. 
- - El archivo `.spa` contiene las variables procesadas por el monitor, como el índice BIS, SEF, MEF, SQI y otros parámetros de configuración. 
- - El archivo `.f_a` contiene la matriz espectral calculada por el propio monitor. Este archivo no siempre está disponible, ya que el equipo BIS VISTA lo exporta vacío.
-- La cabecera `.h_a` proporciona la pendiente y el offset, información de calibración necesaria para convertir los valores crudos a microvoltios. 
- - `.t_a` aporta el instante en el que comienza el BIS a registrar.
- - Los archivos `.r2a` y `.r4a` almacenan el EEG crudo en registros unilaterales y bilaterales, respectivamente. La diferencia entre ambos formatos no se limita al nombre del archivo, sino al número de canales de EEG registrados. Los archivos `.r2a` contienen dos canales de señal cruda, mientras que los archivos `.r4a` contienen cuatro canales. Esta estructura condiciona directamente la reconstrucción de la DSA, ya que no todos los canales se emplean para representar la actividad espectral mostrada por el monitor. En los registros unilaterales, la reconstrucción se realiza a partir del canal 1. En los registros bilaterales, se procesan de forma separada el canal 1, asociado al hemisferio izquierdo, y el canal 3, asociado al hemisferio derecho. Esta elección permite mantener la correspondencia con la organización bilateral de la DSA y de las variables procesadas exportadas por el monitor. El detalle de la estructura interna de los archivos `.r2a` y `.r4a`, así como la justificación técnica de la selección de canales, se recoge en el Anexo F.
+Durante este proceso, la aplicación genera archivos de metadatos en formato JSON, como `paciente.json` y `sesion.json`. Estos archivos actúan como manifiestos de procedencia, ya que registran las fuentes originales utilizadas, el tipo de monitorización BIS, los intervalos temporales detectados y los archivos auxiliares generados.
 
 
-#### Datos ICCA
+## Visualización conjunta BIS-DSA-ICCA
 
-De forma complementaria, las variables clínicas procedentes de ICCA se reciben en forma de plantillas Excel estructuradas. Estas plantillas agrupan la información en hojas diferenciadas: información general del paciente y del ingreso, constantes vitales, resultados analíticos y perfusiones o tratamientos administrados. El detalle completo de los archivos BIS, la estructura de la plantilla ICCA y el significado de las variables principales se recoge en el Anexo F.
+La visualización conjunta se desarrolló mediante Dash y Plotly. La interfaz permite seleccionar un paciente, escoger una sesión BIS y representar de forma integrada la información neurofisiológica y clínica asociada al mismo intervalo temporal.
 
-La sesión BIS define la ventana principal de análisis. A partir de los archivos exportados por el monitor se extraen el inicio y el fin de la sesión, y se utiliza la línea temporal del archivo `.spa` como referencia común. Esta elección permite trabajar con una resolución de un segundo, adecuada para sincronizar la DSA, el índice BIS y el resto de variables procesadas del monitor.
+En la vista principal se muestra la DSA junto con las variables procesadas del monitor BIS, como el índice BIS, SEF, MEF y, en registros bilaterales, ASYM. También se incorporan variables de calidad o contexto, como EMG y SR, cuando están disponibles.
 
-Los datos clínicos procedentes de ICCA se seleccionan o recortan según el intervalo temporal de la sesión BIS. Debido a que las variables clínicas no tienen todas la misma naturaleza temporal, se tratan de formas distintas: 
- - Las constantes vitales pueden representarse como series temporales mantenidas entre mediciones consecutivas cuando su interpretación clínica lo permite. 
- - Los análisis se consideran mediciones puntuales asociadas a una marca temporal concreta. 
- - Las perfusiones se interpretan como cambios de dosis administrada, por lo que se representan como señales escalonadas a lo largo del tiempo.
+Las variables clínicas procedentes de ICCA se incorporan sobre la misma referencia temporal que la sesión BIS, pero sin transformar todas las variables en una señal homogénea. Las constantes vitales se representan como gráficas temporales, los análisis clínicos como mediciones puntuales y las perfusiones como líneas escalonadas. Esta estrategia permite revisar la evolución neurofisiológica junto con el contexto clínico del paciente, preservando el significado temporal de cada tipo de dato.
 
-
-# Técnicas y herramientas
-
-## Tratamiento de los datos BIS
-
-### Flujo de obtención y reconstrucción de la DSA
-La matriz de densidad espectral utilizada en la visualización puede proceder de dos vías. Cuando el archivo `.f_a` está disponible y contiene información válida, se emplea como DSA original exportada por el monitor. Sin embargo, en aquellos casos en los que el archivo espectral no existe, está vacío o se desea comparar la DSA original con una reconstrucción independiente, la matriz se obtiene a partir de la señal EEG cruda almacenada en los archivos `.r2a` o `.r4a`.
-
-La Figura @fig-flujo-dsa resume el flujo metodológico seguido para obtener la DSA utilizada por la aplicación.
-
-```{mermaid}
-flowchart LR
-    A["Archivos BIS"] --> B[".spa<br/>variables procesadas"]
-    A --> C[".f_a<br/>DSA original"]
-    A --> D[".r2a / .r4a<br/>EEG crudo"]
-    A --> E[".h_a<br/>calibración"]
-    A --> F[".t_a<br/>tiempo"]
-
-    C --> G{"DSA válida"}
-    G -- "Sí" --> H["DSA original"]
-    G -- "No" --> I["Reconstrucción desde EEG crudo"]
-
-    D --> I
-    E --> I
-    I --> J["Conversión raw → µV"]
-    J --> K["Procesamiento espectral"]
-    K --> L["Conversión a dB"]
-    L --> M["DSA reconstruida"]
-
-    H --> N["Timeline común"]
-    M --> N
-    B --> N
-    F --> N
-
-    N --> O["Máscaras de calidad"]
-    O --> P["Visualización BIS-DSA-ICCA"]
-```
-
-: Flujo general de obtención y reconstrucción de la DSA. {#fig-flujo-dsa}
-
-El proceso comienza con la lectura de los archivos anteriormente mencionados.
-
-En los registros unilaterales se reconstruye la DSA a partir del canal 1. En los registros bilaterales se procesan de forma separada el canal 1, asociado al hemisferio izquierdo, y el canal 3, asociado al hemisferio derecho. Esta separación permite obtener una matriz espectral independiente para cada hemisferio y mantener la coherencia con la representación bilateral del monitor.
-
-Cuando se realiza la reconstrucción, la señal cruda se convierte primero a microvoltios mediante los parámetros de pendiente y offset definidos en la cabecera `.h_a`. A continuación, se obtiene una representación espectral de la señal en el rango de frecuencias de interés, entre 0,5 y 30 Hz, con una resolución de 0,5 Hz. La potencia calculada se expresa inicialmente como densidad espectral de potencia y posteriormente se transforma a escala logarítmica en decibelios, de acuerdo con la escala empleada por el monitor BIS.
-
-Una vez obtenida la DSA, ya sea original o reconstruida, se ajusta a una línea temporal común. La sesión BIS define el intervalo principal de análisis y la timeline se construye con resolución de un segundo, utilizando como referencia las variables procesadas del archivo `.spa`. Esta normalización temporal permite alinear la DSA con el índice BIS, SEF, MEF y el resto de parámetros del monitor. Los datos clínicos procedentes de ICCA se seleccionan o recortan posteriormente según esta misma ventana temporal.
-
-Durante este proceso no se eliminan sin más los huecos, duplicados o discontinuidades detectadas. En su lugar, se construyen máscaras de calidad que permiten identificar los segundos o regiones no válidas. Estas máscaras tienen en cuenta criterios como baja calidad de señal, ausencia de datos espectrales, discontinuidades temporales, valores no disponibles en `.spa` o `.f_a`, y segmentos de señal cruda no interpretables. La máscara final se aplica sobre la DSA y sobre las variables BIS asociadas, evitando representar como válidos tramos en los que la información no es fiable.
-
-En la reconstrucción también se contemplan etapas adicionales, como el filtrado previo de la señal, la estimación espectral mediante Welch, el suavizado de la matriz y el posible ajuste temporal entre la DSA reconstruida y la exportada por el monitor. Estos pasos se describen de forma detallada en el Anexo G, junto con las pruebas realizadas para seleccionar la configuración final y validar la reconstrucción frente a la DSA original.
-
-
-### Tratamiento de los datos ICCA
-
-La información procedente de ICCA presenta una estructura heterogénea, ya que incluye variables continuas, mediciones puntuales, tratamientos y datos generales del paciente. Para facilitar su integración con BIS, esta información se transforma en una plantilla estructurada en varias hojas: `general`, `constantes_vitales`, `analisis` y `perfusiones`.
-
-La hoja `general` contiene información contextual del paciente y del ingreso. La hoja `constantes_vitales` recoge variables como frecuencia cardiaca, presión arterial, temperatura, saturación de oxígeno, presión intracraneal o frecuencia respiratoria. La hoja `analisis` incluye resultados de laboratorio y gasometría, como hemoglobina, sodio, potasio, glucosa, pO2 y pCO2. La hoja `perfusiones` recoge tratamientos relevantes para la interpretación del estado de sedación y del contexto hemodinámico, como sedantes, analgésicos, relajantes neuromusculares y fármacos vasoactivos.
-
-Durante la preparación de los datos se conserva la procedencia de cada variable mediante campos como fuente, bloque de origen, detalle original y observaciones. Esta decisión resulta importante porque algunas variables pueden aparecer repetidas en distintos bloques de ICCA o presentar diferentes frecuencias de registro.
-
-En el caso de las gasometrías, pO2 y pCO2 se consideran únicamente cuando la medición es interpretable y se puede conservar el contexto de origen. Los valores marcados como fuera de rango se mantienen como valores numéricos, pero conservando la marca original. En las perfusiones se prioriza la dosis activa y la velocidad de administración frente al volumen acumulado, ya que estos valores son los que permiten relacionar mejor la evolución clínica con los cambios observados en BIS y DSA.
-
-
-### Visualización conjunta BIS-DSA-ICCA
-
-La visualización se desarrolló mediante Dash y Plotly. La interfaz permite seleccionar un paciente, escoger una sesión BIS y representar de forma conjunta la información neurofisiológica y clínica asociada a ese intervalo.
-
-En la vista principal se muestra la DSA junto con las variables procesadas del monitor, como BIS, SEF, MEF y, en registros bilaterales, ASYM. También se incorporan variables de calidad o contexto como EMG y SR cuando están disponibles. De forma complementaria, se representan las variables clínicas procedentes de ICCA, separando constantes vitales, análisis y perfusiones para evitar mezclar señales de naturaleza temporal diferente.
-
-La interfaz permite seleccionar tramos horarios, modificar la duración de la ventana visible y desplazarse por el registro. De esta forma, el usuario puede revisar periodos concretos de interés y estudiar la relación temporal entre los cambios de la señal BIS, la DSA y el contexto clínico del paciente.
+La interfaz permite seleccionar tramos horarios, modificar la duración de la ventana visible y desplazarse por el registro. De esta forma, el usuario puede revisar periodos concretos de interés y estudiar la relación temporal entre los cambios observados en la DSA, las variables BIS y la información clínica disponible.
 
 
 ## Metodología de Ingeniería del Software
@@ -137,8 +199,16 @@ El desarrollo se llevó a cabo de forma incremental, partiendo de prototipos exp
 
 El proyecto evolucionó mediante ciclos de prueba y ajuste. Cada iteración incorporó comprobaciones con registros reales unilaterales y bilaterales, revisión visual de las salidas y validación cuantitativa cuando existía una DSA exportada por el monitor. Esta estrategia permitió avanzar desde pruebas aisladas de reconstrucción hacia una herramienta integrada de análisis retrospectivo.
 
-
 ### Trazabilidad y reproducibilidad
 
-Los archivos originales se mantienen separados de los datos auxiliares generados por las aplicaciones. Los archivos derivados pueden regenerarse a partir de las fuentes iniciales y de los parámetros definidos en el procesamiento. Esta separación permite repetir el análisis, comparar configuraciones y mantener una relación clara entre cada resultado mostrado y los archivos de entrada utilizados.
+La organización de los datos por paciente y sesión, descrita anteriormente, ya aporta una primera capa de trazabilidad mediante la separación entre archivos originales y derivados y los manifiestos `paciente.json` y `sesion.json`. A nivel de desarrollo, esta separación se completa con la posibilidad de regenerar los archivos derivados a partir de las fuentes iniciales y de los parámetros definidos en el procesamiento, sin necesidad de repetir manualmente cada paso. Esto permite comparar configuraciones distintas de reconstrucción o enmascarado y mantener siempre una relación clara entre cada resultado mostrado y los archivos de entrada utilizados.
 
+### Entorno de ejecución y máquinas virtuales
+
+La aplicación se ha preparado para poder ejecutarse en un entorno controlado mediante máquinas virtuales, con el objetivo de aproximar su funcionamiento a un posible despliegue dentro de una intranet hospitalaria.
+
+La arquitectura propuesta separa la ejecución de la aplicación y el almacenamiento de los datos. Para ello, se plantea una máquina virtual destinada a ejecutar la aplicación Dash y otra máquina virtual destinada a actuar como repositorio común de pacientes.
+
+La aplicación trabaja siempre sobre una ruta fija de pacientes, evitando que el usuario tenga que seleccionar manualmente la carpeta de trabajo. Los datos no se almacenan en una base de datos relacional, sino mediante una estructura organizada de carpetas y archivos, acorde con el origen de los registros utilizados en el proyecto.
+
+Esta configuración permite simular un escenario en el que varios usuarios acceden a una misma herramienta y consultan una ubicación común de pacientes. La configuración técnica detallada de las máquinas virtuales, la unidad compartida y el protocolo Samba/SMB se recoge en el Anexo E (Manual del programador).

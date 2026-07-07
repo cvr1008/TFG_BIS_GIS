@@ -3,20 +3,17 @@
 \capitulo{7}{Conclusiones}
 ```
 
-Se ha desarrollado una prueba de concepto que permite integrar datos procedentes del monitor BIS y variables clínicas procedentes de ICCA para su análisis retrospectivo en pacientes críticos.
+## Conclusiones principales
 
-Se ha definido una organización de los datos por paciente y por sesión BIS, facilitando la asociación entre cada registro de neuromonitorización y su intervalo temporal correspondiente.
-
-Se ha establecido un flujo de tratamiento de datos BIS que permite utilizar la DSA original cuando está disponible y reconstruirla desde la señal EEG cruda cuando no existe un archivo espectral válido.
-
-Se ha incorporado la diferenciación entre registros unilaterales y bilaterales, adaptando la lectura de canales y la representación visual a la estructura real de cada sesión.
-
-Se ha diseñado una integración temporal conjunta para la DSA, las variables procesadas del BIS y las variables clínicas de ICCA, respetando la naturaleza de cada tipo de dato.
-
-Se han desarrollado dos herramientas complementarias: una aplicación para organizar pacientes, sesiones y archivos asociados, y un visualizador interactivo para consultar de forma conjunta la información BIS-DSA-ICCA.
+- Se ha desarrollado una prueba de concepto que permite integrar datos procedentes del monitor BIS y variables clínicas procedentes de ICCA para su análisis retrospectivo en pacientes críticos.
+- Se ha definido una organización de los datos por paciente y por sesión BIS, facilitando la asociación entre cada registro de neuromonitorización y su intervalo temporal correspondiente.
+- Se ha establecido un flujo de tratamiento de datos BIS que permite utilizar la DSA original cuando está disponible y reconstruirla desde la señal EEG cruda cuando no existe un archivo espectral válido.
+- Se ha incorporado la diferenciación entre registros unilaterales y bilaterales, adaptando la lectura de canales y la representación visual a la estructura real de cada sesión.
+- Se ha diseñado una integración temporal conjunta para la DSA, las variables procesadas del BIS y las variables clínicas de ICCA, respetando la naturaleza de cada tipo de dato.
+- Se ha desarrollado un portal de acceso común y dos aplicaciones complementarias: una para organizar pacientes, sesiones y archivos asociados, y un visualizador interactivo para consultar de forma conjunta la información BIS-DSA-ICCA.
+- Se ha incorporado, como resultado complementario del visualizador, la generación de un informe en PDF por sesión, que permite conservar y comparar el análisis realizado fuera de la aplicación interactiva.
 
 Se concluye que la visualización integrada de datos neurofisiológicos y clínicos puede facilitar la revisión retrospectiva de episodios en UCI, aunque el sistema desarrollado debe entenderse como una prueba de concepto y no como una herramienta clínica validada.
-
 
 ## Aspectos relevantes
 
@@ -26,6 +23,6 @@ También destaca la decisión de contemplar distintos escenarios de disponibilid
 
 Otro aspecto importante ha sido la diferenciación entre registros unilaterales y bilaterales. Esta distinción condiciona tanto la lectura de los archivos de señal cruda como la representación de la DSA y de las variables asociadas, por lo que se incorporó al diseño del flujo de procesamiento y visualización.
 
-En relación con los datos clínicos, se consideró fundamental no tratar todas las variables de ICCA como señales continuas. Las constantes vitales, los resultados analíticos y las perfusiones tienen una naturaleza temporal diferente, por lo que se representaron respetando su significado: como mediciones mantenidas, eventos puntuales o cambios de dosis activa.
+En relación con los datos clínicos, se consideró fundamental no tratar todas las variables de ICCA como señales continuas. Las constantes vitales, los resultados analíticos y las perfusiones tienen una naturaleza temporal diferente, por lo que se representaron respetando su significado: las constantes vitales como series temporales asociadas al intervalo de la sesión, los resultados analíticos como mediciones puntuales en su instante de registro, y las perfusiones como cambios de dosis activa mantenidos hasta el siguiente cambio documentado.
 
 Finalmente, el proyecto ha puesto de manifiesto la importancia de documentar el tratamiento de los datos biomédicos. En este tipo de trabajos no basta con mostrar una visualización final, sino que es necesario justificar cómo se han leído, organizado, sincronizado y representado las distintas fuentes de información.

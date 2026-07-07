@@ -8,62 +8,43 @@
 
 ## Introducción
 
-Este apéndice describe los datos empleados en el proyecto, su procedencia,
-estructura y tratamiento. El núcleo del trabajo está formado por las
-exportaciones generadas por los monitores BIS VISTA y BIS Advance. Estas
-exportaciones incluyen la señal electroencefalográfica (EEG) cruda, la matriz
-espectral calculada por el equipo, las variables procesadas y distintos
-archivos auxiliares de configuración y eventos.
+Este apéndice describe los datos empleados en el proyecto, su procedencia, estructura y tratamiento. El núcleo del trabajo está formado por las exportaciones generadas por los monitores BIS VISTA y BIS Advance, junto con las plantillas Excel de variables clínicas procedentes de ICCA. Las exportaciones BIS incluyen la señal electroencefalográfica (EEG) cruda, la matriz espectral calculada por el equipo, las variables procesadas y distintos archivos auxiliares de configuración y eventos.
 
-La aplicación desarrollada no interpreta todos los archivos con la misma
-profundidad. Los archivos `.spa` y `.f_a` permiten reproducir la información
-procesada por el monitor, mientras que los archivos `.r2a` o `.r4a`, junto con
-`.h_a` y `.t_a`, permiten reconstruir una matriz DSA cuando el espectro
-original no está disponible. Los demás archivos se conservan como información
-complementaria y como apoyo para la trazabilidad del registro.
+La aplicación desarrollada no interpreta todos los archivos con la misma profundidad. Los archivos `.spa` y `.f_a` permiten reproducir la información procesada por el monitor, mientras que los archivos `.r2a` o `.r4a`, junto con `.h_a` y `.t_a`, permiten reconstruir una matriz DSA cuando el espectro original no está disponible. Los demás archivos se conservan como información complementaria y como apoyo para la trazabilidad del registro.
 
-Los nombres de archivos mostrados en este documento corresponden a códigos de
-registro y no contienen datos identificativos directos del paciente.
+Los nombres de archivos mostrados en este documento corresponden a códigos de registro y no contienen datos identificativos directos del paciente.
+
+## Aprobación ética y marco de uso de los datos
+
+Los datos empleados en este proyecto proceden de pacientes reales ingresados en la Unidad de Cuidados Intensivos del Hospital Universitario de Burgos (HUBU). Su uso con fines de investigación fue autorizado por el Comité de Bioética correspondiente, cuya aprobación fue concedida el 2 de julio de 2026.
+
+Esta aprobación habilita el tratamiento de información clínica retrospectiva bajo las condiciones de confidencialidad, protección de datos y finalidad investigadora establecidas por el propio comité. En consecuencia:
+
+- Los datos se han tratado exclusivamente con la finalidad descrita en este trabajo, sin ningún uso posterior distinto al académico e investigador.
+- Los nombres de archivo y los identificadores empleados a lo largo de este documento corresponden a códigos de registro internos y no incluyen datos identificativos directos del paciente (nombre, apellidos, número de historia clínica u otros).
+- La aprobación del comité ampara el tratamiento retrospectivo de los datos con fines de desarrollo y prueba de concepto; no constituye, en ningún caso, una validación clínica de la herramienta desarrollada ni autoriza su uso como apoyo a la toma de decisiones asistenciales.
 
 ## Origen y adquisición de los datos BIS
 
-La señal se adquiere mediante un sensor frontal conectado a un módulo BISx o
-BISx4. El módulo digitaliza y procesa la actividad EEG y envía al monitor tanto
-la señal como los parámetros derivados. Aunque BIS VISTA y BIS Advance
-presentan diferencias de hardware e interfaz, las exportaciones analizadas
-mantienen una organización semejante [@CovidienBISadvanced].
+La señal se adquiere mediante un sensor frontal conectado a un módulo BISx o BISx4. El módulo digitaliza y procesa la actividad EEG y envía al monitor tanto la señal como los parámetros derivados. Aunque BIS VISTA y BIS Advance presentan diferencias de hardware e interfaz, las exportaciones analizadas mantienen una organización semejante [@CovidienBISadvanced].
 
 El tipo de sensor determina la modalidad del registro:
 
-- **Monitorización unilateral:** utiliza un sensor situado sobre un hemisferio
-  y genera dos canales físicos de EEG. En las variables procesadas aparece,
-  además, un bloque combinado denominado `Ch 12`.
-- **Monitorización bilateral:** utiliza un sensor simétrico y un módulo BISx4,
-  generando cuatro canales físicos. Los canales 1 y 2 corresponden al
-  hemisferio izquierdo y los canales 3 y 4 al derecho.
+- **Monitorización unilateral:** utiliza un sensor situado sobre un hemisferio y genera dos canales físicos de EEG. En las variables procesadas aparece,  además, un bloque combinado denominado `Ch 12`.
+- **Monitorización bilateral:** utiliza un sensor simétrico y un módulo BISx4, generando cuatro canales físicos. Los canales 1 y 2 corresponden al hemisferio izquierdo y los canales 3 y 4 al derecho.
 
-En unilateral se utiliza una matriz de cuatro electrodos. El electrodo 1 actúa
-como referencia positiva compartida, el electrodo 2 como tierra y los
-electrodos 3 y 4 como puntos de lectura. De esta disposición se obtienen el
-canal 1, como diferencia entre los electrodos 1 y 3, y el canal 2, como
-diferencia entre los electrodos 1 y 4.
+En unilateral se utiliza una matriz de cuatro electrodos. El electrodo 1 actúa como referencia positiva compartida, el electrodo 2 como tierra y los electrodos 3 y 4 como puntos de lectura. De esta disposición se obtienen el
+canal 1, como diferencia entre los electrodos 1 y 3, y el canal 2, como diferencia entre los electrodos 1 y 4.
 
 ![Colocación del sensor empleado en monitorización unilateral. Elaboración propia a partir de la documentación técnica recopilada.](img/anexo_f_sensor_unilateral.png){#fig-sensor-unilateral width=65%}
 
-En bilateral, el sensor dispone de un electrodo central común (`C`), un
-electrodo de tierra (`G`) y cuatro electrodos de lectura: temporal izquierdo
-(`LT`), frontal izquierdo (`LE`), frontal derecho (`RE`) y temporal derecho
-(`RT`). Los canales 1 y 2 se obtienen en el lado izquierdo y los canales 3 y
-4 en el derecho.
+En bilateral, el sensor dispone de un electrodo central común (`C`), un electrodo de tierra (`G`) y cuatro electrodos de lectura: temporal izquierdo (`LT`), frontal izquierdo (`LE`), frontal derecho (`RE`) y temporal derecho
+(`RT`). Los canales 1 y 2 se obtienen en el lado izquierdo y los canales 3 y 4 en el derecho.
 
 ![Colocación del sensor empleado en monitorización bilateral. Elaboración propia a partir de la documentación técnica recopilada.](img/anexo_f_sensor_bilateral.png){#fig-sensor-bilateral width=55%}
 
-En la implementación final, la reconstrucción unilateral utiliza el canal 1.
-En bilateral se utiliza el canal 1 para la matriz izquierda y el canal 3 para
-la matriz derecha. La especificación técnica del puerto serie indica que, con
-un sensor de dos canales, el primer conjunto espectral válido corresponde al
-canal 1, mientras que con un sensor de cuatro canales los dos conjuntos
-válidos corresponden a los canales 1 y 3 [@CovidienSerial2010].
+En la implementación final, la reconstrucción unilateral utiliza el canal 1. 
+En bilateral se utiliza el canal 1 para la matriz izquierda y el canal 3 para la matriz derecha. La especificación técnica del puerto serie indica que, con un sensor de dos canales, el primer conjunto espectral válido corresponde al canal 1, mientras que con un sensor de cuatro canales los dos conjuntos válidos corresponden a los canales 1 y 3 [@CovidienSerial2010].
 
 | Modalidad | EEG crudo | Canales físicos | Bloque procesado del `.spa` | Conjunto espectral |
 |---|---|---:|---|---|
@@ -95,23 +76,13 @@ partir de la extensión del archivo de EEG.
 
 : Archivos encontrados en las exportaciones BIS analizadas {#tbl-archivos-bis}
 
-No todos los equipos o configuraciones producen archivos con contenido. En
-particular, se han encontrado registros en los que `.f_a` existe pero tiene un
-tamaño de cero bytes. Esta situación es relevante para el proyecto, porque
-justifica la reconstrucción de la DSA a partir del EEG crudo.
+No todos los equipos o configuraciones producen archivos con contenido. En particular, se han encontrado registros en los que `.f_a` existe pero tiene un tamaño de cero bytes. Esta situación es relevante para el proyecto, porque justifica la reconstrucción de la DSA a partir del EEG crudo.
 
 ## Archivos de EEG crudo: `.r2a` y `.r4a`
 
-Los archivos `.r2a` y `.r4a` contienen las muestras digitalizadas del EEG en
-formato binario. No incluyen una cabecera de texto ni una marca temporal para
-cada muestra, por lo que deben interpretarse junto con `.h_a` y `.t_a`.
+Los archivos `.r2a` y `.r4a` contienen las muestras digitalizadas del EEG en formato binario. No incluyen una cabecera de texto ni una marca temporal para cada muestra, por lo que deben interpretarse junto con `.h_a` y `.t_a`.
 
-Cada muestra de un canal ocupa 16 bits y se almacena como un entero con signo
-en complemento a dos y formato *little endian*. Esto significa que cada
-muestra está formada por dos bytes, el byte menos significativo se encuentra
-primero en el archivo y el bit más significativo de la palabra resultante
-indica el signo. Al desempaquetar la pareja se obtiene un entero comprendido
-entre -32768 y 32767.
+Cada muestra de un canal ocupa 16 bits y se almacena como un entero con signo en complemento a dos y formato *little endian*. Esto significa que cada muestra está formada por dos bytes, el byte menos significativo se encuentra primero en el archivo y el bit más significativo de la palabra resultante indica el signo. Al desempaquetar la pareja se obtiene un entero comprendido entre -32768 y 32767.
 
 Las muestras están entrelazadas por instante temporal:
 
@@ -124,12 +95,7 @@ Las muestras están entrelazadas por instante temporal:
 
 ![Organización de las dos primeras tramas de un archivo `.r4a` real.](img/anexo_f_estructura_r4a.png){#fig-estructura-r4a width=100%}
 
-En las exportaciones utilizadas, la frecuencia de muestreo indicada por la
-cabecera es de 128 Hz por canal. Esto implica 128 tramas por segundo y una
-resolución temporal entre muestras de 7,8125 ms. La aplicación no presupone
-este valor, sino que lo obtiene del archivo `.h_a`. La especificación técnica
-también describe la transmisión de EEG crudo como datos entrelazados con una
-frecuencia de 128 muestras por segundo [@CovidienSerial2010].
+En las exportaciones utilizadas, la frecuencia de muestreo indicada por la cabecera es de 128 Hz por canal. Esto implica 128 tramas por segundo y una resolución temporal entre muestras de 7,8125 ms. La aplicación no presupone este valor, sino que lo obtiene del archivo `.h_a`. La especificación técnica también describe la transmisión de EEG crudo como datos entrelazados con una frecuencia de 128 muestras por segundo [@CovidienSerial2010].
 
 | Instante dentro del segundo | Trama | Contenido de `.r2a` | Contenido de `.r4a` |
 |---:|---:|---|---|
@@ -143,26 +109,18 @@ frecuencia de 128 muestras por segundo [@CovidienSerial2010].
 
 ## Decodificación y calibración de las muestras
 
-Los enteros almacenados no deben interpretarse directamente como
-microvoltios. La cabecera `.h_a` contiene una pendiente de calibración y un
-offset propios del registro. La implementación convierte cada muestra
-mediante la expresión **EEG (µV) = valor raw × pendiente + offset**.
+Los enteros almacenados no deben interpretarse directamente como microvoltios. La cabecera `.h_a` contiene una pendiente de calibración y un offset propios del registro. La implementación convierte cada muestra mediante la expresión **EEG (µV) = valor raw × pendiente + offset**.
 
 Por tanto, el procedimiento completo para cada muestra es:
 
 1. leer la pareja de bytes correspondiente al canal;
-2. reconstruir la palabra de 16 bits teniendo en cuenta el orden
-   *little endian*;
+2. reconstruir la palabra de 16 bits teniendo en cuenta el orden *little endian*;
 3. interpretar la palabra como entero con signo en complemento a dos;
 4. leer la pendiente y el offset de `.h_a`;
 5. aplicar la ecuación de calibración.
 
-La @tbl-decodificacion-r2a muestra este proceso sobre las ocho primeras
-tramas de un registro real. En cada fila, los dos primeros bytes corresponden
-al canal 1 y los dos siguientes al canal 2. En ese registro, la pendiente
-almacenada es aproximadamente 0,05 µV por unidad digital y el offset es
--3234 µV. Estos valores se muestran únicamente como ejemplo: la aplicación
-los extrae de la cabecera de cada sesión y no utiliza constantes fijadas
+La @tbl-decodificacion-r2a muestra este proceso sobre las ocho primeras tramas de un registro real. En cada fila, los dos primeros bytes corresponden al canal 1 y los dos siguientes al canal 2. En ese registro, la pendiente
+almacenada es aproximadamente 0,05 µV por unidad digital y el offset es -3234 µV. Estos valores se muestran únicamente como ejemplo: la aplicación los extrae de la cabecera de cada sesión y no utiliza constantes fijadas
 manualmente.
 
 | Trama | Bytes de la trama | Raw C1 | Raw C2 | C1 (µV) | C2 (µV) |
@@ -178,71 +136,53 @@ manualmente.
 
 : Ejemplo de decodificación y calibración de un archivo `.r2a` {#tbl-decodificacion-r2a}
 
-Si se pierden paquetes de EEG, la especificación indica que el monitor rellena
-las muestras ausentes con ceros para mantener la continuidad temporal
-[@CovidienSerial2010]. Esta circunstancia debe tenerse en cuenta porque una
-fila con una proporción elevada de ceros puede representar una pérdida de
-información y no una señal EEG fisiológicamente plana.
+Si se pierden paquetes de EEG, la especificación indica que el monitor rellena las muestras ausentes con ceros para mantener la continuidad temporal [@CovidienSerial2010]. Esta circunstancia debe tenerse en cuenta porque una
+fila con una proporción elevada de ceros puede representar una pérdida de información y no una señal EEG fisiológicamente plana.
 
 ### Diferencias entre unilateral y bilateral
 
-La estructura numérica es la misma en ambas modalidades; cambia el número de
-valores que forman cada trama. En unilateral se obtienen dos series de EEG de
-un mismo lado de la frente. En bilateral se obtienen cuatro series y es
-posible separar la información de ambos hemisferios.
+La estructura numérica es la misma en ambas modalidades; cambia el número de valores que forman cada trama. En unilateral se obtienen dos series de EEG de un mismo lado de la frente. En bilateral se obtienen cuatro series y es posible separar la información de ambos hemisferios.
 
 Para la reconstrucción implementada se emplean:
 
 - canal 1 en los registros unilaterales;
-- canal 1 como señal izquierda y canal 3 como señal derecha en los registros
-  bilaterales.
+- canal 1 como señal izquierda y canal 3 como señal derecha en los registros   bilaterales.
 
-Los canales 2 y 4 se mantienen en el archivo original, pero no se utilizan
-para construir las matrices finales de la aplicación. Esta decisión es
-coherente con los conjuntos espectrales identificados por el fabricante: el
-primer conjunto corresponde al canal 1 y, en bilateral, el segundo corresponde
-al canal 3 [@CovidienSerial2010].
+Los canales 2 y 4 se mantienen en el archivo original, pero no se utilizan para construir las matrices finales de la aplicación. Esta decisión es coherente con los conjuntos espectrales identificados por el fabricante: el
+primer conjunto corresponde al canal 1 y, en bilateral, el segundo corresponde al canal 3 [@CovidienSerial2010].
 
 ## Archivo de cabecera: `.h_a`
 
-El archivo `.h_a` es una cabecera binaria de tamaño reducido que describe cómo
-debe interpretarse la señal cruda. La implementación extrae de ella:
+El archivo `.h_a` es una cabecera binaria de tamaño reducido que describe cómo debe interpretarse la señal cruda. La implementación extrae de ella, mediante desplazamientos de byte fijos, el número de canales, la frecuencia de muestreo y los parámetros de calibración (pendiente y offset):
 
-- número de canales;
-- frecuencia de muestreo;
-- pendiente de conversión;
-- desplazamiento u *offset* de calibración.
+| Parámetro | Offset (byte) | Tipo |
+|---|---:|---|
+| Número de canales | 178 | entero corto (16 bits) |
+| Frecuencia de muestreo (fs) | 186 | entero (32 bits) |
+| Pendiente de calibración | 702 | flotante (32 bits) |
+| Offset de calibración | 766 | flotante (32 bits) |
 
-El número de canales también funciona como comprobación de consistencia. Un
-registro unilateral debe indicar dos canales y uno bilateral debe indicar
-cuatro. Si el valor no coincide con la extensión `.r2a` o `.r4a`, la
-aplicación detiene la reconstrucción para evitar interpretar incorrectamente
-los bytes.
+: Campos extraídos de la cabecera `.h_a` mediante desplazamientos de byte fijos {#tbl-header-offsets-f}
 
-La cabecera puede contener además identificadores de versión del algoritmo y
-otros parámetros internos. Estos campos se conservan como metadatos, pero no
-son necesarios para la visualización desarrollada.
+El número de canales también funciona como comprobación de consistencia. Un registro unilateral debe indicar dos canales y uno bilateral debe indicar cuatro. Si el valor no coincide con la extensión `.r2a` o `.r4a`, la
+aplicación detiene la reconstrucción para evitar interpretar incorrectamente los bytes.
+
+La cabecera puede contener además identificadores de versión del algoritmo y otros parámetros internos. Estos campos se conservan como metadatos, pero no son necesarios para la visualización desarrollada.
 
 ## Archivo temporal: `.t_a`
 
-El archivo `.t_a` contiene, en texto, la fecha y hora asociadas al comienzo de
-la señal cruda. En los registros analizados consta de una única línea, por
-ejemplo:
+El archivo `.t_a` contiene, en texto, la fecha y hora asociadas al comienzo de la señal cruda. En los registros analizados consta de una única línea, por ejemplo:
 
 ```text
 03/04/2026 10:35:21
 ```
 
-A partir de este instante, la frecuencia de muestreo y la posición de cada
-trama puede asignarse una marca temporal a todas las muestras del EEG. La
-aplicación admite las variantes de fecha observadas en las exportaciones y
+A partir de este instante, la frecuencia de muestreo y la posición de cada trama puede asignarse una marca temporal a todas las muestras del EEG. La aplicación admite las variantes de fecha observadas en las exportaciones y
 redondea el instante inicial al segundo.
 
 ## Archivo de espectros: `.f_a`
 
-El archivo `.f_a` contiene la matriz espectral producida por el monitor. Es un
-archivo de texto con dos líneas de cabecera y una fila por segundo. El
-separador principal es el carácter `|`.
+El archivo `.f_a` contiene la matriz espectral producida por el monitor. Es un archivo de texto con dos líneas de cabecera y una fila por segundo. El separador principal es el carácter `|`.
 
 En unilateral su estructura es:
 
@@ -256,70 +196,39 @@ En bilateral su estructura es:
 Time | Left Spectra | Right Spectra
 ```
 
-Cada campo espectral contiene 60 valores separados por comas, correspondientes
-a las frecuencias comprendidas entre 0,5 y 30 Hz, con incrementos de 0,5 Hz.
-Al expandir el campo se obtiene una matriz en la que las filas representan
-segundos, las columnas representan frecuencias y cada celda contiene la
-intensidad espectral.
+Cada campo espectral contiene 60 valores separados por comas, correspondientes a las frecuencias comprendidas entre 0,5 y 30 Hz, con incrementos de 0,5 Hz.
+Al expandir el campo se obtiene una matriz en la que las filas representan segundos, las columnas representan frecuencias y cada celda contiene la intensidad espectral.
 
-En las exportaciones estudiadas, los valores aparecen como enteros de cuatro
-cifras. La implementación actual los divide entre 100 antes de representarlos;
-por ejemplo, `9356` pasa a `93,56`. La unidad y el significado exactos de este
-escalado se verificarán en la versión final con la documentación específica
-del fabricante sobre el archivo `.f_a`. Los manuales de visualización sí
-confirman que la DSA mostrada por el monitor representa potencia espectral
-mediante una escala de color expresada en decibelios, pero este hecho no basta
-por sí solo para demostrar cómo se codifica internamente cada valor del
-archivo [@CovidienBISadvanced].
+En las exportaciones estudiadas, los valores aparecen como enteros de cuatro cifras. La implementación actual los divide entre 100 antes de representarlos; por ejemplo, `9356` pasa a `93,56`. La unidad y el significado exactos de este escalado se verificarán en la versión final con la documentación específica del fabricante sobre el archivo `.f_a`. Los manuales de visualización sí confirman que la DSA mostrada por el monitor representa potencia espectral mediante una escala de color expresada en decibelios, pero este hecho no basta por sí solo para demostrar cómo se codifica internamente cada valor del archivo [@CovidienBISadvanced].
 
 ### Diferencias entre unilateral y bilateral
 
-El archivo unilateral contiene una única columna `Spectra` y genera una sola
-DSA. El bilateral contiene `Left Spectra` y `Right Spectra`, por lo que se
-obtienen dos matrices con el mismo eje temporal y frecuencial. La aplicación
-representa ambas matrices con una escala común para que las intensidades
-puedan compararse visualmente.
+El archivo unilateral contiene una única columna `Spectra` y genera una sola DSA. El bilateral contiene `Left Spectra` y `Right Spectra`, por lo que se obtienen dos matrices con el mismo eje temporal y frecuencial. La aplicación representa ambas matrices con una escala común para que las intensidades puedan compararse visualmente.
 
-La presencia física del archivo no garantiza que contenga información. Si
-`.f_a` no existe o está vacío, la aplicación selecciona automáticamente la
-reconstrucción desde `.r2a` o `.r4a`, siempre que estén disponibles `.h_a`,
+La presencia física del archivo no garantiza que contenga información. Si `.f_a` no existe o está vacío, la aplicación selecciona automáticamente la reconstrucción desde `.r2a` o `.r4a`, siempre que estén disponibles `.h_a`,
 `.t_a` y `.spa`.
 
 ## Archivo de variables procesadas: `.spa`
 
-El archivo `.spa` contiene los parámetros calculados por el algoritmo BIS y
-los ajustes de procesamiento del monitor. Se trata de un archivo de texto
-delimitado por `|`, normalmente con resolución de una fila por segundo.
+El archivo `.spa` contiene los parámetros calculados por el algoritmo BIS y los ajustes de procesamiento del monitor. Se trata de un archivo de texto delimitado por `|`, normalmente con resolución de una fila por segundo.
 
-La primera línea agrupa las columnas por canal, la segunda contiene los
-nombres de las variables y las siguientes contienen los datos. Algunos
-nombres se repiten porque cada bloque de canal exporta el mismo conjunto de
-variables. Durante la lectura se generan nombres únicos mediante sufijos para
-poder seleccionar el bloque adecuado.
+La primera línea agrupa las columnas por canal, la segunda contiene los nombres de las variables y las siguientes contienen los datos. Algunos nombres se repiten porque cada bloque de canal exporta el mismo conjunto de
+variables. Durante la lectura se generan nombres únicos mediante sufijos para poder seleccionar el bloque adecuado.
 
-Los valores `-327.7`, `-3276`, `-3276.0`, `-3276.8`, `-32767` y `-32768`
-se tratan como códigos centinela de dato no válido y se convierten a valores
-ausentes. Esta conversión es necesaria antes de calcular máscaras, estadísticas
-o representaciones.
+Los valores `-327.7`, `-3276`, `-3276.0`, `-3276.8`, `-32767` y `-32768` se tratan como códigos centinela de dato no válido y se convierten a valores ausentes. Esta conversión es necesaria antes de calcular máscaras, estadísticas o representaciones.
 
 ### Estructura unilateral
 
 En una exportación unilateral aparecen tres bloques:
 
 - **`Ch 1`:** variables asociadas al primer canal físico.
-- **`Ch 2`:** canal auxiliar, especialmente sensible a determinados
-  artefactos. Varias variables procesadas aparecen como no válidas.
-- **`Ch 12`:** bloque combinado generado por el procesamiento interno y
-  destinado a la visualización y archivo de los resultados finales.
+- **`Ch 2`:** canal auxiliar, especialmente sensible a determinados artefactos. Varias variables procesadas aparecen como no válidas.
+- **`Ch 12`:** bloque combinado generado por el procesamiento interno y destinado a la visualización y archivo de los resultados finales.
 
-La especificación técnica indica expresamente que el conjunto de datos de
-`Ch 12` debe utilizarse para mostrar y archivar la información procesada del
-modo de dos canales, mientras que el conjunto de `Ch 2` debe ignorarse
+La especificación técnica indica expresamente que el conjunto de datos de `Ch 12` debe utilizarse para mostrar y archivar la información procesada del modo de dos canales, mientras que el conjunto de `Ch 2` debe ignorarse
 [@CovidienSerial2010].
 
-Al convertir los encabezados repetidos en nombres únicos, el tercer bloque
-queda identificado habitualmente mediante el sufijo `_3`. Por este motivo, la
-aplicación prioriza `SEF08_3`, `MEDFRQ08_3`, `SQI10_3`, `TOTPOW08_3` y
+Al convertir los encabezados repetidos en nombres únicos, el tercer bloque queda identificado habitualmente mediante el sufijo `_3`. Por este motivo, la aplicación prioriza `SEF08_3`, `MEDFRQ08_3`, `SQI10_3`, `TOTPOW08_3` y
 `DB13U01_3`, y los normaliza internamente eliminando el sufijo.
 
 ### Estructura bilateral
@@ -330,10 +239,7 @@ conservan:
 - **`Ch 1`, sin sufijo:** variables procesadas del hemisferio izquierdo.
 - **`Ch 3`, sufijo `_3`:** variables procesadas del hemisferio derecho.
 
-Los bloques `Ch 2` y `Ch 4` contienen información auxiliar de los canales
-físicos y numerosos valores centinela para las variables de alto nivel, por lo
-que no se utilizan en la visualización clínica. La modalidad bilateral añade,
-además, variables que comparan ambos hemisferios, especialmente `ASYM09`.
+Los bloques `Ch 2` y `Ch 4` contienen información auxiliar de los canales físicos y numerosos valores centinela para las variables de alto nivel, por lo que no se utilizan en la visualización clínica. La modalidad bilateral añade, además, variables que comparan ambos hemisferios, especialmente `ASYM09`.
 
 ## Variables procesadas de mayor interés
 
@@ -355,48 +261,30 @@ una relación directa con el trabajo.
 
 ### Índice BIS: `DB13U01`
 
-Es el índice numérico derivado del EEG que resume el estado hipnótico en una
-escala de 0 a 100. En la aplicación se representa bajo la DSA y comparte su
-eje temporal. En unilateral se utiliza el valor del bloque `Ch 12`; en
+Es el índice numérico derivado del EEG que resume el estado hipnótico en una escala de 0 a 100. En la aplicación se representa bajo la DSA y comparte su eje temporal. En unilateral se utiliza el valor del bloque `Ch 12`; en
 bilateral se representan de forma independiente el BIS izquierdo y el derecho.
 
-Los valores fuera del intervalo 0-100 y los códigos centinela se consideran no
-válidos. Además, el BIS se oculta cuando la matriz del hemisferio
-correspondiente ha sido invalidada por falta de calidad.
+Los valores fuera del intervalo 0-100 y los códigos centinela se consideran no válidos. Además, el BIS se oculta cuando la matriz del hemisferio correspondiente ha sido invalidada por falta de calidad.
 
 ### Calidad de señal: `SQI10`
 
-El SQI expresa la calidad o fiabilidad de la señal recibida. Una disminución
-puede deberse a mala adherencia del sensor, movimiento, interferencias o
-actividad muscular. Es una variable esencial porque evita interpretar como
+El SQI expresa la calidad o fiabilidad de la señal recibida. Una disminución puede deberse a mala adherencia del sensor, movimiento, interferencias o actividad muscular. Es una variable esencial porque evita interpretar como
 actividad cerebral válida una señal degradada.
 
-En este proyecto se genera una máscara cuando `SQI10` es inferior a 15. Los
-segundos afectados se eliminan de la DSA y de las curvas asociadas. El umbral
-se utiliza como criterio técnico de visualización y no como una decisión
-clínica aislada.
+En este proyecto se genera una máscara cuando `SQI10` es inferior a 15. Los segundos afectados se eliminan de la DSA y de las curvas asociadas. El umbral se utiliza como criterio técnico de visualización y no como una decisión clínica aislada.
 
 ### Potencia total: `TOTPOW08`
 
 Representa la potencia total del EEG en el intervalo espectral de 0,5 a 30 Hz.
-Resulta útil para comprobar si el monitor dispone de información espectral
-válida. Cuando contiene un código centinela, el segundo correspondiente se
-excluye.
+Resulta útil para comprobar si el monitor dispone de información espectral válida. Cuando contiene un código centinela, el segundo correspondiente se excluye.
 
-El análisis conjunto de `.spa` y `.f_a` mostró que muchas bandas blancas de la
-DSA coinciden con valores no válidos de `TOTPOW08` y con descensos del SQI. Por
-ello, ambas variables forman parte de la máscara final.
+El análisis conjunto de `.spa` y `.f_a` mostró que muchas bandas blancas de la DSA coinciden con valores no válidos de `TOTPOW08` y con descensos del SQI. Por ello, ambas variables forman parte de la máscara final.
 
 ### Frecuencias SEF y MEF
 
-`SEF08` es la frecuencia del borde espectral, definida como la frecuencia por
-debajo de la cual se concentra el 95 % de la potencia. `MEDFRQ08` es la
-frecuencia mediana o MEF, que divide la potencia acumulada al 50 %. Ambas se
-expresan en hercios y permiten resumir cómo se distribuye la potencia sin
-reducir toda la información a un único índice BIS.
+`SEF08` es la frecuencia del borde espectral, definida como la frecuencia por debajo de la cual se concentra el 95 % de la potencia. `MEDFRQ08` es la frecuencia mediana o MEF, que divide la potencia acumulada al 50 %. Ambas se expresan en hercios y permiten resumir cómo se distribuye la potencia sin reducir toda la información a un único índice BIS.
 
-La aplicación superpone estas curvas sobre cada DSA. Solo se aceptan valores
-entre 0,5 y 30 Hz, que es el intervalo frecuencial representado.
+La aplicación superpone estas curvas sobre cada DSA. Solo se aceptan valores entre 0,5 y 30 Hz, que es el intervalo frecuencial representado.
 
 ### Suavizado espectral: `SpSmooth`
 
@@ -413,9 +301,7 @@ correspondencia utilizada en el proyecto es:
 
 : Correspondencia empleada para el campo `SpSmooth` {#tbl-spsmooth}
 
-En el registro unilateral utilizado como referencia, el código es 3, por lo
-que se aplica una media móvil causal de 30 segundos. Así, la ventana no se
-elige únicamente por inspección visual, sino a partir de la configuración
+En el registro unilateral utilizado como referencia, el código es 3, por lo que se aplica una media móvil causal de 30 segundos. Así, la ventana no se elige únicamente por inspección visual, sino a partir de la configuración
 exportada por el propio equipo.
 
 ### Filtro de baja frecuencia: `LoFilter`
@@ -432,17 +318,13 @@ siguiente correspondencia:
 
 : Correspondencia empleada para el campo `LoFilter` {#tbl-lofilter}
 
-Durante la reconstrucción se aplica un filtro pasa-altos causal de primer
-orden con la frecuencia indicada. Si el campo no está disponible, se utiliza
-0,25 Hz como valor predeterminado y se registra esta circunstancia en los
+Durante la reconstrucción se aplica un filtro pasa-altos causal de primer orden con la frecuencia indicada. Si el campo no está disponible, se utiliza 0,25 Hz como valor predeterminado y se registra esta circunstancia en los
 parámetros del resultado.
 
 ### Asimetría bilateral: `ASYM09`
 
-`ASYM09` solo es relevante en monitorización bilateral y resume la diferencia
-de potencia entre ambos hemisferios. Se representa entre las dos matrices DSA.
-Para evitar comparaciones engañosas, se invalida cuando falta la DSA izquierda
-o la derecha en ese instante.
+`ASYM09` solo es relevante en monitorización bilateral y resume la diferencia de potencia entre ambos hemisferios. Se representa entre las dos matrices DSA.
+Para evitar comparaciones engañosas, se invalida cuando falta la DSA izquierda o la derecha en ese instante.
 
 ## Otras variables disponibles en `.spa`
 
@@ -450,48 +332,15 @@ El archivo contiene otras variables útiles para interpretar la calidad y el
 estado del registro:
 
 - `SR12`: tasa o porcentaje de supresión del EEG.
-- `BURST`: información sobre brotes de actividad durante patrones de
-  supresión.
-- `EMGLOW01`: actividad electromiográfica frontal, que puede interferir en el
-  cálculo del BIS.
+- `BURST`: información sobre brotes de actividad durante patrones de supresión.
+- `EMGLOW01`: actividad electromiográfica frontal, que puede interferir en el cálculo del BIS.
 - `IMPEDNCE`: información sobre la impedancia y el contacto de los electrodos.
-- `ARTF2`: indicador codificado de artefactos detectados.
 - `BISBIT00`: bits de estado asociados al cálculo del BIS.
-- `SBIS01` y `SEMG01`: medidas de variabilidad presentes en determinadas
-  exportaciones bilaterales.
-- `BiSmooth`, `NotFiltr`, `HiFilter` y `PIC_ID`: parámetros de configuración e
-  identificación del sistema.
+- `SBIS01` y `SEMG01`: medidas de variabilidad presentes en determinadas exportaciones bilaterales.
+- `BiSmooth`, `NotFiltr`, `HiFilter` y `PIC_ID`: parámetros de configuración e identificación del sistema.
 
-Estas variables se preservan en los archivos originales, pero no todas se
-incorporan a la interfaz. La selección final prioriza las que intervienen en
-la reconstrucción, en la evaluación de calidad o en la visualización
+Estas variables se preservan en los archivos originales, pero no todas se incorporan a la interfaz. La selección final prioriza las que intervienen en la reconstrucción, en la evaluación de calidad o en la visualización
 sincronizada.
-
-## Archivos auxiliares
-
-### Registro técnico `.m_a`
-
-El archivo `.m_a` es un registro de mensajes legible. Incluye versiones del
-monitor, del módulo BISx y del algoritmo, números de serie técnicos, el
-identificador del caso y resultados de comprobaciones de impedancia. Es útil
-para conocer la configuración con la que se realizó una adquisición y para
-explicar posibles diferencias entre equipos o versiones.
-
-### Eventos y alarmas `.e_a`
-
-El archivo `.e_a` recoge eventos con fecha y hora, nivel y descripción. Entre
-los ejemplos observados se encuentran alarmas de calidad de señal, cambios en
-el número de canales y mensajes de activación o finalización. Aunque todavía
-no se representa en la aplicación, puede emplearse en el futuro para añadir
-marcadores sobre la línea temporal.
-
-### Archivos `.o_a` y `.ara`
-
-El archivo `.o_a` contiene información auxiliar asociada al archivo de onda
-cruda y a su formato de exportación. El archivo `.ara` es binario y su
-estructura interna no se interpreta en este trabajo. Ambos se conservan para
-mantener completa la exportación, pero no son necesarios para generar las
-vistas actuales.
 
 ## Preparación y validación de los datos
 
@@ -500,17 +349,12 @@ La preparación de una sesión sigue los siguientes pasos:
 1. Se localiza un único archivo `.r2a` o `.r4a` y se determina la modalidad.
 2. Se buscan los archivos con el mismo nombre base.
 3. Se valida que `.spa` contenga marcas temporales y las variables mínimas.
-4. Si `.f_a` contiene datos, se comprueba que cada espectro disponga de 60
-   valores y que su intervalo temporal sea compatible con `.spa`.
-5. Si se solicita reconstrucción, se comprueba la disponibilidad de `.h_a`,
-   `.t_a` y la señal cruda.
+4. Si `.f_a` contiene datos, se comprueba que cada espectro disponga de 60 valores y que su intervalo temporal sea compatible con `.spa`.
+5. Si se solicita reconstrucción, se comprueba la disponibilidad de `.h_a`, `.t_a` y la señal cruda.
 6. Los códigos centinela se convierten en valores ausentes.
 7. Se crea una línea temporal común con resolución de un segundo.
 
-El `.spa` se utiliza como línea temporal oficial porque contiene las variables
-procesadas que deben aparecer sincronizadas con la DSA. Los tiempos duplicados
-se resuelven conservando la última fila recibida y los huecos se mantienen
-como valores ausentes, sin interpolar información clínica.
+El `.spa` se utiliza como línea temporal oficial porque contiene las variables procesadas que deben aparecer sincronizadas con la DSA. Los tiempos duplicados se resuelven conservando la última fila recibida y los huecos se mantienen como valores ausentes, sin interpolar información clínica.
 
 ## Tratamiento de la DSA original
 
@@ -523,8 +367,7 @@ Cuando `.f_a` está disponible, el procesamiento consiste en:
 5. alinear cada fila con el segundo correspondiente de `.spa`;
 6. aplicar la máscara de calidad.
 
-En bilateral se realiza el mismo proceso para `Left Spectra` y
-`Right Spectra`, manteniendo una línea temporal común.
+En bilateral se realiza el mismo proceso para `Left Spectra` y `Right Spectra`, manteniendo una línea temporal común.
 
 ## Reconstrucción desde el EEG crudo
 
@@ -536,40 +379,106 @@ siguiente procedimiento:
 3. separación de los canales entrelazados de `.r2a` o `.r4a`;
 4. conversión de las muestras utilizando la calibración de la cabecera;
 5. filtrado pasa-altos según `LoFilter`;
-6. estimación espectral mediante Welch con ventanas de 2 segundos y avance de
-   1 segundo;
+6. estimación espectral mediante Welch con ventanas de 2 segundos y avance de 1 segundo;
 7. selección de 0,5 a 30 Hz con resolución de 0,5 Hz;
-8. conversión a decibelios respecto a la referencia utilizada por el
-   proyecto;
+8. conversión a decibelios respecto a la referencia utilizada por el proyecto;
 9. ajuste a la línea temporal de `.spa`;
 10. suavizado causal según `SpSmooth`;
-11. aplicación de un desplazamiento temporal empírico de 10 segundos en
-    unilateral o 6 segundos en bilateral;
+11. aplicación de un desplazamiento temporal empírico de 10 segundos en unilateral o 6 segundos en bilateral;
 12. aplicación de la máscara final.
 
 La máscara considera:
 
 - `SQI10` inferior a 15;
 - `TOTPOW08` ausente o no válido;
-- más del 90 % de los valores espectrales iguales a cero;
+- más del 50 % de las muestras del EEG crudo iguales a cero dentro de un mismo segundo;
 - discontinuidades superiores a un segundo;
 - filas completamente ausentes después del suavizado y desplazamiento.
 
-En bilateral se calcula una máscara independiente para cada hemisferio. SEF,
-MEF y BIS siguen la máscara de su lado, mientras que `ASYM09` requiere que
-ambas matrices sean válidas.
+En bilateral se calcula una máscara independiente para cada hemisferio. SEF, MF y BIS siguen la máscara de su lado, mientras que `ASYM09` requiere que ambas matrices sean válidas. El desarrollo completo de esta metodología, incluyendo la validación experimental de cada parámetro, se recoge en el Anexo G.
+
+## Plantilla ICCA: estructura y organización
+
+Las variables clínicas se reciben en forma de una plantilla Excel estructurada, con una organización fija que la aplicación asume al leerla y al generar los archivos auxiliares por sesión. La plantilla se compone de cuatro hojas:
+
+| Hoja | Contenido | Naturaleza temporal |
+|---|---|---|
+| `general` | Contexto del ingreso: identificador, fechas de ingreso y alta, edad, peso | Estática (una fila por paciente) |
+| `constantes_vitales` | Frecuencia cardiaca, presión arterial, SpO₂, temperatura, frecuencia respiratoria, PIC | Mediciones periódicas |
+| `analisis` | Resultados analíticos: hemoglobina, iones, glucosa, gasometría | Observaciones puntuales |
+| `perfusiones` | Fármacos en perfusión continua y sus dosis | Cambios de dosis activa |
+
+: Hojas de la plantilla ICCA y su naturaleza temporal {#tbl-hojas-icca}
+
+En todas las hojas, la fila 3 contiene la cabecera de columnas y los datos comienzan en la fila 4; este convenio de posición fija es el que utiliza la aplicación para leer y para reemplazar los datos de cada hoja sin alterar su formato. Las tres hojas temporales (`constantes_vitales`, `analisis`, `perfusiones`) incluyen obligatoriamente una columna `timestamp`, que es la que se usa para determinar qué filas corresponden al intervalo de una sesión BIS concreta. La hoja `general` incluye, entre otras, las columnas `fecha_hora_ingreso` y `fecha_hora_alta`, que delimitan el intervalo temporal completo cubierto por el Excel cuando están disponibles.
+
+## Organización de pacientes y sesiones
+
+Además de interpretar los archivos BIS e ICCA de forma aislada, la aplicación organiza ambas fuentes en una estructura de carpetas por paciente, generando manifiestos que documentan la procedencia de cada archivo. Esta sección describe la implementación concreta de dicha organización.
+
+### Detección de sesiones BIS y de plantillas ICCA compatibles
+
+Antes de crear un paciente, la aplicación localiza automáticamente las sesiones BIS y las plantillas ICCA disponibles dentro de las carpetas seleccionadas:
+
+- Para BIS, se recorre recursivamente la carpeta en busca de archivos `.spa`; cada uno define una carpeta de sesión candidata. De esa sesión se extrae el intervalo temporal completo (inicio y fin según la columna `Time`), el número de filas, el número de timestamps únicos y duplicados, y la modalidad (unilateral o bilateral, deducida de si existe un archivo `.r2a` o `.r4a` en la misma carpeta).
+- Para ICCA, se recorre la carpeta en busca de archivos `.xlsx`/`.xlsm`, y de cada uno se extrae su intervalo temporal: primero se intenta a partir de las fechas de ingreso y alta de la hoja `general`; si no están disponibles, se calcula a partir del rango de timestamps observado en las hojas temporales.
+
+### Cálculo de solapamiento y compatibilidad BIS-ICCA
+
+Para cada sesión BIS se calcula su solapamiento temporal con cada plantilla ICCA candidata: el intervalo de intersección, la proporción de la duración de la sesión BIS que queda cubierta por el ICCA, y si el ICCA cubre por completo el intervalo de la sesión. Solo las plantillas ICCA con solapamiento mayor que cero segundos se consideran compatibles con esa sesión y se ofrecen como fuente de su archivo auxiliar.
+
+### Estructura de carpetas y manifiestos
+
+Cada paciente se numera automáticamente siguiendo el patrón `PACIENTE_NNN` (con al menos tres dígitos, incrementando a partir del último número existente en el directorio de trabajo). Dentro de la carpeta del paciente:
+
+- `ICCA_ORIGINALES/` conserva una copia numerada de cada plantilla ICCA de origen, sin modificar.
+- `SESIONES/` contiene una subcarpeta por cada sesión BIS asignada, nombrada `SESION_NNN_<identificador>` (numeradas según su orden cronológico de inicio). Cada una de estas subcarpetas incluye:
+  - `BIS/`: copia íntegra de la carpeta de exportación BIS original.
+  - `ICCA/`: si existe alguna plantilla ICCA compatible, un Excel auxiliar generado específicamente para esa sesión (ver más abajo).
+
+Al finalizar la creación, se generan dos tipos de manifiesto en formato JSON:
+
+- **`paciente.json`**, en la raíz del paciente, con el identificador del paciente, las fechas de creación y última actualización, las rutas originales de todas las fuentes utilizadas y un resumen de cada sesión.
+- **`sesion.json`**, dentro de cada subcarpeta de sesión, con el identificador de la sesión BIS, su modalidad, su intervalo temporal, la ruta de la exportación BIS original, la referencia al Excel ICCA auxiliar (si existe) y el detalle de los solapamientos calculados con cada fuente ICCA.
+
+Ambos manifiestos permiten reconstruir en cualquier momento de qué archivos originales procede cada paciente, sin necesidad de volver a inspeccionar los datos.
+
+### Generación del Excel ICCA auxiliar
+
+El Excel auxiliar de cada sesión se genera a partir de la plantilla ICCA original, conservando su estructura de hojas y su formato de celda. Para cada una de las tres hojas temporales, se recopilan las filas de todas las plantillas ICCA compatibles cuyo `timestamp` cae dentro del intervalo de la sesión BIS, se eliminan las filas duplicadas y se ordenan cronológicamente antes de escribirlas; el estilo de celda (formato numérico, fuente, alineación) se copia de la plantilla original para que el archivo auxiliar mantenga el mismo aspecto. Cada fila copiada incorpora además el identificador del paciente y de la sesión (columnas `paciente_id` y `sesion_bis_id`), de forma que la procedencia de un registro pueda determinarse aunque el Excel auxiliar se consulte de forma aislada, sin el manifiesto que lo acompaña. Además, se actualiza la hoja `general` con el identificador del paciente y de la sesión, y se añade una hoja adicional, `metadata_sesion`, con un resumen de procedencia (paciente, sesión BIS, intervalo, modo de monitorización, archivos ICCA de origen y fecha de generación).
+
+### Validaciones y robustez
+
+La creación de un paciente incorpora varias comprobaciones para evitar inconsistencias:
+
+- No se permite asignar al mismo paciente dos sesiones BIS solapadas en más de 30 segundos.
+- Una sesión BIS o una plantilla ICCA ya asignada a otro paciente no puede volver a asignarse; la aplicación identifica el conflicto y señala a qué paciente pertenece.
+- La construcción de la carpeta del paciente se realiza primero en una carpeta temporal oculta; solo si el proceso se completa sin errores se renombra a su nombre definitivo. Si algo falla a mitad del proceso, la carpeta temporal se elimina y no queda ningún paciente a medio crear.
+- Al actualizar un paciente ya existente, la carpeta anterior se conserva como respaldo hasta que la nueva versión se ha construido correctamente, y solo entonces se sustituye; si la sustitución fallara, se restaura el respaldo.
+- Los archivos Excel de origen se abren mediante una copia temporal si el archivo original está bloqueado (por ejemplo, por estar abierto simultáneamente por personal clínico), evitando que esa circunstancia impida generar el Excel auxiliar.
+
+## Preparación de datos ICCA para el visualizador
+
+El Excel auxiliar generado por el organizador (ver apartado anterior) no se representa directamente en el visualizador. Antes de mostrarse, se somete a un procesamiento adicional orientado a dos objetivos: obtener una serie temporal de resolución uniforme para las constantes vitales y decidir, de forma auditable, qué determinaciones de gasometría pueden mostrarse con garantías.
+
+### Generación de series sintéticas a resolución de un segundo
+
+Para las constantes vitales, la aplicación genera un archivo derivado (en formato CSV, acompañado de un `.meta.json` con información de auditoría) que contiene una fila por cada segundo del intervalo de la sesión. Las mediciones reales se colocan exactamente en su segundo de registro y se conservan sin alterar; los instantes anteriores a la primera medición real o posteriores a la última no se extrapolan, y permanecen como valores ausentes. Cada fila incluye una columna `series_reales` que indica qué variables tienen, en ese segundo concreto, una medición real y no un valor sintético, de forma que el visualizador pueda distinguir siempre ambos casos al representarlos o al generar el informe PDF. Este proceso es determinista: generar la serie sintética dos veces a partir de los mismos datos produce exactamente el mismo resultado, lo que permite tratarla como un artefacto reproducible y no como una fuente adicional de variabilidad.
+
+### Auditoría e inferencia del tipo de gasometría
+
+Las determinaciones de gasometría (pO₂, pCO₂) requieren saber si la muestra es arterial o venosa para interpretarse correctamente, y esta información no siempre consta de forma explícita en ICCA. La aplicación resuelve esta situación mediante un procedimiento de auditoría que, para cada determinación, decide si puede incluirse en la visualización y con qué grado de confianza:
+
+- Si la plantilla ICCA indica explícitamente el tipo de gasometría, este se respeta y la determinación se incluye con origen "indicado".
+- Si no se indica explícitamente pero la determinación aparece aislada, sin su pareja pO₂/pCO₂ en el mismo instante, se excluye por considerarse incompleta.
+- Si pO₂ y pCO₂ aparecen juntas en el mismo instante y las marcas asociadas a la medición son coherentes entre sí, el tipo de muestra puede inferirse con confianza alta a partir de ese contexto.
+- Si los indicios disponibles resultan contradictorios o insuficientes para una inferencia fiable, la determinación se excluye.
+
+En todos los casos, la decisión (inclusión o exclusión, tipo final, origen de la información y motivo cuando se excluye) queda registrada en una auditoría propia, de forma que el criterio aplicado a cada dato pueda revisarse posteriormente. Esta estrategia es más matizada que un simple descarte ante cualquier ambigüedad: aprovecha el contexto disponible para recuperar determinaciones interpretables, y solo descarta aquellas en las que el tipo de muestra no puede establecerse con garantías suficientes.
 
 ## Consideraciones clínicas y limitaciones
 
-El índice BIS y las variables espectrales son resultados procesados y no
-sustituyen la valoración clínica. Un valor numérico solo es interpretable si
-la señal tiene calidad suficiente y se consideran posibles interferencias,
-especialmente la actividad electromiográfica, el movimiento y el contacto de
-los electrodos.
+El índice BIS y las variables espectrales son resultados procesados y no sustituyen la valoración clínica. Un valor numérico solo es interpretable si la señal tiene calidad suficiente y se consideran posibles interferencias,
+especialmente la actividad electromiográfica, el movimiento y el contacto de los electrodos.
 
-La DSA conserva más información que un índice único porque muestra cómo se
-distribuye la potencia entre frecuencias y cómo evoluciona en el tiempo. Por
-este motivo, el visualizador combina la matriz con BIS, SEF, MEF, calidad de
-señal y, en bilateral, asimetría. La finalidad es facilitar una revisión
-retrospectiva estructurada, no reproducir de forma exacta el algoritmo
-propietario ni realizar diagnóstico automático.
+La DSA conserva más información que un índice único porque muestra cómo se distribuye la potencia entre frecuencias y cómo evoluciona en el tiempo. Por este motivo, el visualizador combina la matriz con BIS, SEF, MEF, calidad de señal y, en bilateral, asimetría. La finalidad es facilitar una revisión retrospectiva estructurada, no reproducir de forma exacta el algoritmo propietario ni realizar diagnóstico automático.

@@ -3,43 +3,36 @@
 \capitulo{1}{Introducción}
 ```
 
-La monitorización de los pacientes críticos en estado de sedación alojados en la Unidad de Cuidados Intensivos (UCI) requiere de la integración de información procedente de múltiples dispositivos de monitorización y otros sistemas clínicos con el fin de facilitar la toma de decisiones, el seguimiento del paciente y el ajuste de dosis recibida por el mismo.
+La monitorización de los pacientes críticos en estado de sedación alojados en la Unidad de Cuidados Intensivos (UCI) requiere de la integración de información procedente de múltiples dispositivos de monitorización y otros sistemas clínicos con el fin de facilitar la toma de decisiones, el seguimiento del paciente y el ajuste de la dosis recibida por el mismo.
 
-Entre estas fuentes de información, la monitorización neurofisiológica mediante el índice biespectral o BIS (Bispectral Index) constituye una herramienta de interés para valorar el estado de sedación a partir del procesamiento de la actividad electroencefalográfica.
+Entre estas fuentes de información, la monitorización neurofisiológica mediante el índice biespectral o Bispectral Index (BIS) constituye una herramienta de interés para valorar el estado de sedación a partir del procesamiento de la actividad electroencefalográfica.
 
 De forma complementaria, los sistemas de información clínica como el IntelliSpace Critical Care & Anesthesia (ICCA) permiten registrar constantes vitales, parámetros analíticos, tratamientos administrados y otra información relevante del paciente a lo largo del tiempo.
 
-Sin embargo, en la práctica, la información procedente del monitor BIS no siempre es comprendida por todos los profesionales y se desaprovecha una gran cantidad del potencial de la máquina. Además, el material obtenido de del BIS y la información clínica recogida por la ICCA no siempre se encuentra integrada de forma inmediata o fácilmente explorable de forma conjunta. Esto dificulta el análisis retrospectivo de la evolución del paciente, especialmente cuando se pretende estudiar la relación temporal entre la señal neurofisiológica, el índice BIS y otras variables clínicas, como constantes hemodinámicas, parámetros metabólicos o administración de fármacos.
+Sin embargo, en la práctica, la información procedente del monitor BIS no siempre es comprendida por todos los profesionales, por lo que buena parte del potencial de la herramienta no llega a aprovecharse plenamente. Además, los datos obtenidos del BIS y la información clínica recogida en ICCA no siempre se encuentran integrados de forma inmediata o fácilmente explorables de manera conjunta. Esto dificulta el análisis retrospectivo de la evolución del paciente, especialmente cuando se pretende estudiar la relación temporal entre la señal neurofisiológica, el índice BIS y otras variables clínicas, como constantes hemodinámicas, parámetros metabólicos o la administración de fármacos.
 
-En este contexto, surge la necesidad de disponer de una aproximación que permita integrar ambas fuentes de información en una misma línea temporal, de manera que sea posible observar de forma conjunta la evolución del BIS y de variables clínicas relevantes. Esta necesidad es especialmente relevante en el entorno de la UCI, donde la monitorización continua, la hererogeneidad de los datos y la complejidad del estado clínico del paciente hacen especialmente útil contar con herramientas que faciliten la revisión estructurada de la información.
+En este contexto, surge la necesidad de disponer de una aproximación que permita integrar ambas fuentes de información en una misma línea temporal, de manera que sea posible observar de forma conjunta la evolución del BIS y de variables clínicas relevantes. Esta necesidad es especialmente relevante en el entorno de la UCI, donde la monitorización continua, la heterogeneidad de los datos y la complejidad del estado clínico del paciente hacen especialmente útil contar con herramientas que faciliten la revisión estructurada de la información.
 
 El presente Trabajo Fin de Grado se plantea como una prueba de concepto orientada a la integración temporal y visualización conjunta de datos procedentes del monitor BIS y del sistema ICCA. El trabajo no se enfoca como el desarrollo de un producto software final, sino como una aproximación inicial que permita estudiar la viabilidad de extraer, sincronizar, estructurar y representar conjuntamente ambos tipos de datos, sentando así una base para futuros desarrollos más avanzados.
 
 La motivación principal del proyecto radica, por tanto, en la necesidad de facilitar el análisis retrospectivo del paciente crítico mediante la combinación de información neurofisiológica y clínica en un entorno común de exploración. Para ello, se aborda el estudio de los datos accesibles del monitor BIS, incluyendo la matriz de densidad espectral (DSA) y el índice BIS, así como su integración con variables clínicas seleccionadas procedentes de ICCA mediante estrategias de normalización temporal.
 
-
-En este capítulo se presenta el trabajo realizado y se contextualiza el problema abordado. 
-Se debe indicar el ámbito en el que se enmarca el Trabajo Fin de Grado, la motivación del mismo  y la relevancia del problema tratado. 
-Asimismo, se describirá brevemente la estructura de la memoria, indicando el contenido de cada capítulo.
-
-La extensión máxima del Trabajo Fin de Grado será de **50 páginas**, contabilizadas como el total resultante de la suma de todos los capítulos de la memoria comprendidos entre los apartados **Introducción, Metodología, Resultados, Discusión, Conclusiones y Lineas futuras**. 
-
-Este límite no incluye los anexos, que se entregarán en documentos independientes.
+En definitiva, este TFG desarrolla un sistema de organización, reconstrucción y visualización retrospectiva que permite integrar la actividad cerebral monitorizada mediante BIS con variables clínicas extraídas de ICCA, manteniendo la trazabilidad de los datos originales y respetando la naturaleza temporal de cada tipo de información.
 
 ### Estructura del documento
 
 La presente memoria se organiza en varios capítulos:
 
-Objetivos: se definen las metas del trabajo, tanto generales como específicas, así como los propósitos técnicos y académicos asociados al proyecto.
+**Objetivos**: se definen las metas del trabajo, distinguiendo entre el objetivo general, orientado a la integración y visualización conjunta de datos BIS e ICCA, y los objetivos específicos que concretan las tareas necesarias para alcanzarlo.
 
-Marco teórico: se ofrece una visión necesario para contextualizar el estudio,
+**Conceptos teóricos**: se ofrece la visión necesaria para contextualizar el estudio, describiendo el fundamento del índice BIS y de la monitorización neurofisiológica, el sistema ICCA y los conceptos relacionados con el análisis espectral de señales EEG.
 
-Metodología:  seguida para el desarrollo de la prueba de concepto, detallando el procedimiento de extracción, organización e integración temporal de los datos, así como el planteamiento del visualizador propuesto y las herremientas necesarias para desarrollarlo. 
+**Metodología**: se detalla el procedimiento seguido para el desarrollo de la prueba de concepto, incluyendo la extracción y organización de los datos BIS e ICCA, el flujo de reconstrucción de la DSA, la estrategia de sincronización temporal entre ambas fuentes y las herramientas empleadas en el desarrollo de las dos aplicaciones propuestas.
 
-Resultados: 
+**Resultados**: se presentan los resultados obtenidos, tanto en relación con la reconstrucción de las variables BIS como con la integración y visualización conjunta de los datos clínicos procedentes de ICCA.
 
-Discusión: se realiza un análisis crítico de los resultados y las limitaciones del trabajo. 
+**Discusión**: se realiza un análisis crítico de los resultados obtenidos y de las limitaciones del trabajo.
 
-Conclusiones:
+**Conclusiones**: se recogen las principales aportaciones del proyecto y el grado de cumplimiento de los objetivos planteados.
 
-Líneas futuras: una vez terminado el proyecto, se proponen formas de mejorarlo en un futuro, ampliar sus funciones, etc.
+**Líneas futuras**: una vez finalizado el proyecto, se proponen posibles mejoras y ampliaciones para futuros desarrollos.

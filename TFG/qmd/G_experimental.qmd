@@ -1,29 +1,325 @@
 ```{=latex}
 %% ══════════════════════════════════════════════════════
-%%  APÉNDICE G – Resultados experimentales
+%%  APÉNDICE G – Metodología de reconstrucción de la DSA
 %% ══════════════════════════════════════════════════════
+\apendice{Metodología de reconstrucción de la matriz DSA}
+\label{ap:estudio-experimental}
 ```
 
-\apendice{Estudio experimental}
-\label{ap:estudio-experimental}
+## G.1 Objetivo del anexo
 
+Este anexo describe la metodología implementada para reconstruir la matriz de densidad espectral (DSA) a partir de los archivos de onda cruda del monitor BIS. Se explican las funciones principales del módulo `reconstruccion.py`, los parámetros empleados, las decisiones metodológicas adoptadas y las métricas utilizadas para comparar la matriz reconstruida con la matriz espectral exportada por el monitor cuando esta se encuentra disponible.
 
-# Cuaderno de trabajo
+## G.2 Parámetros generales de reconstrucción
 
-Este apéndice recoge los experimentos realizados para seleccionar y validar el
-procedimiento de reconstrucción de la matriz de densidad espectral (DSA) a
-partir del EEG crudo. La matriz almacenada en el archivo `.f_a`, una vez
-convertida a sus unidades de representación, se utilizó como referencia.
+Todos los parámetros de la reconstrucción se centralizan en un único diccionario, `PARAMETROS_RECONSTRUCCION`, lo que permite modificar la configuración sin tocar la lógica de las funciones y deja constancia explícita de cada decisión adoptada.
 
-El objetivo no fue optimizar un procedimiento distinto para cada registro,
-sino seleccionar una configuración única que pudiera aplicarse a registros
-unilaterales y bilaterales sin ajustar sus parámetros en función del resultado.
+| Parámetro | Valor | Significado |
+|---|---:|---|
+| `ventana_welch_s` | 2 s | Duración de cada ventana de análisis espectral |
+| `paso_welch_s` | 1 s | Avance entre ventanas consecutivas |
+| `solapamiento_ventanas_s` | 1 s | Solapamiento efectivo entre ventanas |
+| `fmin` | 0,5 Hz | Frecuencia mínima analizada |
+| `fmax` | 30 Hz | Frecuencia máxima analizada |
+| `paso_frecuencia` | 0,5 Hz | Anchura de cada bin frecuencial |
+| `modo_welch` | densidad | Welch devuelve PSD en µV²/Hz |
+| `tiempo_referencia` | centro | La ventana se asigna a su instante central |
+| `umbral_sqi` | 15 | Límite mínimo de calidad de señal (`SQI10`) |
+| `umbral_ceros`$^*$ | 0,9 | Definido en el diccionario de parámetros, pero no consumido por la función de máscara actualmente en uso (ver nota tras la tabla) |
+| `aplicar_mascara_ceros_raw` | True | Activa la detección de pérdidas en el EEG crudo |
+| `umbral_ceros_raw` | 0,5 | Segundo de EEG crudo inválido si ≥50 % de sus muestras son cero |
+| `excluir_invalidos_suavizado` | True | Los segundos inválidos se excluyen del promedio móvil |
+| `referencia_amplitud_uv_rms` | 0,0001 µV RMS | Referencia usada en la conversión logarítmica a dB |
+| `combinacion_unilateral` | canal 1 | Canal físico usado en unilateral |
+| `combinacion_bilateral` | canal 1 izquierdo, canal 3 derecho | Canales físicos usados en bilateral |
+| `orden_filtro_pasa_altos` | 1 | Orden del filtro Butterworth |
+| `filtro_pasa_altos_predeterminado_hz` | 0,25 Hz | Corte usado si `LoFilter` no está disponible en el `.spa` |
+| `shift_unilateral_s` | 10 s | Desplazamiento temporal usado en unilateral |
+| `shift_bilateral_s` | 6 s | Desplazamiento temporal usado en bilateral |
 
-## Registros empleados
+: Parámetros generales de la reconstrucción, extraídos de `PARAMETROS_RECONSTRUCCION` {#tbl-parametros-reconstruccion}
 
-La evaluación se realizó sobre tres registros BIS. Los registros bilaterales
-aportaron dos matrices independientes, una por hemisferio, por lo que se
-compararon cinco matrices en total.
+Nótese que `umbral_ceros` (90 %, aplicado sobre los *bins* espectrales ya calculados) y `umbral_ceros_raw` (50 %, aplicado sobre las muestras de la onda cruda) son dos criterios distintos y complementarios: el primero detecta espectros degenerados una vez calculados; el segundo detecta la pérdida de señal en origen, antes incluso de aplicar Welch (ver G.9).
+
+$^*$ *Nota:* `umbral_ceros` es un parámetro heredado de una versión anterior del módulo de reconstrucción. La función que efectivamente calcula la máscara de calidad en la implementación actual (`_calcular_mascaras_comunes`) no lo utiliza; el criterio equivalente que sí está activo es la detección de pérdida de señal en la onda cruda (`umbral_ceros_raw`, G.9). Se mantiene documentado aquí porque el parámetro sigue presente en el diccionario de configuración, aunque no tiene efecto sobre el resultado.
+
+## G.3 Lectura de cabecera, tiempo inicial y onda cruda
+
+**Funciones:** `_extraer_parametros_eeg`, `_leer_raw_intercalado`, `_dar_forma_raw`, `_interpretar_inicio_ta`.
+
+La cabecera `.h_a` se lee como un binario y se interpretan cuatro campos mediante desplazamientos fijos de byte:
+
+| Parámetro | Offset (byte) | Tipo | Formato `struct` |
+|---|---:|---|---|
+| Número de canales | 178 | entero corto | `<h` |
+| Frecuencia de muestreo (fs) | 186 | entero | `<i` |
+| Pendiente de calibración | 702 | flotante | `<f` |
+| Offset de calibración | 766 | flotante | `<f` |
+
+: Campos extraídos de la cabecera `.h_a` mediante desplazamientos de byte fijos {#tbl-header-offsets}
+
+Se valida que el número de canales sea 2 (unilateral) o 4 (bilateral) y que `fs` sea positivo; en caso contrario se rechaza el archivo. El archivo `.t_a` aporta el instante de inicio de la señal cruda, que se trunca al segundo.
+
+La señal cruda (`.r2a`/`.r4a`) se lee como una secuencia binaria de enteros de 16 bits con signo (`<i2`, *little endian*) y se reorganiza en una matriz de `n_muestras × n_canales`. Si el número total de valores no es múltiplo exacto del número de canales, la implementación descarta el resto final en lugar de fallar, evitando así perder todo el registro por un desajuste de unas pocas muestras sueltas.
+
+## G.4 Conversión de la señal cruda a microvoltios
+
+**Función:** `_canal_alineado_uv`.
+
+Antes del cálculo espectral, las muestras digitales se transforman a microvoltios utilizando los parámetros de calibración de la cabecera:
+
+$$\text{EEG}_{\mu V} = \text{valor\_crudo} \cdot \text{pendiente} + \text{offset}$$
+
+Esta conversión se realiza ya alineada temporalmente con la timeline común: la función construye un array del tamaño exacto de la timeline objetivo, inicializado a `NaN`, y solo rellena con la conversión los instantes para los que existe muestra cruda real disponible. Así, cualquier tramo de la timeline sin cobertura de señal cruda queda automáticamente como ausencia de información, sin necesidad de una máscara adicional en este paso.
+
+## G.5 Filtro pasa-altos causal
+
+**Funciones:** `_extraer_filtro_lofilter`, `_filtrar_pasa_altos_causal`.
+
+El filtro pasa-altos se aplica antes del cálculo espectral con el objetivo de atenuar componentes de muy baja frecuencia y deriva de línea base. Se utiliza un filtro Butterworth causal de primer orden, implementado con `scipy.signal.butter` (`output="sos"`) y aplicado mediante `sosfilt`. Al ser causal, cada muestra de salida depende únicamente de muestras presentes y anteriores, respetando la dirección temporal de adquisición.
+
+La frecuencia de corte se obtiene de la columna `LoFilter` del archivo `.spa`:
+
+| Código `LoFilter` | Frecuencia de corte |
+|---:|---:|
+| 0 | 0,25 Hz |
+| 1 | 1,0 Hz |
+| 2 | 2,0 Hz |
+| 3 | 2,5 Hz |
+
+: Correspondencia de códigos `LoFilter` {#tbl-lofilter-anexo}
+
+Si la columna `LoFilter` no está disponible en el `.spa`, se emplea 0,25 Hz como valor predeterminado y se registra esta circunstancia en los parámetros del resultado (campo `lofilter_origen`).
+
+Un detalle metodológico relevante es el tratamiento de los huecos: la señal puede contener tramos de `NaN` (por ejemplo, donde la alineación con la timeline no dispuso de muestra cruda). En lugar de filtrar la señal completa arrastrando esos huecos, la implementación localiza los bloques de valores finitos y filtra cada bloque de forma independiente, con su propio estado inicial del filtro (`sosfilt_zi`). De este modo, un hueco no contamina con transitorios de filtro los tramos válidos situados antes o después de él, y los valores no finitos permanecen como ausencia de información en la salida.
+
+### Ejemplo numérico del filtrado
+
+Para ilustrar el funcionamiento del filtro, se toma un caso concreto: frecuencia de muestreo $f_s = 128$ Hz, frecuencia de corte $f_c = 2,5$ Hz (código `LoFilter` 3) y orden 1.
+
+Para un filtro Butterworth pasa-altos digital de primer orden diseñado mediante transformación bilineal, los coeficientes pueden expresarse a partir de:
+
+$$K = \tan\left(\frac{\pi f_c}{f_s}\right)$$
+
+Sustituyendo los valores del caso:
+
+$$K = \tan\left(\frac{\pi \cdot 2{,}5}{128}\right) = \tan(0{,}0614) \approx 0{,}0614$$
+
+A partir de $K$ se obtienen los coeficientes del filtro:
+
+$$b_0 = \frac{1}{1+K} \approx 0{,}9412 \qquad b_1 = \frac{-1}{1+K} \approx -0{,}9412 \qquad a_1 = \frac{K-1}{K+1} \approx -0{,}8842$$
+
+La ecuación recursiva del filtro es:
+
+$$y[n] = b_0\,x[n] + b_1\,x[n-1] - a_1\,y[n-1] = 0{,}9412\,(x[n]-x[n-1]) + 0{,}8842\,y[n-1]$$
+
+Esta expresión es la que relaciona la salida filtrada $y[n]$ con la muestra de entrada actual $x[n]$, la muestra de entrada anterior $x[n-1]$ y la propia salida anterior $y[n-1]$; por ello es una ecuación recursiva, y la dependencia de $y[n-1]$ es la que da lugar al comportamiento de suavizado característico de un filtro Butterworth de primer orden. El término $x[n]-x[n-1]$ explica el carácter pasa-altos: cuando la señal cambia lentamente, esta diferencia es pequeña y la salida queda muy atenuada; cuando cambia rápidamente, la diferencia es mayor y esa componente se conserva en mayor medida.
+
+Para la primera muestra de un bloque no existen $x[-1]$ ni $y[-1]$. La implementación resuelve esto con `zi = sosfilt_zi(sos) * segmento[0]`, que inicializa el filtro como si, antes de la primera muestra, la señal hubiese permanecido constante en su valor inicial. Como una señal constante corresponde a una componente de 0 Hz, un filtro pasa-altos debe producir para ella una salida estacionaria aproximadamente nula; esta inicialización reduce el transitorio artificial que aparecería al comienzo del filtrado si se partiera, por ejemplo, de un estado en reposo.
+
+Tomando como entrada, a modo de ejemplo, cinco muestras en µV y fijando $y[0]=0$ por simplicidad:
+
+| $n$ | $x[n]$ (µV) | $y[n]$ (µV) |
+|---:|---:|---:|
+| 0 | 100 | 0 |
+| 1 | 102 | 1,88 |
+| 2 | 104 | 3,55 |
+| 3 | 103 | 2,19 |
+| 4 | 101 | 0,06 |
+
+: Ejemplo numérico del filtrado pasa-altos causal {#tbl-ejemplo-filtro}
+
+Por ejemplo, la segunda muestra se obtiene como $y[1] = 0{,}9412\cdot(102-100) + 0{,}8842\cdot 0 = 1{,}88$ µV, y la tercera como $y[2] = 0{,}9412\cdot(104-102) + 0{,}8842\cdot 1{,}88 = 3{,}55$ µV, y así sucesivamente. En el proyecto estos coeficientes no se calculan ni se codifican manualmente, sino que los obtiene `scipy.signal.butter` a partir de la frecuencia de corte y de la frecuencia de muestreo; la expresión de $K$ se incluye aquí únicamente para explicar su origen matemático. El filtrado se aplica después con `scipy.signal.sosfilt`, por lo que es causal: cada muestra filtrada depende de la muestra actual, de muestras previas y del estado previo del filtro, sin utilizar en ningún momento muestras futuras.
+
+## G.6 Reconstrucción espectral mediante Welch
+
+**Funciones:** `_welch_por_bloques`, `_reconstruir_lado`.
+
+| Parámetro | Justificación |
+|---|---|
+| Ventana de 2 s | Compromiso entre resolución temporal y frecuencial |
+| Avance de 1 s | Permite obtener una estimación por segundo |
+| Ventana Hann | Reduce la fuga espectral |
+| `detrend="constant"` | Elimina el valor medio de cada ventana |
+| `scaling="density"` | Obtiene PSD en µV²/Hz |
+| Rango 0,5-30 Hz | Rango representado por la DSA del BIS |
+| Bin de 0,5 Hz | Resolución frecuencial de la matriz |
+| Referencia temporal central | Cada ventana se asigna a su instante central |
+
+: Configuración de la estimación espectral mediante Welch {#tbl-welch-config}
+
+### De la señal discreta a la resolución de 0,5 Hz
+
+El EEG no llega al ordenador como una señal continua, sino como una secuencia finita de muestras. Por eso el análisis frecuencial no puede usar la Transformada de Fourier continua, sino su versión para señales muestreadas y finitas, la Transformada Discreta de Fourier (DFT); la FFT (*Fast Fourier Transform*) no es una transformada distinta, sino el algoritmo con el que se calcula esa misma DFT de forma mucho más rápida, y es lo que usa internamente `scipy.signal.welch`.
+
+La resolución frecuencial que se obtiene de una ventana de $N$ muestras a una frecuencia de muestreo $f_s$ es:
+
+$$\Delta f = \frac{f_s}{N}$$
+
+Con los parámetros de este proyecto ($f_s = 128$ Hz, $N = 256$ muestras por ventana de 2 s):
+
+$$\Delta f = \frac{128}{256} = 0{,}5\ \text{Hz}$$
+
+Este resultado no es casual: es precisamente la razón por la que la ventana de 2 segundos permite obtener directamente bins de 0,5 Hz, sin necesidad de ningún ajuste adicional (`nfft = fs / paso_frecuencia` en la implementación, ver G.2).
+
+La misma relación impone también un límite superior a las frecuencias analizables, la frecuencia de Nyquist:
+
+$$f_{Nyquist} = \frac{f_s}{2} = \frac{128}{2} = 64\ \text{Hz}$$
+
+El rango representado en la DSA (0,5-30 Hz) queda muy por debajo de ese límite, por lo que la resolución del muestreo no supone ninguna restricción práctica. La componente de 0 Hz, además, no se incluye en la matriz resultante, en línea con la eliminación de la media descrita más abajo: ambas decisiones evitan que un posible desplazamiento constante de la señal se confunda con actividad oscilatoria real.
+
+Por último, que se use la FFT y no la DFT calculada de forma directa no es un detalle menor a la escala de este proyecto: el coste de la DFT directa crece con el cuadrado del número de muestras analizadas, mientras que la FFT lo reduce a un crecimiento casi lineal. Esa diferencia es la que permite reconstruir la DSA de un registro de varias horas completas en un tiempo razonable, en vez de estar limitados a unos pocos segundos de señal.
+
+Para cada canal, la señal se procesa por segmentos de 2 segundos, a los que se aplican dos correcciones antes del cálculo espectral propiamente dicho:
+
+- **Eliminación de la media (`detrend="constant"`).** Cada segmento se centra en torno a cero, eliminando su nivel medio sin alterar sus oscilaciones. Si el fragmento tuviese un desplazamiento constante respecto a cero (una componente de continua), la FFT lo interpretaría como una gran cantidad de potencia concentrada en 0 Hz, una potencia artificial que no corresponde a actividad oscilatoria real y que podría contaminar la lectura de las frecuencias más bajas.
+- **Ventana Hann.** Suaviza progresivamente la amplitud del segmento hacia sus dos extremos. La FFT asume implícitamente que el fragmento analizado se repite de forma periódica; si el principio y el final del segmento no encajan entre sí, aparece un salto artificial en ese punto de unión. Ese salto, al descomponerse en frecuencias, se parece a componentes de alta frecuencia y añade potencia que no está realmente presente en el EEG. La ventana Hann atenúa los bordes para reducir ese salto y, con ello, la fuga espectral que provocaría.
+
+La implementación no llama a `scipy.signal.welch` sobre la señal completa con su parámetro de solapamiento interno. En su lugar, extrae manualmente segmentos de 256 muestras (2 s a 128 Hz) con un desplazamiento de 128 muestras (1 s) entre inicios consecutivos —lo que produce el solapamiento efectivo del 50 % entre ventanas—, y aplica `welch` de forma independiente a cada segmento ya extraído, con `noverlap=0` y `nfft = fs / paso_frecuencia`. El resultado equivale a un periodograma modificado (ventana Hann) por segmento, calculado con el avance deseado; esta equivalencia es la que se comprueba experimentalmente en la sección G.15.1 frente a `scipy.signal.spectrogram`.
+
+Sobre la selección de canales: en registros unilaterales se utiliza el canal 1 (índice 0). En registros bilaterales, `_reconstruir_lado` se invoca por separado para el canal 1 (izquierdo) y el canal 3 (derecho); los canales 2 y 4 no intervienen en la reconstrucción final.
+
+## G.7 Conversión de densidad espectral a dB
+
+**Función:** `_convertir_potencia_a_db`.
+
+### De la FFT a la densidad espectral de potencia
+
+Para cada segmento, la FFT devuelve un valor complejo por frecuencia, formado por una magnitud (cuánta cantidad de esa frecuencia contiene la señal) y una fase (en qué punto de su ciclo se encuentra esa componente). El flujo hasta llegar a la densidad espectral de potencia (PSD) es el siguiente:
+
+1. **Fragmento de EEG**, $x(t)$, en µV.
+2. **FFT**: para cada frecuencia analizada (0,5 Hz, 1 Hz, ..., 30 Hz) se obtiene una amplitud compleja $X(f)$.
+3. **Potencia**: se toma el módulo al cuadrado de esa amplitud, $P(f) = |X(f)|^2$; al elevar al cuadrado una magnitud en µV, el resultado queda en µV².
+4. **Densidad espectral de potencia**: para expresar cuánta potencia hay por hercio, el resultado se normaliza por el ancho de banda analizado y por la ventana empleada, obteniendo $\text{PSD}(f)$ en µV²/Hz. Este es precisamente el resultado que devuelve `scipy.signal.welch` con `scaling="density"`.
+
+### Integración por bin y paso a decibelios
+
+Dado que Welch devuelve densidad espectral de potencia (µV²/Hz) y cada columna de la DSA representa un intervalo de 0,5 Hz, cada celda se integra multiplicando por la anchura del bin para recuperar una potencia aproximada en µV²:
+
+$$\text{potencia\_bin} = \text{PSD} \cdot 0{,}5\ \text{Hz}$$
+
+Posteriormente se aplica una conversión logarítmica respecto a una referencia de amplitud:
+
+$$\text{DSA}_{dB} = 10 \cdot \log_{10}\!\left(\frac{\text{potencia\_bin} + 10^{-12}}{(0{,}0001\ \mu V)^2}\right)$$
+
+El término $10^{-12}$ se añade únicamente para evitar problemas numéricos al calcular el logaritmo de valores nulos, y su magnitud es lo bastante pequeña como para no alterar de forma perceptible ninguna celda con señal real.
+
+La referencia del fabricante se expresa como una amplitud, 0,0001 µV RMS, mientras que lo que se compara en la fórmula es una potencia. Por ello la referencia debe elevarse al cuadrado, $(0{,}0001\ \mu V)^2 = 10^{-8}\ \mu V^2$, antes de dividir; el resultado es equivalente a haber trabajado directamente con amplitudes y una expresión en $20 \log_{10}$. Esta referencia se mantiene constante en toda la aplicación para asegurar la comparabilidad entre registros y permitir la comparación con la DSA exportada por el monitor.
+
+Para la representación gráfica se emplea la escala lineal fija de 49 a 94 dB especificada por el fabricante (ver G.2). Los valores que quedan fuera de ese intervalo no se eliminan ni se invalidan: se saturan en los extremos de la escala cromática, de modo que una celda con una potencia superior a 94 dB se muestra igual que una de exactamente 94 dB, y análogamente en el extremo inferior.
+
+## G.8 Alineación temporal de la DSA reconstruida
+
+**Funciones:** `_ajustar_reconstruida_a_timeline`, `_alinear_spa`, `_calcular_indices_alineacion`.
+
+Welch produce tiempos relativos al inicio de la señal analizada. Estos tiempos se convierten a marcas temporales absolutas tomando como referencia el inicio de la timeline común, y la matriz se reindexa sobre dicha timeline, de forma que cada fila de la DSA reconstruida corresponda al mismo segundo que las variables procesadas del `.spa`. Si el proceso genera marcas temporales duplicadas, se conserva la última aparición. El `.spa` se alinea de forma equivalente sobre la misma timeline mediante `_alinear_spa`.
+
+## G.9 Máscaras de calidad
+
+**Funciones:** `_detectar_perdidas_raw_por_segundo`, `_proyectar_mascara_raw_a_timeline_dsa`, `_crear_mascara_raw_para_canal`, `_calcular_mascaras_comunes`, `_calcular_mascara_final_comun`.
+
+Un segundo de la timeline común se considera no válido cuando se cumple alguno de los siguientes criterios:
+
+| Máscara | Criterio |
+|---|---|
+| Calidad `.spa` | `SQI10 < 15` o `TOTPOW08` ausente |
+| Pérdida de señal cruda | ≥50 % de las muestras del segundo, en el canal correspondiente, son exactamente cero |
+| Segundo incompleto | La alineación no dispuso del conjunto completo de 128 muestras crudas para ese segundo (p. ej. en los bordes del registro) |
+| Discontinuidades | Segundo ausente en la timeline del `.spa` o, si existe, del `.f_a` |
+| Sin ventana Welch | No existe ninguna ventana de Welch cuyo instante central caiga en ese segundo (ocurre en el margen inicial que exige la ventana de 2 s) |
+| Hemisferios (bilateral) | Cada hemisferio tiene su propia máscara; `ASYM09` se invalida cuando falta información válida en cualquiera de los dos lados |
+
+: Criterios que componen la máscara de calidad {#tbl-criterios-mascara}
+
+El criterio de **pérdida de señal cruda** se basa en que, ante la pérdida de paquetes de EEG, el propio equipo rellena las muestras ausentes con ceros para mantener la continuidad temporal [@CovidienSerial2010]. Los ceros aislados y esporádicos, que no alcanzan ese 50 %, no invalidan el segundo. Esta máscara se calcula sobre el EEG crudo y después se proyecta a la resolución de las ventanas de Welch: una ventana se invalida si incorpora aunque sea una muestra perteneciente a un segundo crudo ya marcado como inválido, ya que la estimación espectral no admite valores ausentes.
+
+La máscara final que efectivamente se aplica a la visualización no es únicamente la máscara base anterior. Antes de mostrarse, se calcula una **disponibilidad** por segundo: cuántos de los últimos `SpSmooth` segundos (ver G.10) tenían datos válidos según la máscara base. Tras aplicar el desplazamiento temporal (G.11) a esa disponibilidad, un segundo se marca como no representable si, una vez desplazada, no queda ningún dato válido dentro de su ventana de suavizado. La máscara final es, por tanto, la unión de la máscara base y la ausencia de disponibilidad tras suavizado y desplazamiento. Esto es lo que justifica que, en la práctica, los primeros segundos de cualquier reconstrucción bilateral o unilateral aparezcan siempre en blanco: no existe todavía suficiente historia disponible para calcular ni el suavizado ni aplicarle el desplazamiento.
+
+En registros bilaterales, todos estos criterios (salvo la calidad `.spa`, que usa las columnas `_izq`/`_der` correspondientes) se calculan de forma independiente para cada hemisferio.
+
+## G.10 Suavizado temporal mediante `SpSmooth`
+
+**Función:** `_suavizar_y_desplazar`.
+
+| Código `SpSmooth` | Ventana |
+|---:|---:|
+| 0 | 0 s (sin suavizado) |
+| 1 | 5 s |
+| 2 | 10 s |
+| 3 | 30 s |
+| 4 | 60 s |
+
+: Correspondencia de códigos `SpSmooth` {#tbl-spsmooth-anexo}
+
+El suavizado se aplica mediante una media móvil causal (`rolling`, `center=False`) con `min_periods=1`, de modo que cada segundo se calcula utilizando únicamente valores presentes y anteriores, y no exige que la ventana esté completamente llena para producir un resultado. Los segundos marcados como inválidos por la máscara base se sustituyen por `NaN` antes del suavizado (cuando `excluir_invalidos_suavizado=True`, que es el valor por defecto), evitando así que contribuyan al promedio temporal.
+
+La existencia del parámetro `SpSmooth` procede de la estructura exportada por el monitor BIS. La forma exacta del suavizado interno del equipo no es pública, por lo que la media móvil causal se adopta como aproximación reproducible y coherente con el carácter temporal del parámetro, sin pretender reproducir exactamente el algoritmo propietario.
+
+## G.11 Desplazamiento temporal aplicado
+
+**Función:** `_suavizar_y_desplazar`.
+
+| Modo | Shift |
+|---|---:|
+| Unilateral | 10 s |
+| Bilateral | 6 s |
+
+: Desplazamiento temporal aplicado tras el suavizado {#tbl-shift-anexo}
+
+Tras el suavizado se aplica un desplazamiento temporal fijo. Este desplazamiento no se interpreta como un parámetro fisiológico, sino como una corrección empírica destinada a mejorar la correspondencia temporal entre la DSA reconstruida y la DSA exportada por el monitor. Los valores utilizados fueron seleccionados tras comparar diferentes desplazamientos (0-30 s) y evaluar las métricas de similitud frente al archivo `.f_a` (ver G.15.2); no se emplea ninguna referencia bibliográfica para justificarlo, ya que se trata de un resultado experimental propio y no de una propiedad documentada del dispositivo.
+
+## G.12 Aplicación final de máscaras y variables BIS
+
+**Funciones:** `_preparar_curva`, `_preparar_bis`, `_preparar_variable_0_100`.
+
+Una vez suavizada y desplazada la matriz, la máscara final se aplica tanto a la DSA como a las variables procesadas asociadas: SEF y MEF (acotadas a 0,5-30 Hz), BIS (acotado a 0-100) y EMG/SR (acotados a 0-100). Esto garantiza que no se representen parámetros BIS en segundos en los que no existe información espectral válida. En bilateral, `ASYM09` se invalida cuando falta información válida en cualquiera de los dos hemisferios.
+
+## G.13 Funciones principales del módulo `reconstruccion.py`
+
+- **`reconstruir_desde_uploads`**: usada cuando los archivos se suben directamente desde la aplicación.
+- **`reconstruir_desde_rutas`**: usada cuando se trabaja con carpetas y sesiones ya organizadas por la aplicación de organización de pacientes.
+- **`_reconstruir_desde_datos`**: núcleo común al que convergen ambas vías anteriores; aplica la misma lógica de lectura, alineación, reconstrucción, suavizado y enmascaramiento con independencia del origen de los archivos.
+- **`calcular_mascaras_comunes_desde_rutas`**: permite calcular las máscaras de calidad sin reconstruir el espectro completo, lo que se usa cuando se visualiza directamente la DSA del `.f_a` pero se quiere aplicar el mismo criterio de calidad.
+
+## G.14 Métricas de comparación
+
+La comparación entre la DSA reconstruida y la DSA exportada por el monitor se realiza únicamente sobre celdas válidas comunes entre ambas matrices. No se comparan segundos enmascarados ni celdas ausentes en ninguna de las dos.
+
+| Métrica | Qué mide | Por qué se usa |
+|---|---|---|
+| Pearson | Similitud lineal de patrón | Evalúa si la estructura tiempo-frecuencia se parece |
+| Spearman | Similitud monotónica | Menos sensible a relaciones no lineales |
+| MAE | Error absoluto medio en dB | Error promedio interpretable |
+| RMSE | Error cuadrático medio en dB | Penaliza más los errores grandes |
+| Sesgo medio | Diferencia media en dB | Detecta desplazamiento sistemático |
+
+: Métricas empleadas para comparar la DSA reconstruida con la DSA original {#tbl-metricas-comparacion}
+
+$$MAE = \frac{1}{N}\sum_{i=1}^{N} |x_i - y_i|$$
+
+$$RMSE = \sqrt{\frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)^2}$$
+
+$$\text{sesgo} = \frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)$$
+
+<!-- NOTA: el módulo que implementa el cálculo de estas métricas no estaba entre los scripts revisados
+     (lectura_spa.py, pacientes_icca.py, reconstruccion.py, validacion_bis.py, visualizacion_icca.py,
+     figuras.py, vistas_temporales.py, alineacion_temporal.py, bandas.py, carpeta_bis.py,
+     figuras_estaticas.py, informe_pdf.py, lectura_fa.py). Si tienes ese script (posiblemente
+     "metricas.py" o similar), pásamelo para verificar esta sección igual que las anteriores. -->
+
+## G.15 Resultados experimentales
+
+### G.15.1 Equivalencia entre Welch y `spectrogram`
+
+Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD como en dB y en las referencias temporales. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado.
+
+### G.15.2 Resultados de la validación por registro
+
+::: {.callout-note}
+**Nota metodológica.** Las métricas de esta sección se obtuvieron con una versión anterior del módulo de reconstrucción, cuya máscara de calidad incluía el criterio espectral `umbral_ceros` (90 % de *bins* nulos) descrito en G.2. La implementación final sustituye ese criterio por la detección de pérdida de señal sobre la onda cruda (`umbral_ceros_raw`, 50 %, ver G.9), que actúa en una etapa anterior del proceso. Ambos criterios persiguen el mismo objetivo —detectar segundos sin información fiable—, pero al no ser idénticos, el porcentaje de segundos enmascarados y, en consecuencia, los valores exactos de Pearson, MAE y RMSE calculados sobre la implementación final podrían diferir ligeramente de los aquí presentados. Los resultados deben interpretarse como una validación orientativa de la estrategia de reconstrucción adoptada, no como una medición exacta y actualizada de la versión final del código. Repetir esta validación con el pipeline definitivo queda como tarea pendiente antes de la entrega, si el tiempo lo permite.
+:::
+
+La evaluación se realizó sobre tres registros BIS. Los registros bilaterales aportaron dos matrices independientes, una por hemisferio, por lo que se compararon cinco matrices en total.
 
 | Registro | Modalidad | Duración analizada | Matrices evaluadas |
 |:---|:---|---:|---:|
@@ -31,164 +327,9 @@ compararon cinco matrices en total.
 | `L05141322` | Bilateral | 2712 s | 2 |
 | `L04301923` | Bilateral | 7200 s | 2 |
 
-En `L04301923`, cuyo archivo completo contiene aproximadamente 17 horas, se
-analizaron las dos primeras horas para mantener un coste computacional
-razonable durante la comparación de técnicas.
+: Registros empleados en la validación experimental {#tbl-registros-validacion}
 
-## Experimentos realizados
-
-Se llevaron a cabo los siguientes experimentos:
-
-1. Comparación de la estimación espectral mediante Welch y la transformada
-   wavelet continua (CWT) de Morlet.
-2. Comprobación de la equivalencia entre Welch y `spectrogram` cuando ambos se
-   configuran con la misma ventana, solapamiento, detrend y escalado.
-3. Comparación entre una media móvil causal (`rolling`) y una media
-   exponencial causal (`ewm`).
-4. Evaluación de desplazamientos temporales comprendidos entre 0 y 30 s.
-5. Comparación de la máscara de calidad base con una máscara ampliada,
-   denominada ARTF2, construida a partir de indicadores adicionales de
-   artefacto del monitor.
-6. Evaluación mediante correlación de Pearson, MAE, RMSE y sesgo.
-
-Los experimentos no satisfactorios se conservaron como parte del estudio,
-puesto que permiten justificar la selección final y sus limitaciones.
-
-
-# Configuración y parametrización de las técnicas
-
-## Configuración común
-
-Para que la comparación fuese válida, las técnicas compartieron la misma
-señal de entrada, preprocesamiento, resolución temporal y conversión de
-potencia.
-
-| Parámetro | Configuración |
-|:---|:---|
-| Canal unilateral | Canal 1 |
-| Canales bilaterales | Canal 1 para el hemisferio izquierdo y canal 3 para el derecho |
-| Frecuencia de muestreo | Extraída de la cabecera; 128 Hz en los registros evaluados |
-| Filtrado | Pasa-altos causal de primer orden con el corte indicado por `LoFilter` |
-| Ventana espectral | Ventana Hann de 2 s |
-| Avance temporal | 1 s |
-| Rango de frecuencias | 0,5--30 Hz |
-| Resolución espectral | Bins de 0,5 Hz |
-| Magnitud | Densidad espectral de potencia en \(\mu V^2/Hz\) |
-| Referencia temporal | Centro de la ventana |
-| Suavizado | Duración indicada por `SpSmooth`; 30 s en los registros evaluados |
-| Desplazamientos probados | 0--30 s |
-| Escala de visualización | Lineal entre 49 y 94 dB |
-
-El registro unilateral se reconstruyó a partir del canal 1. En los registros
-bilaterales, el mismo procedimiento se aplicó de manera independiente a los
-canales 1 y 3, de acuerdo con los dos conjuntos espectrales exportados por el
-monitor.
-
-## Conversión y comparación de potencia
-
-La potencia reconstruida y la matriz de referencia se expresaron en la misma
-escala física antes de calcular las métricas. El archivo `.f_a` almacena los
-valores espectrales con un factor de escala de 100, por lo que sus valores se
-dividieron entre 100. La PSD reconstruida se integró en bins de 0,5 Hz y se
-convirtió a decibelios empleando la referencia del monitor.
-
-Las métricas principales se calcularon directamente en dB, sin normalizar
-cada matriz mediante z-score. La normalización independiente habría eliminado
-las diferencias de nivel medio y contraste, haciendo que MAE y RMSE dejasen de
-representar errores de potencia en dB.
-
-La correlación de Pearson se utilizó para estudiar la semejanza del patrón
-espectral. MAE y RMSE cuantificaron la diferencia absoluta en la escala física,
-mientras que el sesgo permitió detectar si la reconstrucción quedaba
-sistemáticamente por encima o por debajo de la referencia.
-
-## Máscara de calidad y suavizado
-
-La máscara base identifica los segundos sin información válida mediante los
-criterios disponibles en la señal cruda y el archivo `.spa`, entre ellos una
-calidad de señal insuficiente, ausencia de potencia total, discontinuidades,
-pérdidas de muestras y filas completamente vacías.
-
-La máscara se calculó antes del suavizado. Los segundos inválidos se
-sustituyeron por `NaN`, de manera que no participasen en la media móvil. Para
-cada frecuencia, `rolling` calculó el promedio únicamente con las
-observaciones válidas de los segundos anteriores. Después del suavizado y del
-desplazamiento temporal, la máscara se aplicó nuevamente para conservar las
-bandas blancas en los instantes correspondientes.
-
-La máscara ARTF2 añadió indicadores internos de artefacto procedentes del
-archivo `.ara`. Se evaluó como alternativa, pero no se asumió que todos estos
-indicadores implicasen necesariamente la pérdida completa de la DSA de ese
-segundo.
-
-
-# Detalle de resultados
-
-## Equivalencia entre Welch y `spectrogram`
-
-Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo
-detrend y el mismo escalado de PSD, Welch y `spectrogram` produjeron resultados
-numéricamente idénticos. La diferencia máxima observada fue cero tanto en PSD
-como en dB y en las referencias temporales.
-
-Por tanto, `spectrogram` no constituyó una metodología espectral distinta en
-estas condiciones, sino otra interfaz para organizar los mismos periodogramas
-modificados. Se mantuvo la denominación Welch por describir con mayor precisión
-el estimador utilizado.
-
-## Comparación de métodos espectrales
-
-La mejor configuración global de CWT según Pearson utilizó una wavelet Morlet
-con ancho de banda \(B=6\). Incluso en esa configuración, los errores absolutos
-fueron superiores a los de Welch.
-
-| Método | Suavizado | Máscara | Pearson medio | MAE (dB) | RMSE (dB) |
-|:---|:---|:---|---:|---:|---:|
-| Welch | `rolling` | Base | **0,9149** | **1,816** | **2,581** |
-| CWT Morlet, \(B=6\) | `rolling` | Base | 0,9077 | 3,227 | 3,833 |
-| CWT Morlet, \(B=12\) | `rolling` | Base | 0,9070 | 3,095 | 3,730 |
-
-La CWT constituye una representación tiempo-frecuencia válida y puede ser
-ventajosa para estudiar transitorios o fenómenos multiescala. Sin embargo, no
-mejoró la reproducción del archivo `.f_a`, que era el objetivo de este
-experimento, y añadió una mayor complejidad de parametrización y cálculo. Por
-este motivo no se seleccionó para la reconstrucción final.
-
-## Comparación de suavizados
-
-| Método espectral | Suavizado | Máscara | Pearson medio | MAE (dB) | RMSE (dB) |
-|:---|:---|:---|---:|---:|---:|
-| Welch | `rolling` | Base | **0,9149** | **1,816** | 2,581 |
-| Welch | `ewm` | Base | 0,9088 | 1,844 | **2,567** |
-
-La media exponencial presentó un RMSE medio ligeramente menor, con una
-diferencia de 0,014 dB. Sin embargo, `rolling` obtuvo mayor Pearson y menor MAE,
-y reprodujo mejor el comportamiento global de los registros evaluados. Debido
-a que la mejora aislada de RMSE con `ewm` fue mínima, se seleccionó la media
-móvil causal como solución única.
-
-## Influencia de la máscara
-
-| Máscara | Pearson medio | MAE (dB) | RMSE (dB) | Información enmascarada |
-|:---|---:|---:|---:|---:|
-| Base | **0,9149** | **1,816** | 2,581 | **2,9 %** |
-| ARTF2 | 0,9096 | 1,819 | **2,531** | 33,6 % |
-
-ARTF2 redujo ligeramente el RMSE, pero eliminó aproximadamente un tercio de la
-información sin mejorar de forma consistente Pearson ni MAE. El efecto fue
-especialmente acusado en `L03041035`, donde enmascaró el 70,1 % del registro,
-frente al 7,6 % de la máscara base, y redujo Pearson de 0,724 a 0,683.
-
-La magnitud de esta pérdida de información no quedó justificada por la mejora
-de las métricas. En consecuencia, ARTF2 se descartó como máscara obligatoria.
-Sus indicadores pueden conservarse para análisis de sensibilidad o como
-información adicional sobre la calidad del registro.
-
-## Resultados de la configuración seleccionada
-
-La siguiente tabla muestra los resultados de Welch, `rolling` y máscara base
-para cada matriz evaluada. El desplazamiento se seleccionó dentro del intervalo
-de 0 a 30 s.
+**Resultados de la configuración seleccionada** (Welch, `rolling`, máscara base):
 
 | Registro | Lado | Shift (s) | Pearson | MAE (dB) | RMSE (dB) | Enmascarado |
 |:---|:---|---:|---:|---:|---:|---:|
@@ -197,39 +338,40 @@ de 0 a 30 s.
 | `L05141322` | Derecho | 6 | 0,9455 | 1,746 | 2,387 | 1,0 % |
 | `L04301923` | Izquierdo | 6 | 0,9836 | 0,994 | 1,577 | 0,4 % |
 | `L04301923` | Derecho | 6 | 0,9830 | 1,022 | 1,598 | 0,4 % |
-| **Promedio** |  |  | **0,9149** | **1,816** | **2,581** | **2,9 %** |
+| **Promedio** | | | **0,9149** | **1,816** | **2,581** | **2,9 %** |
 
-El registro unilateral presentó resultados inferiores a los bilaterales y una
-mayor proporción de segundos con calidad insuficiente. Esto refuerza la
-necesidad de ampliar la validación unilateral y evita interpretar el promedio
-global como una estimación definitiva del rendimiento en nuevos pacientes.
+: Resultados finales de validación por registro {#tbl-resultados-finales}
 
-## Selección metodológica
+El registro unilateral presentó resultados inferiores a los bilaterales y una mayor proporción de segundos con calidad insuficiente. Esto refuerza la necesidad de ampliar la validación unilateral y evita interpretar el promedio global como una estimación definitiva del rendimiento en nuevos pacientes.
 
-A partir de los experimentos se seleccionó la siguiente configuración:
+### G.15.3 Configuración final
 
-- estimación espectral mediante Welch;
-- canal 1 en registros unilaterales;
-- canales 1 y 3 en registros bilaterales;
-- media móvil causal con la duración indicada por `SpSmooth`;
-- máscara base aplicada antes del suavizado y nuevamente al final;
-- desplazamiento de 10 s en unilateral y 6 s en bilateral;
-- cálculo de Pearson, MAE, RMSE y sesgo sin normalización z-score;
-- representación lineal común entre 49 y 94 dB.
+| Elemento | Decisión final |
+|---|---|
+| Método espectral | Welch |
+| Ventana | Hann |
+| Tamaño ventana | 2 s |
+| Avance | 1 s |
+| Rango | 0,5-30 Hz |
+| Bin | 0,5 Hz |
+| Unilateral | Canal 1 |
+| Bilateral | Canal 1 izquierdo, canal 3 derecho |
+| Suavizado | `SpSmooth` (media móvil causal) |
+| Máscara previa al suavizado | Sí |
+| Shift unilateral | 10 s |
+| Shift bilateral | 6 s |
 
-Esta configuración ofreció el mejor equilibrio entre correspondencia con la
-DSA exportada, error en escala física, conservación de información y
-simplicidad metodológica.
+: Configuración final adoptada para la reconstrucción {#tbl-configuracion-final}
 
-## Limitaciones y validación pendiente
+Esta configuración ofreció el mejor equilibrio entre correspondencia con la DSA exportada, error en escala física, conservación de información y simplicidad metodológica.
 
-La selección se obtuvo a partir de tres registros y cinco matrices. Aunque los
-resultados bilaterales fueron consistentes, solo se dispuso de un registro
-unilateral con archivo `.f_a` válido. Por ello, la configuración debe
-considerarse seleccionada pero todavía sujeta a validación externa.
+**Limitaciones de la validación.** La selección se obtuvo a partir de tres registros y cinco matrices. Aunque los resultados bilaterales fueron consistentes, solo se dispuso de un registro unilateral con archivo `.f_a` válido. Por ello, la configuración debe considerarse seleccionada pero todavía sujeta a validación externa con un mayor número de registros unilaterales.
 
-Los nuevos registros unilaterales se evaluarán manteniendo todos los parámetros
-fijos. Se calcularán las métricas por registro y se resumirán mediante media,
-mediana, desviación típica, rango y porcentaje enmascarado. Esta fase permitirá
-comprobar la capacidad de generalización sin escoger una metodología diferente
-para cada sesión.
+## G.16 Limitaciones
+
+La reconstrucción no pretende reproducir exactamente el algoritmo propietario del monitor BIS, sino generar una aproximación reproducible de la DSA a partir de la señal cruda disponible. Algunas diferencias pueden deberse a filtrados internos no documentados, tratamiento propietario de artefactos, suavizados internos o detalles de escalado no accesibles públicamente.
+
+En particular, dos parámetros de la reconstrucción tienen una naturaleza distinta y no deben presentarse con el mismo nivel de certeza:
+
+- **`SpSmooth`** es un parámetro real, extraído directamente del `.spa` de cada registro; lo que se aproxima mediante una media móvil causal es únicamente la forma interna de ese suavizado, no su existencia.
+- **El desplazamiento temporal (`shift`)** es un ajuste enteramente empírico, obtenido por comparación con el archivo `.f_a`, y no se apoya en ninguna documentación del fabricante ni en un fundamento fisiológico.

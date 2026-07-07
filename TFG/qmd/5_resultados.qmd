@@ -83,4 +83,18 @@ El resultado final del proyecto es un visualizador interactivo que permite explo
 
 En registros bilaterales, el visualizador muestra de forma diferenciada la información correspondiente a ambos hemisferios, incluyendo las matrices DSA izquierda y derecha, las curvas BIS asociadas y la asimetría bilateral. Además, permite incorporar variables clínicas seleccionadas para facilitar el análisis retrospectivo de situaciones concretas del paciente crítico.
 
+## Generación de informe en PDF
+
+Como resultado complementario del visualizador, se incorporó la posibilidad de generar un informe en formato PDF asociado a una sesión BIS concreta. El documento se organiza en tres bloques: una portada con los datos identificativos de la sesión (paciente, sesión BIS, tipo de registro, origen de la DSA, intervalo temporal analizado y disponibilidad de información ICCA), una página con la representación completa de la DSA junto con las variables procesadas del monitor, y un resumen textual de la información clínica ICCA asociada al intervalo (constantes vitales, análisis clínicos y perfusiones), cuando está disponible.
+
+La generación del PDF resulta útil para conservar una salida estática del análisis realizado en la aplicación interactiva. De este modo, además de explorar los datos dentro del visualizador, el usuario puede obtener un documento resumen que facilite la revisión posterior, la comparación entre sesiones o la incorporación de evidencias visuales a la documentación del proyecto.
+
+Las Figuras @fig-informe-pdf, @fig-informe-dsa-pdf y @fig-informe-analisis-pdf muestran, respectivamente, la portada del informe, la página con la representación de la DSA y el resumen de la información clínica ICCA.
+
+![Portada del informe PDF, con los datos identificativos de la sesión.](img/capturas_app_visualizador/visual_informe_pdf.png){#fig-informe-pdf width=95%}
+
+![Página de la DSA y las variables procesadas del monitor en el informe PDF.](img/capturas_app_visualizador/visual_informe_2_pdf.png){#fig-informe-dsa-pdf width=95%}
+
+![Resumen de análisis clínicos ICCA en el informe PDF.](img/capturas_app_visualizador/visual_informe_5_pdf.png){#fig-informe-analisis-pdf width=95%}
+
 En conjunto, el sistema desarrollado cumple la función propuesta: integrar datos neurofisiológicos y clínicos en una misma línea temporal, mantener la trazabilidad de los archivos originales y ofrecer una herramienta de exploración orientada al análisis retrospectivo en UCI.
