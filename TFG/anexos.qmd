@@ -5,6 +5,8 @@
 # ============================================================
 title: "Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI"
 author: "Cristina Velázquez Romano"
+bibliography: bibliografiaAnexos.bib
+
  
 format:
   pdf:
@@ -36,7 +38,7 @@ knitr:
 
 ```{=latex}
 %% ── Portada anexos ──────────────────────────────────────────
-\title{Título del Trabajo Fin de Grado}
+\title{Integración de señales BIS y variables clínicas para análisis retrospectivo en UCI}
 \author{\nombre}
 \date{\today}
 
