@@ -1,0 +1,1085 @@
+{
+  "carpeta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305",
+  "carpeta_datos": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305",
+  "base": "L05031305",
+  "modo": "bilateral",
+  "archivos": {
+    "raw": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.r4a",
+    "fa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.f_a",
+    "header": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.h_a",
+    "ta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.t_a",
+    "spa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.spa"
+  },
+  "fa_disponible": true,
+  "fa_bytes": 53744250,
+  "raw_completo": true,
+  "origenes": [
+    "fa",
+    "raw"
+  ],
+  "origen_forzado": null,
+  "validacion": {
+    "files": [
+      {
+        "key": "raw",
+        "label": "Onda cruda",
+        "name": "L05031305.r4a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.r4a",
+        "size_bytes": 88477312,
+        "size_label": "84.4 MB",
+        "status": "found"
+      },
+      {
+        "key": "spa",
+        "label": "Variables .spa",
+        "name": "L05031305.spa",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.spa",
+        "size_bytes": 76555716,
+        "size_label": "73.0 MB",
+        "status": "found"
+      },
+      {
+        "key": "fa",
+        "label": "DSA .f_a",
+        "name": "L05031305.f_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.f_a",
+        "size_bytes": 53744250,
+        "size_label": "51.3 MB",
+        "status": "found"
+      },
+      {
+        "key": "header",
+        "label": "Cabecera .h_a",
+        "name": "L05031305.h_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.h_a",
+        "size_bytes": 2048,
+        "size_label": "2.0 KB",
+        "status": "found"
+      },
+      {
+        "key": "ta",
+        "label": "Inicio .t_a",
+        "name": "L05031305.t_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_005_L05031305\\BIS\\DH05031305\\L05031305.t_a",
+        "size_bytes": 21,
+        "size_label": "21 B",
+        "status": "found"
+      }
+    ],
+    "spa": {
+      "found": true,
+      "non_empty": true,
+      "row_count": 86404,
+      "valid_timestamp_count": 86404,
+      "unique_timestamp_count": 86313,
+      "duplicate_timestamp_count": 91,
+      "first_timestamp": "2026-05-03T13:05:24",
+      "last_timestamp": "2026-05-04T13:05:26",
+      "key_variables_found": {
+        "DB13U01": true,
+        "SQI10": true,
+        "TOTPOW08": true,
+        "SEF08": true,
+        "MEDFRQ08": true,
+        "EMGLOW01": true,
+        "BURST": true
+      },
+      "warnings": []
+    },
+    "fa": {
+      "found": true,
+      "non_empty": true,
+      "datasets": 2,
+      "rows_parsed": 86404,
+      "valid_timestamp_count": 86404,
+      "unique_timestamp_count": 86313,
+      "duplicate_timestamp_count": 91,
+      "first_timestamp": "2026-05-03T13:05:24",
+      "last_timestamp": "2026-05-04T13:05:26",
+      "expected_bins_per_row": 60,
+      "rows_checked_for_bins": 500,
+      "rows_with_expected_bins": 500,
+      "finite_ratio": 1.0,
+      "zero_empty_row_ratio": 0.0,
+      "warnings": []
+    },
+    "alignment": {
+      "status": "aligned",
+      "start_delta_seconds": 0.0,
+      "end_delta_seconds": 0.0,
+      "overlap_seconds": 86402.0
+    },
+    "cobertura_temporal": {
+      "inicio": "2026-05-03T13:05:24",
+      "fin": "2026-05-04T13:05:26",
+      "segundos": 86403,
+      "muestras_residuales_raw": 80,
+      "fuentes": {
+        "raw": {
+          "nombre": "raw",
+          "inicio": "2026-05-03T13:05:24",
+          "fin": "2026-05-04T13:05:26",
+          "segundos_originales": 86403,
+          "segundos_retenidos": 86403,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 86403,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        },
+        "spa": {
+          "nombre": "spa",
+          "inicio": "2026-05-03T13:05:24",
+          "fin": "2026-05-04T13:05:26",
+          "segundos_originales": 86403,
+          "segundos_retenidos": 86403,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 91,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 86313,
+          "segundos_huecos_internos": 90,
+          "tramos_huecos_internos": [
+            {
+              "inicio": "2026-05-03T23:44:08",
+              "fin": "2026-05-03T23:44:08",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:11",
+              "fin": "2026-05-03T23:44:11",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:13",
+              "fin": "2026-05-03T23:44:13",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:25",
+              "fin": "2026-05-03T23:44:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:28",
+              "fin": "2026-05-03T23:44:28",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:35",
+              "fin": "2026-05-03T23:44:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:43",
+              "fin": "2026-05-03T23:44:43",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:50",
+              "fin": "2026-05-03T23:44:50",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:57",
+              "fin": "2026-05-03T23:44:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:00",
+              "fin": "2026-05-03T23:45:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:02",
+              "fin": "2026-05-03T23:45:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:12",
+              "fin": "2026-05-03T23:45:12",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:16",
+              "fin": "2026-05-03T23:45:16",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:20",
+              "fin": "2026-05-03T23:45:20",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:35",
+              "fin": "2026-05-03T23:45:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:38",
+              "fin": "2026-05-03T23:45:38",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:42",
+              "fin": "2026-05-03T23:45:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:44",
+              "fin": "2026-05-03T23:45:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:51",
+              "fin": "2026-05-03T23:45:51",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:53",
+              "fin": "2026-05-03T23:45:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:56",
+              "fin": "2026-05-03T23:45:56",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:00",
+              "fin": "2026-05-03T23:46:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:03",
+              "fin": "2026-05-03T23:46:03",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:06",
+              "fin": "2026-05-03T23:46:06",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:10",
+              "fin": "2026-05-03T23:46:10",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:13",
+              "fin": "2026-05-03T23:46:13",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:16",
+              "fin": "2026-05-03T23:46:16",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:24",
+              "fin": "2026-05-03T23:46:24",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:28",
+              "fin": "2026-05-03T23:46:28",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:30",
+              "fin": "2026-05-03T23:46:30",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:32",
+              "fin": "2026-05-03T23:46:32",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:36",
+              "fin": "2026-05-03T23:46:36",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:38",
+              "fin": "2026-05-03T23:46:38",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:41",
+              "fin": "2026-05-03T23:46:41",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:44",
+              "fin": "2026-05-03T23:46:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:50",
+              "fin": "2026-05-03T23:46:50",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:53",
+              "fin": "2026-05-03T23:46:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:55",
+              "fin": "2026-05-03T23:46:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:57",
+              "fin": "2026-05-03T23:46:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:00",
+              "fin": "2026-05-03T23:47:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:02",
+              "fin": "2026-05-03T23:47:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:05",
+              "fin": "2026-05-03T23:47:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:09",
+              "fin": "2026-05-03T23:47:09",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:11",
+              "fin": "2026-05-03T23:47:11",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:15",
+              "fin": "2026-05-03T23:47:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:19",
+              "fin": "2026-05-03T23:47:19",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:21",
+              "fin": "2026-05-03T23:47:21",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:24",
+              "fin": "2026-05-03T23:47:24",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:33",
+              "fin": "2026-05-03T23:47:33",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:35",
+              "fin": "2026-05-03T23:47:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:42",
+              "fin": "2026-05-03T23:47:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:53",
+              "fin": "2026-05-03T23:47:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:05",
+              "fin": "2026-05-03T23:48:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:20",
+              "fin": "2026-05-03T23:48:20",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:29",
+              "fin": "2026-05-03T23:48:29",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:37",
+              "fin": "2026-05-03T23:48:37",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:43",
+              "fin": "2026-05-03T23:48:43",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:54",
+              "fin": "2026-05-03T23:48:54",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:02",
+              "fin": "2026-05-03T23:49:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:05",
+              "fin": "2026-05-03T23:49:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:08",
+              "fin": "2026-05-03T23:49:08",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:25",
+              "fin": "2026-05-03T23:49:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:35",
+              "fin": "2026-05-03T23:49:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:41",
+              "fin": "2026-05-03T23:49:41",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:44",
+              "fin": "2026-05-03T23:49:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:51",
+              "fin": "2026-05-03T23:49:51",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:05",
+              "fin": "2026-05-03T23:50:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:15",
+              "fin": "2026-05-03T23:50:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:25",
+              "fin": "2026-05-03T23:50:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:45",
+              "fin": "2026-05-03T23:50:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:55",
+              "fin": "2026-05-03T23:50:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:05",
+              "fin": "2026-05-03T23:52:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:25",
+              "fin": "2026-05-03T23:52:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:42",
+              "fin": "2026-05-03T23:52:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:45",
+              "fin": "2026-05-03T23:52:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:55",
+              "fin": "2026-05-03T23:52:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:53:25",
+              "fin": "2026-05-03T23:53:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:53:45",
+              "fin": "2026-05-03T23:53:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:54:25",
+              "fin": "2026-05-03T23:54:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:54:35",
+              "fin": "2026-05-03T23:54:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:25",
+              "fin": "2026-05-03T23:55:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:35",
+              "fin": "2026-05-03T23:55:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:45",
+              "fin": "2026-05-03T23:55:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:57",
+              "fin": "2026-05-03T23:55:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:57:15",
+              "fin": "2026-05-03T23:57:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:58:25",
+              "fin": "2026-05-03T23:58:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:58:45",
+              "fin": "2026-05-03T23:58:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:25",
+              "fin": "2026-05-04T00:00:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:45",
+              "fin": "2026-05-04T00:00:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:47",
+              "fin": "2026-05-04T00:00:47",
+              "segundos": 1
+            }
+          ],
+          "numero_tramos_huecos_internos": 90,
+          "discontinuidad_interna": true
+        },
+        "fa": {
+          "nombre": "fa",
+          "inicio": "2026-05-03T13:05:24",
+          "fin": "2026-05-04T13:05:26",
+          "segundos_originales": 86403,
+          "segundos_retenidos": 86403,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 91,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 86313,
+          "segundos_huecos_internos": 90,
+          "tramos_huecos_internos": [
+            {
+              "inicio": "2026-05-03T23:44:08",
+              "fin": "2026-05-03T23:44:08",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:11",
+              "fin": "2026-05-03T23:44:11",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:13",
+              "fin": "2026-05-03T23:44:13",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:25",
+              "fin": "2026-05-03T23:44:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:28",
+              "fin": "2026-05-03T23:44:28",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:35",
+              "fin": "2026-05-03T23:44:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:43",
+              "fin": "2026-05-03T23:44:43",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:50",
+              "fin": "2026-05-03T23:44:50",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:44:57",
+              "fin": "2026-05-03T23:44:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:00",
+              "fin": "2026-05-03T23:45:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:02",
+              "fin": "2026-05-03T23:45:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:12",
+              "fin": "2026-05-03T23:45:12",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:16",
+              "fin": "2026-05-03T23:45:16",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:20",
+              "fin": "2026-05-03T23:45:20",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:35",
+              "fin": "2026-05-03T23:45:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:38",
+              "fin": "2026-05-03T23:45:38",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:42",
+              "fin": "2026-05-03T23:45:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:44",
+              "fin": "2026-05-03T23:45:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:51",
+              "fin": "2026-05-03T23:45:51",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:53",
+              "fin": "2026-05-03T23:45:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:45:56",
+              "fin": "2026-05-03T23:45:56",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:00",
+              "fin": "2026-05-03T23:46:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:03",
+              "fin": "2026-05-03T23:46:03",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:06",
+              "fin": "2026-05-03T23:46:06",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:10",
+              "fin": "2026-05-03T23:46:10",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:13",
+              "fin": "2026-05-03T23:46:13",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:16",
+              "fin": "2026-05-03T23:46:16",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:24",
+              "fin": "2026-05-03T23:46:24",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:28",
+              "fin": "2026-05-03T23:46:28",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:30",
+              "fin": "2026-05-03T23:46:30",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:32",
+              "fin": "2026-05-03T23:46:32",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:36",
+              "fin": "2026-05-03T23:46:36",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:38",
+              "fin": "2026-05-03T23:46:38",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:41",
+              "fin": "2026-05-03T23:46:41",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:44",
+              "fin": "2026-05-03T23:46:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:50",
+              "fin": "2026-05-03T23:46:50",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:53",
+              "fin": "2026-05-03T23:46:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:55",
+              "fin": "2026-05-03T23:46:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:46:57",
+              "fin": "2026-05-03T23:46:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:00",
+              "fin": "2026-05-03T23:47:00",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:02",
+              "fin": "2026-05-03T23:47:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:05",
+              "fin": "2026-05-03T23:47:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:09",
+              "fin": "2026-05-03T23:47:09",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:11",
+              "fin": "2026-05-03T23:47:11",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:15",
+              "fin": "2026-05-03T23:47:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:19",
+              "fin": "2026-05-03T23:47:19",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:21",
+              "fin": "2026-05-03T23:47:21",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:24",
+              "fin": "2026-05-03T23:47:24",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:33",
+              "fin": "2026-05-03T23:47:33",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:35",
+              "fin": "2026-05-03T23:47:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:42",
+              "fin": "2026-05-03T23:47:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:47:53",
+              "fin": "2026-05-03T23:47:53",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:05",
+              "fin": "2026-05-03T23:48:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:20",
+              "fin": "2026-05-03T23:48:20",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:29",
+              "fin": "2026-05-03T23:48:29",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:37",
+              "fin": "2026-05-03T23:48:37",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:43",
+              "fin": "2026-05-03T23:48:43",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:48:54",
+              "fin": "2026-05-03T23:48:54",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:02",
+              "fin": "2026-05-03T23:49:02",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:05",
+              "fin": "2026-05-03T23:49:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:08",
+              "fin": "2026-05-03T23:49:08",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:25",
+              "fin": "2026-05-03T23:49:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:35",
+              "fin": "2026-05-03T23:49:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:41",
+              "fin": "2026-05-03T23:49:41",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:44",
+              "fin": "2026-05-03T23:49:44",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:49:51",
+              "fin": "2026-05-03T23:49:51",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:05",
+              "fin": "2026-05-03T23:50:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:15",
+              "fin": "2026-05-03T23:50:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:25",
+              "fin": "2026-05-03T23:50:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:45",
+              "fin": "2026-05-03T23:50:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:50:55",
+              "fin": "2026-05-03T23:50:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:05",
+              "fin": "2026-05-03T23:52:05",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:25",
+              "fin": "2026-05-03T23:52:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:42",
+              "fin": "2026-05-03T23:52:42",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:45",
+              "fin": "2026-05-03T23:52:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:52:55",
+              "fin": "2026-05-03T23:52:55",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:53:25",
+              "fin": "2026-05-03T23:53:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:53:45",
+              "fin": "2026-05-03T23:53:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:54:25",
+              "fin": "2026-05-03T23:54:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:54:35",
+              "fin": "2026-05-03T23:54:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:25",
+              "fin": "2026-05-03T23:55:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:35",
+              "fin": "2026-05-03T23:55:35",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:45",
+              "fin": "2026-05-03T23:55:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:55:57",
+              "fin": "2026-05-03T23:55:57",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:57:15",
+              "fin": "2026-05-03T23:57:15",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:58:25",
+              "fin": "2026-05-03T23:58:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-03T23:58:45",
+              "fin": "2026-05-03T23:58:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:25",
+              "fin": "2026-05-04T00:00:25",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:45",
+              "fin": "2026-05-04T00:00:45",
+              "segundos": 1
+            },
+            {
+              "inicio": "2026-05-04T00:00:47",
+              "fin": "2026-05-04T00:00:47",
+              "segundos": 1
+            }
+          ],
+          "numero_tramos_huecos_internos": 90,
+          "discontinuidad_interna": true
+        }
+      },
+      "alerta": false
+    },
+    "warnings": [
+      "Discontinuidad interna en spa: faltan 90 s repartidos en 90 tramo(s) dentro del intervalo común. No es un recorte de extremos; el primer segundo presente tras cada hueco se conserva si supera los demás criterios de calidad.",
+      "Discontinuidad interna en fa: faltan 90 s repartidos en 90 tramo(s) dentro del intervalo común. No es un recorte de extremos; el primer segundo presente tras cada hueco se conserva si supera los demás criterios de calidad."
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "version": "2.4",
+  "formato": "csv",
+  "paciente_id": "PACIENTE_001",
+  "sesion_bis_id": "L05061009",
+  "inicio_bis": "2026-05-06T10:09:42",
+  "fin_bis": "2026-05-06T10:25:28",
+  "filas_segundo": 947,
+  "series_generadas": 0,
+  "mediciones_reales": 0,
+  "gasometrias_incluidas_visualizacion": 0,
+  "gasometrias_excluidas_visualizacion": 0,
+  "semilla_base": 20260629,
+  "origen_tamano": 30200,
+  "origen_mtime_ns": 1783290961163409900,
+  "aviso": "Constantes vitales simuladas a partir de mediciones intermitentes. No aptas para validación clínica ni correlaciones reales con BIS.",
+  "series_sinteticas": [],
+  "gasometrias_auditoria": []
+}

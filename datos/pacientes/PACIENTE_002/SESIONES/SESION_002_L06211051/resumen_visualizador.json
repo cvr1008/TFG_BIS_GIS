@@ -1,0 +1,180 @@
+{
+  "carpeta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051",
+  "carpeta_datos": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051",
+  "base": "L06211051",
+  "modo": "unilateral",
+  "archivos": {
+    "raw": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.r2a",
+    "fa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.f_a",
+    "header": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.h_a",
+    "ta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.t_a",
+    "spa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.spa"
+  },
+  "fa_disponible": true,
+  "fa_bytes": 496846,
+  "raw_completo": true,
+  "origenes": [
+    "fa",
+    "raw"
+  ],
+  "origen_forzado": null,
+  "validacion": {
+    "files": [
+      {
+        "key": "raw",
+        "label": "Onda cruda",
+        "name": "L06211051.r2a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.r2a",
+        "size_bytes": 789120,
+        "size_label": "770.6 KB",
+        "status": "found"
+      },
+      {
+        "key": "spa",
+        "label": "Variables .spa",
+        "name": "L06211051.spa",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.spa",
+        "size_bytes": 769957,
+        "size_label": "751.9 KB",
+        "status": "found"
+      },
+      {
+        "key": "fa",
+        "label": "DSA .f_a",
+        "name": "L06211051.f_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.f_a",
+        "size_bytes": 496846,
+        "size_label": "485.2 KB",
+        "status": "found"
+      },
+      {
+        "key": "header",
+        "label": "Cabecera .h_a",
+        "name": "L06211051.h_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.h_a",
+        "size_bytes": 2048,
+        "size_label": "2.0 KB",
+        "status": "found"
+      },
+      {
+        "key": "ta",
+        "label": "Inicio .t_a",
+        "name": "L06211051.t_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002\\SESIONES\\SESION_002_L06211051\\BIS\\DH06211051\\L06211051.t_a",
+        "size_bytes": 21,
+        "size_label": "21 B",
+        "status": "found"
+      }
+    ],
+    "spa": {
+      "found": true,
+      "non_empty": true,
+      "row_count": 1541,
+      "valid_timestamp_count": 1541,
+      "unique_timestamp_count": 1541,
+      "duplicate_timestamp_count": 0,
+      "first_timestamp": "2026-06-21T10:51:36",
+      "last_timestamp": "2026-06-21T11:17:16",
+      "key_variables_found": {
+        "DB13U01": true,
+        "SQI10": true,
+        "TOTPOW08": true,
+        "SEF08": true,
+        "MEDFRQ08": true,
+        "EMGLOW01": true,
+        "BURST": true
+      },
+      "warnings": []
+    },
+    "fa": {
+      "found": true,
+      "non_empty": true,
+      "datasets": 1,
+      "rows_parsed": 1541,
+      "valid_timestamp_count": 1541,
+      "unique_timestamp_count": 1541,
+      "duplicate_timestamp_count": 0,
+      "first_timestamp": "2026-06-21T10:51:36",
+      "last_timestamp": "2026-06-21T11:17:16",
+      "expected_bins_per_row": 60,
+      "rows_checked_for_bins": 500,
+      "rows_with_expected_bins": 500,
+      "finite_ratio": 1.0,
+      "zero_empty_row_ratio": 0.0,
+      "warnings": []
+    },
+    "alignment": {
+      "status": "aligned",
+      "start_delta_seconds": 0.0,
+      "end_delta_seconds": 0.0,
+      "overlap_seconds": 1540.0
+    },
+    "cobertura_temporal": {
+      "inicio": "2026-06-21T10:51:36",
+      "fin": "2026-06-21T11:17:16",
+      "segundos": 1541,
+      "muestras_residuales_raw": 32,
+      "fuentes": {
+        "raw": {
+          "nombre": "raw",
+          "inicio": "2026-06-21T10:51:36",
+          "fin": "2026-06-21T11:17:16",
+          "segundos_originales": 1541,
+          "segundos_retenidos": 1541,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 1541,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        },
+        "spa": {
+          "nombre": "spa",
+          "inicio": "2026-06-21T10:51:36",
+          "fin": "2026-06-21T11:17:16",
+          "segundos_originales": 1541,
+          "segundos_retenidos": 1541,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 1541,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        },
+        "fa": {
+          "nombre": "fa",
+          "inicio": "2026-06-21T10:51:36",
+          "fin": "2026-06-21T11:17:16",
+          "segundos_originales": 1541,
+          "segundos_retenidos": 1541,
+          "segundos_eliminados": 0,
+          "proporcion_eliminada": 0.0,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "sin_recorte",
+          "tramos_recortados": [],
+          "numero_tramos_recortados": 0,
+          "segundos_observados_intervalo_comun": 1541,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        }
+      },
+      "alerta": false
+    },
+    "warnings": []
+  }
+}

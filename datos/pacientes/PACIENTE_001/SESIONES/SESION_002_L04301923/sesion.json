@@ -1,0 +1,26 @@
+{
+  "nombre_carpeta": "SESION_002_L04301923",
+  "sesion_bis_id": "L04301923",
+  "modo": "bilateral",
+  "inicio_bis": "2026-04-30 19:23:29",
+  "fin_bis": "2026-05-01 12:18:16",
+  "origen_bis": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\BIS_ICCA_1\\2_M-Py5D-04301923\\DH04301923",
+  "carpeta_bis": "SESIONES\\SESION_002_L04301923\\BIS\\DH04301923",
+  "excel_icca_auxiliar": "SESIONES\\SESION_002_L04301923\\ICCA\\ICCA_L04301923.xlsx",
+  "icca_origen": [
+    "pac_1_plantilla_icca_rellena.xlsx"
+  ],
+  "icca_origen_rutas": [
+    "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_1\\pac_1_plantilla_icca_rellena.xlsx"
+  ],
+  "solapamientos": [
+    {
+      "icca": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_1\\pac_1_plantilla_icca_rellena.xlsx",
+      "inicio": "2026-04-30 19:23:29",
+      "fin": "2026-05-01 12:18:16",
+      "segundos": 60887,
+      "cobertura_bis": 1.0,
+      "completo": true
+    }
+  ]
+}

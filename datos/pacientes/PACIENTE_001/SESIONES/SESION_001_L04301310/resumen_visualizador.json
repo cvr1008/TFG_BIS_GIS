@@ -1,0 +1,201 @@
+{
+  "carpeta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310",
+  "carpeta_datos": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310",
+  "base": "L04301310",
+  "modo": "bilateral",
+  "archivos": {
+    "raw": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.r4a",
+    "fa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.f_a",
+    "header": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.h_a",
+    "ta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.t_a",
+    "spa": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.spa"
+  },
+  "fa_disponible": true,
+  "fa_bytes": 7458106,
+  "raw_completo": true,
+  "origenes": [
+    "fa",
+    "raw"
+  ],
+  "origen_forzado": null,
+  "validacion": {
+    "files": [
+      {
+        "key": "raw",
+        "label": "Onda cruda",
+        "name": "L04301310.r4a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.r4a",
+        "size_bytes": 12277504,
+        "size_label": "11.7 MB",
+        "status": "found"
+      },
+      {
+        "key": "spa",
+        "label": "Variables .spa",
+        "name": "L04301310.spa",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.spa",
+        "size_bytes": 10624026,
+        "size_label": "10.1 MB",
+        "status": "found"
+      },
+      {
+        "key": "fa",
+        "label": "DSA .f_a",
+        "name": "L04301310.f_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.f_a",
+        "size_bytes": 7458106,
+        "size_label": "7.1 MB",
+        "status": "found"
+      },
+      {
+        "key": "header",
+        "label": "Cabecera .h_a",
+        "name": "L04301310.h_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.h_a",
+        "size_bytes": 2048,
+        "size_label": "2.0 KB",
+        "status": "found"
+      },
+      {
+        "key": "ta",
+        "label": "Inicio .t_a",
+        "name": "L04301310.t_a",
+        "path": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_001\\SESIONES\\SESION_001_L04301310\\BIS\\DH04301310\\L04301310.t_a",
+        "size_bytes": 21,
+        "size_label": "21 B",
+        "status": "found"
+      }
+    ],
+    "spa": {
+      "found": true,
+      "non_empty": true,
+      "row_count": 11989,
+      "valid_timestamp_count": 11989,
+      "unique_timestamp_count": 11989,
+      "duplicate_timestamp_count": 0,
+      "first_timestamp": "2026-04-30T13:10:23",
+      "last_timestamp": "2026-04-30T16:30:11",
+      "key_variables_found": {
+        "DB13U01": true,
+        "SQI10": true,
+        "TOTPOW08": true,
+        "SEF08": true,
+        "MEDFRQ08": true,
+        "EMGLOW01": true,
+        "BURST": true
+      },
+      "warnings": []
+    },
+    "fa": {
+      "found": true,
+      "non_empty": true,
+      "datasets": 2,
+      "rows_parsed": 11989,
+      "valid_timestamp_count": 11989,
+      "unique_timestamp_count": 11989,
+      "duplicate_timestamp_count": 0,
+      "first_timestamp": "2026-04-30T13:10:23",
+      "last_timestamp": "2026-04-30T16:30:11",
+      "expected_bins_per_row": 60,
+      "rows_checked_for_bins": 500,
+      "rows_with_expected_bins": 500,
+      "finite_ratio": 1.0,
+      "zero_empty_row_ratio": 0.0,
+      "warnings": []
+    },
+    "alignment": {
+      "status": "aligned",
+      "start_delta_seconds": 0.0,
+      "end_delta_seconds": 0.0,
+      "overlap_seconds": 11988.0
+    },
+    "cobertura_temporal": {
+      "inicio": "2026-04-30T13:10:23",
+      "fin": "2026-04-30T16:30:10",
+      "segundos": 11988,
+      "muestras_residuales_raw": 96,
+      "fuentes": {
+        "raw": {
+          "nombre": "raw",
+          "inicio": "2026-04-30T13:10:22",
+          "fin": "2026-04-30T16:30:10",
+          "segundos_originales": 11989,
+          "segundos_retenidos": 11988,
+          "segundos_eliminados": 1,
+          "proporcion_eliminada": 8.340979230961715e-05,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "bloque_continuo",
+          "tramos_recortados": [
+            {
+              "inicio": "2026-04-30T13:10:22",
+              "fin": "2026-04-30T13:10:22",
+              "segundos": 1,
+              "posicion": "inicio"
+            }
+          ],
+          "numero_tramos_recortados": 1,
+          "segundos_observados_intervalo_comun": 11988,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        },
+        "spa": {
+          "nombre": "spa",
+          "inicio": "2026-04-30T13:10:23",
+          "fin": "2026-04-30T16:30:11",
+          "segundos_originales": 11989,
+          "segundos_retenidos": 11988,
+          "segundos_eliminados": 1,
+          "proporcion_eliminada": 8.340979230961715e-05,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "bloque_continuo",
+          "tramos_recortados": [
+            {
+              "inicio": "2026-04-30T16:30:11",
+              "fin": "2026-04-30T16:30:11",
+              "segundos": 1,
+              "posicion": "final"
+            }
+          ],
+          "numero_tramos_recortados": 1,
+          "segundos_observados_intervalo_comun": 11988,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        },
+        "fa": {
+          "nombre": "fa",
+          "inicio": "2026-04-30T13:10:23",
+          "fin": "2026-04-30T16:30:11",
+          "segundos_originales": 11989,
+          "segundos_retenidos": 11988,
+          "segundos_eliminados": 1,
+          "proporcion_eliminada": 8.340979230961715e-05,
+          "duplicados_eliminados": 0,
+          "alerta_recorte": false,
+          "forma_recorte": "bloque_continuo",
+          "tramos_recortados": [
+            {
+              "inicio": "2026-04-30T16:30:11",
+              "fin": "2026-04-30T16:30:11",
+              "segundos": 1,
+              "posicion": "final"
+            }
+          ],
+          "numero_tramos_recortados": 1,
+          "segundos_observados_intervalo_comun": 11988,
+          "segundos_huecos_internos": 0,
+          "tramos_huecos_internos": [],
+          "numero_tramos_huecos_internos": 0,
+          "discontinuidad_interna": false
+        }
+      },
+      "alerta": false
+    },
+    "warnings": []
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "paciente_id": "PACIENTE_002",
+  "creado": "2026-07-06 06:39:54",
+  "actualizado": "2026-07-06 06:45:18",
+  "carpeta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Documentos\\tfg\\datos\\pacientes\\PACIENTE_002",
+  "fuentes": {
+    "icca": [
+      "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx"
+    ],
+    "bis": [
+      "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\BIS_ICCA_2\\1_M-UK9G-06201811\\DH06201811",
+      "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\BIS_ICCA_2\\2_M-UK9H-06211051\\DH06211051"
+    ]
+  },
+  "icca": [
+    {
+      "tipo": "ICCA",
+      "ruta": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx",
+      "nombre": "pac_2_plantilla_icca_rellena.xlsx",
+      "inicio": "2026-06-19 18:49:00",
+      "fin": "2026-06-26 11:00:00",
+      "duracion_s": 576660,
+      "observaciones_inicio": "2026-06-19 19:00:00",
+      "observaciones_fin": "2026-06-26 11:00:00",
+      "hojas": [
+        "general",
+        "constantes_vitales",
+        "analisis",
+        "perfusiones",
+        "diccionario_variables",
+        "fuentes_pdf",
+        "guia_interpretacion"
+      ],
+      "bytes": 141998,
+      "copia": "ICCA_ORIGINALES\\01_pac_2_plantilla_icca_rellena.xlsx"
+    }
+  ],
+  "sesiones": [
+    {
+      "nombre_carpeta": "SESION_001_L06201811",
+      "sesion_bis_id": "L06201811",
+      "modo": "unilateral",
+      "inicio_bis": "2026-06-20 18:11:21",
+      "fin_bis": "2026-06-21 10:18:45",
+      "origen_bis": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\BIS_ICCA_2\\1_M-UK9G-06201811\\DH06201811",
+      "carpeta_bis": "SESIONES\\SESION_001_L06201811\\BIS\\DH06201811",
+      "excel_icca_auxiliar": "SESIONES\\SESION_001_L06201811\\ICCA\\ICCA_L06201811.xlsx",
+      "icca_origen": [
+        "pac_2_plantilla_icca_rellena.xlsx"
+      ],
+      "icca_origen_rutas": [
+        "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx"
+      ],
+      "solapamientos": [
+        {
+          "icca": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx",
+          "inicio": "2026-06-20 18:11:21",
+          "fin": "2026-06-21 10:18:45",
+          "segundos": 58044,
+          "cobertura_bis": 1.0,
+          "completo": true
+        }
+      ]
+    },
+    {
+      "nombre_carpeta": "SESION_002_L06211051",
+      "sesion_bis_id": "L06211051",
+      "modo": "unilateral",
+      "inicio_bis": "2026-06-21 10:51:36",
+      "fin_bis": "2026-06-21 11:17:16",
+      "origen_bis": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\BIS_ICCA_2\\2_M-UK9H-06211051\\DH06211051",
+      "carpeta_bis": "SESIONES\\SESION_002_L06211051\\BIS\\DH06211051",
+      "excel_icca_auxiliar": "SESIONES\\SESION_002_L06211051\\ICCA\\ICCA_L06211051.xlsx",
+      "icca_origen": [
+        "pac_2_plantilla_icca_rellena.xlsx"
+      ],
+      "icca_origen_rutas": [
+        "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx"
+      ],
+      "solapamientos": [
+        {
+          "icca": "C:\\Users\\usuario\\OneDrive - Universidad de Burgos\\Escritorio\\data\\ICCA_2\\pac_2_plantilla_icca_rellena.xlsx",
+          "inicio": "2026-06-21 10:51:36",
+          "fin": "2026-06-21 11:17:16",
+          "segundos": 1540,
+          "cobertura_bis": 1.0,
+          "completo": true
+        }
+      ]
+    }
+  ]
+}
