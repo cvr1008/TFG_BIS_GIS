@@ -72,28 +72,32 @@ La visualización de las variables ICCA se ha planteado evitando inventar datos 
 
 ## Estructura del repositorio
 
-```text
 TFG_BIS_GIS/
 |-- aplicaciones/
 |   |-- portal_bis_icca/
 |   |-- organizador_bis_icca/
 |   |-- visualizador_bis_icca/
-|   |
-|   |  
 |   |-- requirements.txt
+|   |-- abrir_apps.ps1
+|   |-- iniciar_aplicaciones.ps1
+|   |-- detener_aplicaciones.ps1
+|   |-- preparar_entorno.ps1
+|   |-- preparar_entorno_offline.ps1
+|
+|-- datos/
+|   `-- pacientes/
+|
+|-- TFG/
+|   `-- memoria, anexos e imágenes del trabajo
+|
+|-- notebooks/
+|   `-- validacion_metodos_dsa_multiregistro
 |
 |-- preparar_entornos.bat
 |-- abrir_aplicaciones.bat
 |-- cerrar_aplicaciones.bat
-|
-|-- datos/
-|   `-- pacientes/
-|-- TFG/
-|   `-- memoria, anexos e imágenes del trabajo
-|-- notebooks/
-|   `-- validacion_metodos_dsa_multiregistro
-`-- README.md
-```
+|-- README.md
+`-- .gitignore
 
 La carpeta `aplicaciones/` contiene el código fuente del sistema. Dentro de ella se encuentran los tres módulos principales:
 
@@ -101,19 +105,18 @@ La carpeta `aplicaciones/` contiene el código fuente del sistema. Dentro de ell
 - `organizador_bis_icca/`: aplicación encargada de crear pacientes, asociar sesiones BIS y vincular registros ICCA cuando están disponibles.
 - `visualizador_bis_icca/`: aplicación encargada de consultar pacientes ya organizados, visualizar las sesiones BIS, mostrar las variables clínicas ICCA y generar informes.
 
-El archivo `aplicaciones/requirements.txt` recoge las dependencias necesarias para ejecutar el sistema completo. Además, `organizador_bis_icca/` y `visualizador_bis_icca/` conservan cada uno su propio `requirements.txt`, con las dependencias específicas de esa aplicación, para poder analizar o ejecutar cada una por separado si se desea.
+El archivo aplicaciones/requirements.txt recoge las dependencias necesarias para ejecutar el sistema completo. Además, organizador_bis_icca/ y visualizador_bis_icca/ conservan cada uno su propio requirements.txt, con las dependencias específicas de esa aplicación, para poder analizar o ejecutar cada una por separado si se desea.
 
-Los tres archivos `.bat` de la carpeta `aplicaciones/` se utilizan para preparar el entorno y arrancar o detener las aplicaciones Dash.
+La carpeta aplicaciones/ también incluye varios scripts internos de PowerShell. preparar_entorno.ps1 crea el entorno virtual e instala las dependencias; iniciar_aplicaciones.ps1 arranca el portal, el organizador y el visualizador; detener_aplicaciones.ps1 detiene los procesos iniciados; abrir_apps.ps1 agrupa el arranque completo usando la ruta local de pacientes; y preparar_entorno_offline.ps1 permite preparar el entorno usando paquetes locales si existen o, en caso contrario, instalando desde internet.
 
-La carpeta `datos/` contiene la ubicación de trabajo de la aplicación. En concreto, `datos/pacientes/` es la carpeta donde se guardan los pacientes creados durante el uso local o de demostración.
+La carpeta datos/ contiene la ubicación de trabajo de la aplicación. En concreto, datos/pacientes/ es la carpeta donde se guardan los pacientes creados durante el uso local o de demostración.
 
-La carpeta `TFG/` contiene la documentación académica del proyecto, incluyendo memoria, anexos, imágenes y otros materiales utilizados en la redacción del trabajo.
+La carpeta TFG/ contiene la documentación académica del proyecto, incluyendo memoria, anexos, imágenes y otros materiales utilizados en la redacción del trabajo.
 
-La carpeta notebooks contiene el notebook en el que se desgrana la validación de la metodología elegida para la reconstrucción de la DSA.
+La carpeta notebooks/ contiene el notebook utilizado para documentar y validar la metodología elegida para la reconstrucción de la matriz DSA.
+En la raíz del repositorio se incluyen tres archivos .bat pensados para facilitar el uso en Windows. Estos permiten preparar el entorno, abrir la aplicación y detener los servidores sin necesidad de escribir comandos manualmente.
 
-En la raíz del repositorio se incluyen tres archivos `.bat` pensados para facilitar el uso en Windows. Estos permiten preparar el entorno, abrir la aplicación y detener los servidores sin necesidad de escribir comandos manualmente.
-
-En el repositorio no deben incluirse datos clínicos reales. La carpeta `datos/pacientes/` puede estar vacía inicialmente y se irá rellenando al utilizar la aplicación.
+En el repositorio no deben incluirse datos clínicos reales. La carpeta datos/pacientes/ puede estar vacía inicialmente y se irá rellenando al utilizar la aplicación.
 
 ## Datos de prueba
 
