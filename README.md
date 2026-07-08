@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="TFG/img/CabeceraEPS.png" alt="Cabecera EPS" width="420">
+  &nbsp;&nbsp;&nbsp;
+  <img src="TFG/img/Logo_GIS.png" alt="Logo GIS" width="120">
+</p>
+
 # Sistema BIS-ICCA para organización y visualización de pacientes críticos
 
 Este repositorio contiene una aplicación desarrollada en Python/Dash para organizar, integrar y visualizar información clínica procedente de pacientes ingresados en UCI.
