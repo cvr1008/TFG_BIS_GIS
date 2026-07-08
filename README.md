@@ -1,102 +1,66 @@
-# TFG BIS-ICCA
+# Sistema BIS-ICCA para organización y visualización de pacientes críticos
 
-Sistema desarrollado en Python/Dash para organizar, consultar y visualizar
-datos procedentes de monitorizacion BIS e informacion clinica ICCA en pacientes
-neurocriticos.
+Este repositorio contiene una aplicación desarrollada en Python/Dash para organizar, integrar y visualizar información clínica procedente de pacientes ingresados en UCI.
 
-El proyecto se estructura como una herramienta web local, accesible desde un
-navegador, con un portal inicial que permite entrar en los dos flujos principales
-de trabajo: organizacion de pacientes y visualizacion de pacientes.
+El proyecto nace en un contexto clínico en el que se trabaja con dos fuentes principales de información: los registros BIS, asociados a la monitorización cerebral mediante índice biespectral, y los registros ICCA, exportados en formato Excel desde el sistema de información clínica. El objetivo general es facilitar la revisión conjunta de estos datos, evitando una exploración manual dispersa en múltiples carpetas y archivos.
 
-## Descripcion general
+La herramienta no sustituye la valoración clínica ni los sistemas hospitalarios originales. Su finalidad es organizar los datos exportados, facilitar su consulta y permitir una visualización integrada del caso.
 
-La aplicacion permite trabajar con sesiones BIS exportadas desde el monitor y,
-cuando existen registros ICCA asociados, integrarlos en el mismo caso clinico.
-El objetivo es centralizar la informacion de cada paciente en una estructura de
-carpetas reproducible, evitando modificar los archivos originales.
+El uso de los datos del proyecto fue tramitado y cuenta con aprobación del CEIm con fecha 30 de junio de 2026.
 
-El sistema no utiliza una base de datos relacional. Los datos se almacenan en
-carpetas y archivos:
+## Flujos principales de trabajo
+
+El sistema se organiza en dos flujos principales:
+
+1. Organización de pacientes.
+2. Visualización de pacientes.
+
+Ambos flujos comparten una misma ubicación de pacientes, de forma que los datos creados desde el organizador pueden consultarse después desde el visualizador.
+
+## Organización de pacientes
+
+El organizador permite crear una estructura homogénea de carpetas por paciente. A partir de sesiones BIS y, cuando existen, registros ICCA asociados, la aplicación genera una carpeta individual para cada paciente.
+
+La estructura general es:
 
 ```text
 datos/
 └── pacientes/
     ├── PACIENTE_001/
+    │   ├── paciente.json
+    │   ├── ICCA/
+    │   └── SESIONES/
+    │       ├── SESION_001_...
+    │       └── SESION_002_...
     ├── PACIENTE_002/
-    └── ...
+    └── PACIENTE_003/
 ```
 
-La carpeta `datos/pacientes/` contiene datos de trabajo o datos clinicos y no
-debe subirse a GitHub.
+Cada paciente contiene la información necesaria para reconstruir su caso: metadatos, sesiones BIS, registros ICCA y archivos auxiliares generados durante el procesamiento.
 
-## Flujos de trabajo
+Este flujo evita que el usuario tenga que decidir manualmente dónde guardar cada caso, ya que la aplicación trabaja siempre sobre una carpeta de pacientes configurada de forma fija.
 
-### 1. Organizacion de pacientes
+## Visualización de pacientes
 
-El modulo `organizador_bis_icca` permite crear y editar carpetas de paciente.
-Desde esta aplicacion se pueden:
+El visualizador permite seleccionar un paciente ya organizado y consultar sus sesiones BIS. Para cada sesión se muestran distintas representaciones de la información disponible.
+Entre los elementos principales se incluyen:
+* Matriz DSA.
+* Reconstrucción de la matriz de densidad espectral cuando no está disponible directamente.
+* Variables BIS, EMG, SEF, MEF y ASYM09.
+* Variables clínicas procedentes de ICCA, cuando existen.
+* Constantes vitales documentadas
+* Perfusiones y medicación administrada.
+* Resumen del caso e informe exportable en PDF.
 
-- seleccionar archivos Excel ICCA ya preparados;
-- seleccionar una o varias carpetas BIS;
-- analizar los intervalos temporales de las sesiones;
-- comprobar solapamientos entre sesiones;
-- crear la carpeta final del paciente;
-- editar pacientes ya creados;
-- asociar cada sesion BIS con su Excel ICCA auxiliar cuando exista coincidencia.
+Uno de los apartados más importantes del proyecto ha sido la reconstrucción de la matriz DSA. A partir de los archivos crudos exportados por el monitor BIS y de la documentación disponible sobre el formato de los registros, se ha implementado un proceso que permite reconstruir la matriz de densidad espectral con una fidelidad suficiente para su consulta visual dentro de la aplicación.
 
-Cada paciente queda organizado en una carpeta `PACIENTE_###`, que contiene sus
-sesiones, registros auxiliares y manifiestos JSON.
+## Integración de datos ICCA
+Además de los registros BIS, el sistema integra información clínica procedente de archivos Excel exportados desde ICCA.
 
-### 2. Visualizacion de pacientes
+Esta integración permite visualizar, junto a la información cerebral, variables clínicas relevantes del paciente, como constantes vitales, análisis puntuales y perfusiones. En el caso de las perfusiones, la aplicación representa la evolución de la dosis o del volumen administrado según la información disponible en los registros.
 
-El modulo `visualizador_bis_icca` permite seleccionar un paciente ya organizado
-y consultar sus sesiones. Desde esta aplicacion se pueden visualizar:
+La visualización de las variables ICCA se ha planteado evitando inventar datos entre mediciones: se muestran las mediciones reales documentadas y, cuando procede, tramos que indican el último valor registrado hasta la siguiente medición.
 
-- matriz DSA bilateral;
-- indices BIS y EMG;
-- asimetria bilateral;
-- variables clinicas procedentes de ICCA;
-- perfusiones y administracion acumulada;
-- tarjetas resumen del intervalo seleccionado;
-- informe PDF imprimible del caso visualizado.
-
-El usuario accede a ambos flujos desde el portal principal `portal_bis_icca`.
-
-## Reconstruccion de la DSA
-
-Cuando el registro lo permite, la aplicacion reconstruye la matriz de densidad
-espectral bilateral a partir de los datos BIS disponibles. La visualizacion DSA
-incluye informacion de ambos hemisferios y permite consultar el intervalo de
-registro de forma interactiva.
-
-La reconstruccion y representacion se realiza sin modificar los archivos BIS
-originales. Los resultados se calculan en la aplicacion y se muestran en el
-visualizador.
-
-## Integracion de datos ICCA
-
-Los registros ICCA se incorporan como archivos Excel preparados. La aplicacion
-extrae y representa las variables clinicas relevantes dentro del intervalo de
-cada sesion BIS.
-
-La integracion ICCA incluye:
-
-- constantes vitales;
-- analisis clinicos;
-- perfusiones;
-- dosis documentadas;
-- volumen o dosis acumulada cuando es posible calcularla;
-- resumen del intervalo seleccionado.
-
-La aplicacion evita inventar datos intermedios: en las constantes clinicas se
-muestran mediciones reales y tramos que representan el ultimo valor documentado
-hasta la siguiente medicion.
-
-## CEIm
-
-La tramitacion del proyecto ante el CEIm se realizo el 30 de junio de 2026. Los
-datos clinicos no forman parte del repositorio y deben mantenerse fuera de
-GitHub.
 
 ## Estructura del repositorio
 
@@ -107,156 +71,90 @@ TFG_BIS_GIS/
 │   ├── organizador_bis_icca/
 │   ├── visualizador_bis_icca/
 │   ├── requirements.txt
-│   ├── preparar_entorno.ps1
-│   ├── preparar_entorno_offline.ps1
-│   ├── iniciar_aplicaciones.ps1
-│   └── detener_aplicaciones.ps1
+│   └── scripts internos de arranque
 ├── datos/
 │   └── pacientes/
 ├── TFG/
-│   ├── img/
-│   ├── qmd/
-│   ├── memoria.qmd
-│   └── anexos.qmd
-├── PREPARAR_DEMO_DEFENSA.bat
-├── ABRIR_DEMO_DEFENSA.bat
-├── CERRAR_DEMO_DEFENSA.bat
-├── README.md
-└── .gitignore
+│   └── memoria, anexos e imágenes del trabajo
+├── preparar_entornos.bat
+├── abrir_aplicaciones.bat
+├── cerrar_aplicaciones.bat
+└── README.md
 ```
 
-## Requisitos
+La carpeta aplicaciones/ contiene el código fuente del sistema. Dentro de ella se encuentran los tres módulos principales:
+* portal_bis_icca/: pantalla inicial de acceso, desde la que se puede entrar al organizador o al visualizador.
+* organizador_bis_icca/: aplicación encargada de crear pacientes, asociar sesiones BIS y vincular registros ICCA cuando están disponibles.
+* visualizador_bis_icca/: aplicación encargada de consultar pacientes ya organizados, visualizar las sesiones BIS, mostrar las variables clínicas ICCA y generar informes.
 
-- Windows 10 o superior.
-- Python 3.10-3.12. Se recomienda Python 3.12.10 en Windows.
-- Navegador web: Chrome, Edge o Firefox.
-- Conexion a internet durante la primera instalacion de dependencias, salvo que
-  se utilice una carpeta `wheelhouse` preparada previamente.
+El archivo aplicaciones/requirements.txt recoge las dependencias necesarias para ejecutar el sistema completo. Los scripts internos de esta carpeta se utilizan para preparar el entorno y arrancar las aplicaciones Dash.
 
-Durante la instalacion de Python en Windows, marcar la opcion:
+La carpeta datos/ contiene la ubicación de trabajo de la aplicación. En concreto, datos/pacientes/ es la carpeta donde se guardan los pacientes creados durante el uso local o de demostración.
+
+La carpeta TFG/ contiene la documentación académica del proyecto, incluyendo memoria, anexos, imágenes y otros materiales utilizados en la redacción del trabajo.
+
+En la raíz del repositorio se incluyen tres archivos .bat pensados para facilitar el uso en Windows. Estos permiten preparar el entorno, abrir la aplicación y detener los servidores sin necesidad de escribir comandos manualmente.
+
+En el repositorio no deben incluirse datos clínicos reales. La carpeta datos/pacientes/ puede estar vacía inicialmente y se irá rellenando al utilizar la aplicación.
+
+
+## Datos de prueba
+
+Los datos para la visualización se proporcionarán en una memoria USB con una estructura similar a esta:
 
 ```text
-Add python.exe to PATH
+DATOS/
+├── SESIONES_BIS/
+│   ├── BIS_ICCA_1/
+│   ├── BIS_ICCA_2/
+│   ├── BIS_ICCA_3/
+│   └── sesiones_BIS_sin_icca/
+│   
+└── SESIONES_ICCA/
+    ├── ICCA_1/
+    ├── ICCA_2/
+    └── ICCA_3/
 ```
 
-Para comprobar que Python esta disponible:
 
-```cmd
-python --version
-```
+Las sesiones de BIS y los excels de variables clínicas están en carpetas separadas con el fin de facilitar la experiencia de uso. Se incluyen sesiones BIS de pacientes cuya estancia en la UCI ha estado monitorizada por el sistema ICCA. Los nombres de las sesiones de esos pacientes llevan incluido el nombre de la carpeta que contiene el excel correspondiente a su estancia.
 
-## Puesta en marcha rapida
 
-Desde la carpeta principal del repositorio:
+## Instalación y ejecución local
+Para ejecutar la aplicación en un ordenador nuevo, se recomienda seguir estos pasos.
 
-```cmd
-PREPARAR_DEMO_DEFENSA.bat
-```
+### 1. Descargar el proyecto
+El repositorio puede descargarse desde GitHub como archivo ZIP o clonarse mediante Git.
+Si se descarga como ZIP, es importante extraerlo antes de ejecutar la aplicación.
 
-Este paso crea el entorno virtual:
+### 2. Instalar Python
+La aplicación se ha probado con Python 3.12.10
 
-```text
-aplicaciones/.venv/
-```
+Durante la instalación de Python en Windows es importante marcar la opción: Add python.exe to PATH
 
-e instala las dependencias necesarias.
+Esto permite que Windows reconozca el comando python desde la terminal y que los scripts de preparación funcionen correctamente.
 
-Despues, para abrir la aplicacion:
+### 3. Preparar el entorno
+Una vez descargado el repositorio, ejecutar: preparar_entornos.bat
 
-```cmd
-ABRIR_DEMO_DEFENSA.bat
-```
+Este archivo crea el entorno virtual de Python e instala las dependencias necesarias para ejecutar la aplicación.
+Este paso solo es necesario la primera vez, o si se borra el entorno virtual.
 
-El portal principal se abrira en:
+### 4. Abrir la aplicación
+Después de preparar el entorno, ejecutar: abrir_aplicaciones.bat
+Este archivo arranca las aplicaciones Dash necesarias y abre el portal principal en el navegador.
 
-```text
-http://127.0.0.1:8040/
-```
+### 5. Cerrar la aplicación
+Cuando se termine de utilizar la herramienta, ejecutar: cerrar_aplicaciones.bat
+Este archivo detiene los servidores de la aplicación. Es posible que el navegador siga abierto, pero la aplicación dejará de ejecutarse en segundo plano.
 
-Para cerrar las aplicaciones:
 
-```cmd
-CERRAR_DEMO_DEFENSA.bat
-```
 
-## Puesta en marcha manual
 
-Tambien se puede preparar y arrancar el sistema desde PowerShell:
 
-```powershell
-cd aplicaciones
-.\preparar_entorno.ps1
-.\iniciar_aplicaciones.ps1 -RutaPacientesFija
-```
-
-Direcciones locales:
-
-```text
-Portal:        http://127.0.0.1:8040/
-Visualizador:  http://127.0.0.1:8050/
-Organizador:   http://127.0.0.1:8060/
-```
-
-Para detener las aplicaciones:
-
-```powershell
-.\detener_aplicaciones.ps1
-```
-
-## Ubicacion de pacientes
-
-Por defecto, la aplicacion guarda y busca pacientes en:
-
-```text
-datos/pacientes/
-```
-
-Si otra persona descarga el repositorio en otra ruta, sus pacientes se guardaran
-en la carpeta `datos/pacientes/` de su propia copia del proyecto.
-
-Ejemplo:
-
-```text
-C:\Users\NombreUsuario\Downloads\TFG_BIS_GIS\datos\pacientes
-```
-
-En un despliegue tipo hospitalario, esta ruta puede sustituirse por una unidad
-de red compartida, por ejemplo:
-
-```text
-P:\Pacientes
-```
-
-## Notas para GitHub
-
-Subir al repositorio:
-
-- codigo de `aplicaciones/`;
-- scripts `.bat` y `.ps1`;
-- documentacion del TFG;
-- `README.md`;
-- `.gitignore`;
-- estructura vacia o documentada de `datos/`.
-
-No subir:
-
-- `aplicaciones/.venv/`;
-- `aplicaciones/.runtime/`;
-- `datos/pacientes/` con datos reales;
-- archivos temporales;
-- salidas generadas que no sean necesarias;
-- documentos clinicos o administrativos sensibles.
-
-## Arquitectura HUBU
-
-La aplicacion puede ejecutarse en local para pruebas y demostracion. Ademas, se
-ha planteado una arquitectura con maquinas virtuales para simular un posible
-despliegue en intranet hospitalaria:
-
-- una VM Windows para ejecutar la aplicacion Dash/Python;
-- una VM Ubuntu Server para almacenar la carpeta comun de pacientes;
-- comparticion Samba/SMB para montar la carpeta de pacientes como unidad de red;
-- ruta fija de trabajo, por ejemplo `P:\Pacientes`.
-
-El codigo de la aplicacion no cambia entre local y despliegue tipo HUBU. Cambia
-la ruta de pacientes configurada al arrancar.
+## Notas importantes
+* La aplicación no incluye datos clínicos reales en el repositorio.
+* La carpeta datos/pacientes puede estar vacía inicialmente.
+* Los pacientes creados desde la aplicación se guardan automáticamente en la ubicación configurada.
+* El navegador puede ser Chrome, Edge, Firefox u otro navegador moderno.
+* La herramienta está orientada a organización, consulta y apoyo visual de datos exportados, no a la toma directa de decisiones clínicas.
