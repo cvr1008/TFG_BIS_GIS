@@ -417,13 +417,13 @@ Una vez montada la unidad de red, la aplicación puede ejecutarse indicando `P:\
 
 La aplicación se ejecutó en la máquina Windows indicando como carpeta fija de pacientes la ruta `P:\Pacientes`, como se muestra en la @fig-vm-ejecucion-app.
 
-![Ejecución de la aplicación en la máquina Windows usando P:\Pacientes como ruta de pacientes. Fuente: elaboración propia.](img/capturas_vm/EjecutarAppEnWindows.png){#fig-vm-ejecucion-app width=85%}
+![Ejecución de la aplicación en la máquina Windows usando la unidad P: como ruta de pacientes. Fuente: elaboración propia.](img/capturas_vm/EjecutarAppEnWindows.png){#fig-vm-ejecucion-app}
 
 El organizador guarda ahí los pacientes creados, y el visualizador lee desde esa misma ubicación. Esto permite simular un funcionamiento hospitalario en el que los datos no dependen de una carpeta local de un único ordenador, sino de un repositorio común accesible en red.
 
 Finalmente, el portal de la aplicación muestra `P:\Pacientes` como ubicación configurada, confirmando que la aplicación trabaja sobre la unidad compartida mediante Samba (@fig-vm-app-pacientes-p).
 
-![Portal BIS-ICCA ejecutándose en la máquina virtual Windows con P:\Pacientes como ubicación configurada. Fuente: elaboración propia.](img/capturas_vm/AppEjecutandoseEnVMcarpetaP.png){#fig-vm-app-pacientes-p width=85%}
+![Aplicación ejecutándose en la máquina virtual Windows con la unidad P: como ubicación configurada. Fuente: elaboración propia.](img/capturas_vm/AppEjecutandoseEnVMcarpetaP.png){#fig-vm-app-pacientes-p}
 
 Esta configuración es una prueba de concepto. En un entorno hospitalario real, la máquina Ubuntu podría sustituirse por un servidor o recurso compartido gestionado por el servicio informático del hospital.
 

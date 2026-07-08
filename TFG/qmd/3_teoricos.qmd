@@ -84,7 +84,8 @@ El predominio de las distintas bandas y las características del EEG varían seg
 ### Monitor e Índice Biespectral (BIS)
 El monitor BIS\texttrademark{} es el dispositivo de neuromonitorización, fabricado por Covidien (actualmente Medtronic), que adquiere y procesa de forma continua las señales electroencefalográficas (EEG) frontales del paciente mediante un sensor conectado a un módulo BISx o BISx4 [@CovidienBISadvanced]. Es, por tanto, el equipo físico: la pantalla, el procesador y el módulo de adquisición, no un valor ni una medida en sí mismo.
 
-En este trabajo se han empleado datos procedentes de dos versiones del equipo, BIS VISTA y BIS Advance, que comparten los mismos fundamentos de adquisición y procesamiento de la señal, aunque presentan diferencias de hardware e interfaz [@CovidienBISadvanced]. La estructura de los archivos exportados por ambos equipos, prácticamente equivalente entre versiones, se detalla en el Anexo F.
+En este trabajo se han empleado datos procedentes de dos versiones del equipo, BIS VISTA y BIS Advance, mostradas en las Figuras @fig-monitor-vista y @fig-monitor-advance, respectivamente. Ambas comparten los mismos fundamentos de adquisición y procesamiento de la señal, aunque presentan diferencias de hardware e interfaz [@CovidienBISadvanced]. La estructura de los archivos exportados por ambos equipos, prácticamente equivalente entre versiones, se detalla en el Anexo F.
+
 
 ![Monitor BIS VISTA. Fuente: Elaboración propia [@CovidienBISadvanced].](img/bis_vista.png){#fig-monitor-vista width=45%}
 
