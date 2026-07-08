@@ -304,15 +304,18 @@ $$\text{sesgo} = \frac{1}{N}\sum_{i=1}^{N} (x_i - y_i)$$
 
 Al emplear una ventana Hann de 2 s, un solapamiento efectivo de 1 s, el mismo `detrend` y el mismo escalado de PSD, Welch y `scipy.signal.spectrogram` produjeron resultados numéricamente idénticos: de las 682 combinaciones de filtro, suavizado, ventana y desplazamiento evaluadas en la validación experimental, las 682 arrojaron exactamente el mismo Pearson, MAE y RMSE para ambas funciones. Por tanto, `spectrogram` no constituyó una metodología espectral distinta en estas condiciones, sino otra interfaz para organizar los mismos periodogramas modificados descritos en G.6. Se mantuvo la denominación Welch por describir con mayor precisión el estimador utilizado, coherente con otros trabajos que también implementan el análisis espectral del EEG mediante Python mediante estas dos funciones equivalentes [@Sawa2022].
 
-En la misma validación se probó adicionalmente una transformada wavelet como alternativa a Welch. Aunque el Pearson obtenido con wavelet resultó razonable (hasta 0,69 en su mejor configuración), el error en escala física fue muy superior al de Welch: MAE en torno a 18,8 dB y RMSE en torno a 19,3 dB, frente a los 3,7 y 5,0 dB de Welch. Esta diferencia tan marcada en el error absoluto, pese a una correlación de patrón similar, descartó la transformada wavelet como alternativa viable para este proyecto.
+En la misma validación se probó adicionalmente una transformada wavelet como alternativa a Welch. Aunque el Pearson obtenido con wavelet resultó razonable, el error en escala física fue muy superior al de Welch. Esta diferencia tan marcada en el error absoluto, pese a una correlación de patrón similar, descartó la transformada wavelet como alternativa viable para este proyecto.
 
 | Método espectral | Pearson | MAE (dB) | RMSE (dB) |
 |---|---:|---:|---:|
-| Welch | 0,726 | 3,72 | 5,02 |
-| `spectrogram` | 0,726 | 3,72 | 5,02 |
-| Wavelet | 0,690 | 18,75 | 19,26 |
+| Welch | 0.805434 | 3.454749 | 4.836533 |
+| `spectrogram` | 0.805434 | 3.454749 | 4.836533 |
+| Wavelet | 0.851939 | 16.431503 | 16.7813616 |
+
 
 : Comparación de métodos espectrales, mejor configuración de cada uno (registro `L03041035`) {#tbl-metodos-espectrales}
+
+Todos estos análisis explicados se encuentran en el notebook de validación (llamado validacion_metodos_dsa_multiregistro.ipynb) que podemos encontrar en la carpeta notebooks del repositorio.
 
 ### G.15.2 Comparación de filtrado y tipos de suavizado
 

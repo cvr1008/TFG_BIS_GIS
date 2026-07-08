@@ -15,15 +15,55 @@ SOLAPE_BIS_MAXIMO_TOLERADO_SEGUNDOS = 30
 
 
 def _nombre_seguro(texto):
+    """
+    Genera un nombre seguro para carpetas o archivos a partir de un texto.
+
+    Parámetros
+    ----------
+    texto : str
+        Texto original que se quiere convertir en un nombre válido.
+
+    Devuelve
+    --------
+    str
+        Texto normalizado, conservando solo letras, números, guiones y guiones
+        bajos. Si el resultado queda vacío, devuelve "BIS".
+    """
     limpio = re.sub(r"[^A-Za-z0-9_-]+", "_", texto).strip("_")
     return limpio or "BIS"
 
 
 def _ruta_normalizada(ruta):
+    """
+    Normaliza una ruta para poder compararla de forma robusta.
+
+    Parámetros
+    ----------
+    ruta : str | pathlib.Path
+        Ruta que se desea normalizar.
+
+    Devuelve
+    --------
+    str
+        Ruta absoluta, expandida y convertida a minúsculas mediante `casefold`.
+    """
     return str(Path(ruta).expanduser().resolve()).casefold()
 
 
 def siguiente_paciente(directorio):
+    """
+    Calcula el siguiente identificador disponible de paciente.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan las carpetas de pacientes.
+
+    Devuelve
+    --------
+    str
+        Identificador del siguiente paciente con formato `PACIENTE_XXX`.
+    """
     raiz = Path(directorio).expanduser().resolve()
     numeros = []
     if raiz.exists():
@@ -37,6 +77,22 @@ def siguiente_paciente(directorio):
 
 
 def _guardar_json(ruta, datos):
+    """
+    Guarda un diccionario en formato JSON.
+
+    Parámetros
+    ----------
+    ruta : str | pathlib.Path
+        Ruta del archivo JSON de salida.
+
+    datos : dict
+        Datos que se desean guardar.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor. Escribe el archivo en disco.
+    """
     Path(ruta).write_text(
         json.dumps(datos, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -44,6 +100,23 @@ def _guardar_json(ruta, datos):
 
 
 def _esta_dentro(ruta, raiz):
+    """
+    Comprueba si una ruta está contenida dentro de un directorio raíz.
+
+    Parámetros
+    ----------
+    ruta : str | pathlib.Path
+        Ruta que se desea comprobar.
+
+    raiz : str | pathlib.Path
+        Directorio raíz que debe contener la ruta.
+
+    Devuelve
+    --------
+    bool
+        `True` si la ruta está dentro de la raíz indicada, `False` en caso
+        contrario.
+    """
     try:
         Path(ruta).resolve().relative_to(Path(raiz).resolve())
         return True
@@ -52,12 +125,43 @@ def _esta_dentro(ruta, raiz):
 
 
 def _eliminar_temporal(ruta, raiz):
+    """
+    Elimina una carpeta temporal si existe y pertenece al directorio esperado.
+
+    Parámetros
+    ----------
+    ruta : str | pathlib.Path
+        Carpeta temporal que se desea eliminar.
+
+    raiz : str | pathlib.Path
+        Directorio raíz dentro del cual debe encontrarse la carpeta temporal.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor. Elimina la carpeta si la validación
+        de seguridad es correcta.
+    """
     ruta = Path(ruta)
     if ruta.exists() and _esta_dentro(ruta, raiz):
         shutil.rmtree(ruta)
 
 
 def listar_pacientes(directorio):
+    """
+    Lista los pacientes disponibles en el directorio de trabajo.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan las carpetas de pacientes.
+
+    Devuelve
+    --------
+    list[dict]
+        Lista de manifiestos de pacientes leídos desde `paciente.json`. Cada
+        diccionario incluye además la ruta de la carpeta del paciente.
+    """
     raiz = Path(directorio).expanduser().resolve()
     if not raiz.exists():
         return []
@@ -78,6 +182,20 @@ def listar_pacientes(directorio):
 
 
 def obtener_fuentes_paciente(datos):
+    """
+    Obtiene las fuentes ICCA y BIS asociadas a un paciente.
+
+    Parámetros
+    ----------
+    datos : dict
+        Manifiesto del paciente leído desde `paciente.json`.
+
+    Devuelve
+    --------
+    dict
+        Diccionario con dos claves: `icca` y `bis`. Cada una contiene una lista
+        de rutas absolutas y sin duplicados.
+    """
     """Devuelve fuentes editables, con compatibilidad para manifiestos antiguos."""
     carpeta = Path(datos["carpeta"]).resolve()
     fuentes = datos.get("fuentes", {})
@@ -109,6 +227,28 @@ def obtener_fuentes_paciente(datos):
 
 
 def _conflictos_fuentes(directorio, analisis, excluir_paciente=None):
+    """
+    Detecta si las fuentes ICCA o BIS seleccionadas ya están asignadas a otros
+    pacientes.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    analisis : dict
+        Resultado del análisis de selección, con las claves `icca` y `bis`.
+
+    excluir_paciente : str | None
+        Identificador de paciente que se debe ignorar durante la comprobación.
+        Se utiliza al actualizar un paciente ya existente.
+
+    Devuelve
+    --------
+    dict
+        Diccionario cuyas claves son identificadores de paciente y cuyos valores
+        son conjuntos con los tipos de conflicto detectados: `icca`, `bis` o ambos.
+    """
     conflictos = {}
     rutas_icca = {_ruta_normalizada(item["ruta"]): item for item in analisis["icca"]}
     rutas_bis = {_ruta_normalizada(item["ruta"]): item for item in analisis["bis"]}
@@ -144,6 +284,21 @@ def _conflictos_fuentes(directorio, analisis, excluir_paciente=None):
 
 
 def _mensaje_conflictos(conflictos):
+    """
+    Construye un mensaje legible a partir de los conflictos detectados.
+
+    Parámetros
+    ----------
+    conflictos : dict
+        Diccionario generado por `_conflictos_fuentes`, con pacientes afectados
+        y tipos de conflicto encontrados.
+
+    Devuelve
+    --------
+    str
+        Mensaje descriptivo indicando qué fuente ya estaba asignada y a qué
+        paciente o pacientes.
+    """
     pacientes = sorted(conflictos)
     tipos = set().union(*(conflictos[paciente] for paciente in pacientes))
     if tipos == {"icca", "bis"}:
@@ -165,6 +320,26 @@ def _mensaje_conflictos(conflictos):
 
 
 def _validar_bis_no_solapados(analisis):
+    """
+    Comprueba que las sesiones BIS seleccionadas no se solapen entre sí.
+
+    Parámetros
+    ----------
+    analisis : dict
+        Resultado del análisis de selección, con la lista de sesiones BIS en la
+        clave `bis`.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor. Si detecta un solapamiento no
+        permitido, lanza una excepción.
+
+    Lanza
+    -----
+    ValueError
+        Si dos sesiones BIS se solapan más que el máximo tolerado.
+    """
     sesiones = sorted(
         analisis.get("bis", []),
         key=lambda item: item.get("inicio") or "",
@@ -188,6 +363,34 @@ def _validar_bis_no_solapados(analisis):
 
 
 def _analizar_y_validar(directorio, rutas_icca, carpetas_bis, excluir_paciente=None):
+    """
+    Analiza las fuentes seleccionadas y valida que puedan asignarse a un paciente.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    rutas_icca : list[str | pathlib.Path]
+        Rutas de los archivos ICCA seleccionados.
+
+    carpetas_bis : list[str | pathlib.Path]
+        Carpetas de exportación BIS seleccionadas.
+
+    excluir_paciente : str | None
+        Identificador de paciente que se ignora en la búsqueda de conflictos.
+
+    Devuelve
+    --------
+    dict
+        Resultado validado del análisis de selección.
+
+    Lanza
+    -----
+    ValueError
+        Si no se selecciona ninguna sesión BIS, si existen solapamientos no
+        permitidos o si alguna fuente ya está asignada a otro paciente.
+    """
     rutas_icca = list(rutas_icca or [])
     carpetas_bis = list(carpetas_bis or [])
     if not carpetas_bis:
@@ -206,6 +409,29 @@ def _analizar_y_validar(directorio, rutas_icca, carpetas_bis, excluir_paciente=N
 
 
 def analizar_asignacion(directorio, rutas_icca, carpetas_bis, excluir_paciente=None):
+    """
+    Analiza una asignación de fuentes ICCA y BIS antes de crear o actualizar un
+    paciente.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    rutas_icca : list[str | pathlib.Path]
+        Rutas de los archivos ICCA seleccionados.
+
+    carpetas_bis : list[str | pathlib.Path]
+        Carpetas de exportación BIS seleccionadas.
+
+    excluir_paciente : str | None
+        Identificador de paciente que se ignora durante la validación.
+
+    Devuelve
+    --------
+    dict
+        Resultado del análisis y validación de la asignación.
+    """
     return _analizar_y_validar(
         directorio,
         rutas_icca,
@@ -221,6 +447,33 @@ def _construir_paciente(
     analisis,
     creado=None,
 ):
+    """
+    Construye la estructura interna de carpetas y manifiestos de un paciente.
+
+    Parámetros
+    ----------
+    temporal : pathlib.Path
+        Carpeta temporal donde se prepara la estructura del paciente.
+
+    destino : pathlib.Path
+        Carpeta final del paciente.
+
+    paciente_id : str
+        Identificador del paciente.
+
+    analisis : dict
+        Resultado validado del análisis de fuentes ICCA y BIS.
+
+    creado : str | None
+        Fecha de creación original del paciente. Si no se indica, se usa la
+        fecha actual.
+
+    Devuelve
+    --------
+    dict
+        Manifiesto completo del paciente.
+    """
+
     originales_icca = temporal / "ICCA_ORIGINALES"
     sesiones_raiz = temporal / "SESIONES"
     originales_icca.mkdir(parents=True)
@@ -298,6 +551,33 @@ def _construir_paciente(
 
 
 def crear_paciente(directorio, rutas_icca, carpetas_bis):
+    """
+    Crea un nuevo paciente a partir de archivos ICCA y sesiones BIS.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    rutas_icca : list[str | pathlib.Path]
+        Rutas de los archivos ICCA seleccionados.
+
+    carpetas_bis : list[str | pathlib.Path]
+        Carpetas de exportación BIS seleccionadas.
+
+    Devuelve
+    --------
+    dict
+        Manifiesto del paciente creado.
+
+    Lanza
+    -----
+    FileExistsError
+        Si ya existe una carpeta con el identificador generado.
+
+    ValueError
+        Si la asignación de fuentes no es válida.
+    """
     raiz = Path(directorio).expanduser().resolve()
     raiz.mkdir(parents=True, exist_ok=True)
     paciente_id = siguiente_paciente(raiz)
@@ -326,6 +606,40 @@ def crear_paciente(directorio, rutas_icca, carpetas_bis):
 
 
 def actualizar_paciente(directorio, paciente_id, rutas_icca, carpetas_bis):
+    """
+    Actualiza las fuentes y sesiones asociadas a un paciente existente.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    paciente_id : str
+        Identificador del paciente que se desea actualizar.
+
+    rutas_icca : list[str | pathlib.Path]
+        Rutas de los archivos ICCA seleccionados.
+
+    carpetas_bis : list[str | pathlib.Path]
+        Carpetas de exportación BIS seleccionadas.
+
+    Devuelve
+    --------
+    dict
+        Manifiesto actualizado del paciente.
+
+    Lanza
+    -----
+    ValueError
+        Si el identificador del paciente no es válido o no se puede leer el
+        manifiesto anterior.
+
+    FileNotFoundError
+        Si no existe la carpeta del paciente.
+
+    RuntimeError
+        Si existe un respaldo pendiente de una actualización anterior.
+    """
     raiz = Path(directorio).expanduser().resolve()
     if not PATRON_PACIENTE.fullmatch(str(paciente_id)):
         raise ValueError("El identificador de paciente no es valido.")
@@ -379,6 +693,30 @@ def actualizar_paciente(directorio, paciente_id, rutas_icca, carpetas_bis):
 
 
 def eliminar_paciente(directorio, paciente_id):
+    """
+    Elimina la carpeta completa de un paciente.
+
+    Parámetros
+    ----------
+    directorio : str | pathlib.Path
+        Directorio raíz donde se almacenan los pacientes.
+
+    paciente_id : str
+        Identificador del paciente que se desea eliminar.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor. Elimina la carpeta del paciente.
+
+    Lanza
+    -----
+    ValueError
+        Si el identificador del paciente no tiene un formato válido.
+
+    FileNotFoundError
+        Si el paciente no existe dentro del directorio indicado.
+    """
     raiz = Path(directorio).expanduser().resolve()
     if not PATRON_PACIENTE.fullmatch(str(paciente_id)):
         raise ValueError("El identificador de paciente no es valido.")
