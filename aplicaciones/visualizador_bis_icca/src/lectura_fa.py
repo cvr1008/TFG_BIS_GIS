@@ -100,6 +100,22 @@ def _cargar_fa_unilateral_desde_texto(texto, escalar_db=True):
 
 
 def cargar_fa_unilateral_desde_upload(contents, escalar_db=True):
+    """
+    Carga fa unilateral desde upload.
+
+    Parámetros
+    ----------
+    contents : Any
+        Contenido codificado recibido desde la interfaz.
+
+    escalar_db : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _cargar_fa_unilateral_desde_texto(
         _decode_upload_to_text(contents),
         escalar_db=escalar_db,
@@ -107,6 +123,22 @@ def cargar_fa_unilateral_desde_upload(contents, escalar_db=True):
 
 
 def cargar_fa_unilateral_desde_ruta(ruta, escalar_db=True):
+    """
+    Carga fa unilateral desde ruta.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    escalar_db : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta, "r", encoding="latin1", errors="ignore") as archivo:
         texto = archivo.read()
     return _cargar_fa_unilateral_desde_texto(
@@ -160,6 +192,27 @@ def _cargar_fa_bilateral_desde_texto(texto, escalar_db=True):
     frecuencias = np.arange(0.5, 30.0 + 0.5, 0.5)
 
     def procesar_columna_spectra(serie_spectra, nombre):
+        """
+        Ejecuta la lógica asociada a procesar columna spectra.
+
+        Parámetros
+        ----------
+        serie_spectra : Any
+            Valor de entrada utilizado por la función.
+
+        nombre : Any
+            Valor de entrada utilizado por la función.
+
+        Devuelve
+        --------
+        Any
+            Resultado generado por la función.
+
+        Lanza
+        -----
+        ValueError
+            Si se produce una condición no válida durante la ejecución.
+        """
         dsa = (
             serie_spectra
             .astype(str)
@@ -199,6 +252,22 @@ def _cargar_fa_bilateral_desde_texto(texto, escalar_db=True):
 
 
 def cargar_fa_bilateral_completo_desde_upload(contents, escalar_db=True):
+    """
+    Carga fa bilateral completo desde upload.
+
+    Parámetros
+    ----------
+    contents : Any
+        Contenido codificado recibido desde la interfaz.
+
+    escalar_db : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _cargar_fa_bilateral_desde_texto(
         _decode_upload_to_text(contents),
         escalar_db=escalar_db,
@@ -206,6 +275,22 @@ def cargar_fa_bilateral_completo_desde_upload(contents, escalar_db=True):
 
 
 def cargar_fa_bilateral_completo_desde_ruta(ruta, escalar_db=True):
+    """
+    Carga fa bilateral completo desde ruta.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    escalar_db : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta, "r", encoding="latin1", errors="ignore") as archivo:
         texto = archivo.read()
     return _cargar_fa_bilateral_desde_texto(

@@ -53,6 +53,24 @@ MAPA_LOFILTER_HZ = {
 
 
 def _decodificar_upload_bytes(contents):
+    """
+    Decodifica upload bytes.
+
+    Parámetros
+    ----------
+    contents : Any
+        Contenido codificado recibido desde la interfaz.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not contents or "," not in contents:
         raise ValueError("El archivo subido no contiene datos válidos.")
     _, contenido = contents.split(",", 1)
@@ -60,16 +78,60 @@ def _decodificar_upload_bytes(contents):
 
 
 def extraer_parametros_eeg_desde_upload(contents_header):
+    """
+    Extrae parametros eeg desde upload.
+
+    Parámetros
+    ----------
+    contents_header : Any
+        Contenido codificado de la cabecera.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     datos = _decodificar_upload_bytes(contents_header)
     return _extraer_parametros_eeg(datos)
 
 
 def extraer_parametros_eeg_desde_ruta(ruta_header):
+    """
+    Extrae parametros eeg desde ruta.
+
+    Parámetros
+    ----------
+    ruta_header : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta_header, "rb") as archivo:
         return _extraer_parametros_eeg(archivo.read())
 
 
 def _extraer_parametros_eeg(datos):
+    """
+    Extrae parametros eeg.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if len(datos) < 770:
         raise ValueError("El archivo .h_a es demasiado corto.")
 
@@ -94,6 +156,19 @@ def _extraer_parametros_eeg(datos):
 
 
 def leer_inicio_ta_desde_upload(contents_ta):
+    """
+    Lee inicio ta desde upload.
+
+    Parámetros
+    ----------
+    contents_ta : Any
+        Contenido codificado del archivo de inicio.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = _decodificar_upload_bytes(contents_ta).decode(
         "latin1",
         errors="ignore",
@@ -102,11 +177,42 @@ def leer_inicio_ta_desde_upload(contents_ta):
 
 
 def leer_inicio_ta_desde_ruta(ruta_ta):
+    """
+    Lee inicio ta desde ruta.
+
+    Parámetros
+    ----------
+    ruta_ta : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta_ta, "r", encoding="latin1", errors="ignore") as archivo:
         return _interpretar_inicio_ta(archivo.read())
 
 
 def _interpretar_inicio_ta(texto):
+    """
+    Interpreta inicio ta.
+
+    Parámetros
+    ----------
+    texto : Any
+        Texto que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     linea = texto.splitlines()[0].strip() if texto.splitlines() else ""
     inicio = pd.to_datetime(linea, dayfirst=False, errors="coerce")
     if pd.isna(inicio):
@@ -119,6 +225,22 @@ def _interpretar_inicio_ta(texto):
 
 
 def _leer_raw_intercalado(contents_raw, num_canales):
+    """
+    Lee raw intercalado.
+
+    Parámetros
+    ----------
+    contents_raw : Any
+        Contenido codificado de la onda cruda.
+
+    num_canales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     datos = np.frombuffer(
         _decodificar_upload_bytes(contents_raw),
         dtype="<i2",
@@ -127,11 +249,48 @@ def _leer_raw_intercalado(contents_raw, num_canales):
 
 
 def _leer_raw_intercalado_desde_ruta(ruta_raw, num_canales):
+    """
+    Lee raw intercalado desde ruta.
+
+    Parámetros
+    ----------
+    ruta_raw : Any
+        Ruta utilizada por la función.
+
+    num_canales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     datos = np.fromfile(ruta_raw, dtype="<i2")
     return _dar_forma_raw(datos, num_canales)
 
 
 def _dar_forma_raw(datos, num_canales):
+    """
+    Ejecuta la lógica asociada a dar forma raw.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    num_canales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     resto = len(datos) % num_canales
     if resto:
         datos = datos[:-resto]
@@ -141,6 +300,24 @@ def _dar_forma_raw(datos, num_canales):
 
 
 def _extraer_suavizado_spsmooth(df_spa):
+    """
+    Extrae suavizado spsmooth.
+
+    Parámetros
+    ----------
+    df_spa : Any
+        DataFrame utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if "SpSmooth" not in df_spa.columns:
         raise ValueError("El archivo .spa no contiene la columna SpSmooth.")
 
@@ -177,6 +354,28 @@ def _calcular_indices_alineacion(
     fs,
     numero_muestras_raw,
 ):
+    """
+    Calcula indices alineacion.
+
+    Parámetros
+    ----------
+    inicio_raw : Any
+        Valor de entrada utilizado por la función.
+
+    timeline_spa : Any
+        Valor de entrada utilizado por la función.
+
+    fs : Any
+        Valor de entrada utilizado por la función.
+
+    numero_muestras_raw : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     inicio_spa = timeline_spa.iloc[0]
     desfase_s = (inicio_spa - inicio_raw).total_seconds()
     indice_raw_inicial = int(round(desfase_s * fs))
@@ -210,6 +409,31 @@ def _canal_alineado_uv(
     offset,
     info_alineacion,
 ):
+    """
+    Ejecuta la lógica asociada a canal alineado uv.
+
+    Parámetros
+    ----------
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    canal : Any
+        Valor de entrada utilizado por la función.
+
+    pendiente : Any
+        Valor de entrada utilizado por la función.
+
+    offset : Any
+        Valor de entrada utilizado por la función.
+
+    info_alineacion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     señal = np.full(
         info_alineacion["muestras_objetivo"],
         np.nan,
@@ -230,6 +454,33 @@ def _detectar_perdidas_raw_por_segundo(
     info_alineacion,
     umbral_ceros,
 ):
+    """
+    Detecta perdidas raw por segundo.
+
+    Parámetros
+    ----------
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    canal : Any
+        Valor de entrada utilizado por la función.
+
+    info_alineacion : Any
+        Valor de entrada utilizado por la función.
+
+    umbral_ceros : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     fs = int(info_alineacion["fs"])
     muestras_objetivo = int(info_alineacion["muestras_objetivo"])
     if muestras_objetivo % fs:
@@ -270,6 +521,39 @@ def _proyectar_mascara_raw_a_timeline_dsa(
     ventana_seg,
     paso_seg,
 ):
+    """
+    Ejecuta la lógica asociada a proyectar mascara raw a timeline dsa.
+
+    Parámetros
+    ----------
+    mascara_segundos : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    tiempos_s : Any
+        Valor de entrada utilizado por la función.
+
+    timeline_spa : Any
+        Valor de entrada utilizado por la función.
+
+    fs : Any
+        Valor de entrada utilizado por la función.
+
+    ventana_seg : Any
+        Valor de entrada utilizado por la función.
+
+    paso_seg : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     mascara_segundos = np.asarray(mascara_segundos, dtype=bool)
     muestras_invalidas = np.repeat(mascara_segundos, int(fs))
     nperseg = int(ventana_seg * fs)
@@ -314,6 +598,34 @@ def _crear_mascara_raw_para_canal(
     tiempos_s,
     timeline_spa,
 ):
+    """
+    Crea mascara raw para canal.
+
+    Parámetros
+    ----------
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    canal : Any
+        Valor de entrada utilizado por la función.
+
+    info_alineacion : Any
+        Valor de entrada utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    tiempos_s : Any
+        Valor de entrada utilizado por la función.
+
+    timeline_spa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not parametros["aplicar_mascara_ceros_raw"]:
         return pd.Series(False, index=range(len(timeline_spa))), {
             "canal": int(canal + 1),
@@ -360,6 +672,51 @@ def _welch_por_bloques(
     tiempo_referencia,
     tamaño_bloque=2048,
 ):
+    """
+    Ejecuta la lógica asociada a welch por bloques.
+
+    Parámetros
+    ----------
+    señal : Any
+        Valor de entrada utilizado por la función.
+
+    fs : Any
+        Valor de entrada utilizado por la función.
+
+    ventana_seg : Any
+        Valor de entrada utilizado por la función.
+
+    paso_seg : Any
+        Valor de entrada utilizado por la función.
+
+    fmin : Any
+        Valor de entrada utilizado por la función.
+
+    fmax : Any
+        Valor de entrada utilizado por la función.
+
+    paso_frecuencia : Any
+        Valor de entrada utilizado por la función.
+
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo_referencia : Any
+        Valor de entrada utilizado por la función.
+
+    tamaño_bloque : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     nperseg = int(ventana_seg * fs)
     paso = int(paso_seg * fs)
     nfft = int(fs / paso_frecuencia)
@@ -423,6 +780,31 @@ def _reconstruir_lado(
     info_alineacion,
     parametros,
 ):
+    """
+    Reconstruye lado.
+
+    Parámetros
+    ----------
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    canales : Any
+        Valor de entrada utilizado por la función.
+
+    parametros_header : Any
+        Valor de entrada utilizado por la función.
+
+    info_alineacion : Any
+        Valor de entrada utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     acumulada = None
     frecuencias = None
     tiempos_s = None
@@ -465,6 +847,22 @@ def _reconstruir_lado(
 
 
 def _convertir_potencia_a_db(potencia, parametros):
+    """
+    Ejecuta la lógica asociada a convertir potencia a db.
+
+    Parámetros
+    ----------
+    potencia : Any
+        Valor de entrada utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     potencia = np.asarray(potencia, dtype=np.float64).copy()
     if parametros["modo_welch"] == "densidad":
         # Welch returns uV^2/Hz. Each DSA column covers a 0.5 Hz bin, so
@@ -575,6 +973,28 @@ def _ajustar_reconstruida_a_timeline(
     tiempos_s,
     timeline_spa,
 ):
+    """
+    Ejecuta la lógica asociada a ajustar reconstruida a timeline.
+
+    Parámetros
+    ----------
+    matriz : Any
+        Valor de entrada utilizado por la función.
+
+    frecuencias : Any
+        Valor de entrada utilizado por la función.
+
+    tiempos_s : Any
+        Valor de entrada utilizado por la función.
+
+    timeline_spa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     columnas = [float(frecuencia) for frecuencia in frecuencias]
     df = pd.DataFrame(matriz, columns=columnas)
     df.insert(0, "tiempo_s", tiempos_s)
@@ -591,6 +1011,22 @@ def _ajustar_reconstruida_a_timeline(
 
 
 def _alinear_spa(timeline_spa, df_spa):
+    """
+    Alinea spa.
+
+    Parámetros
+    ----------
+    timeline_spa : Any
+        Valor de entrada utilizado por la función.
+
+    df_spa : Any
+        DataFrame utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     df_spa_unico = deduplicar_dataframe_temporal(df_spa, "Time")
     return pd.DataFrame({"Time": timeline_spa}).merge(
         df_spa_unico,
@@ -608,6 +1044,36 @@ def _calcular_tiempos_ventanas(
     paso_seg,
     tiempo_referencia,
 ):
+    """
+    Calcula tiempos ventanas.
+
+    Parámetros
+    ----------
+    numero_muestras : Any
+        Valor de entrada utilizado por la función.
+
+    fs : Any
+        Valor de entrada utilizado por la función.
+
+    ventana_seg : Any
+        Valor de entrada utilizado por la función.
+
+    paso_seg : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo_referencia : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     nperseg = int(ventana_seg * fs)
     paso = int(paso_seg * fs)
     inicios = np.arange(
@@ -802,6 +1268,33 @@ def _suavizar_y_desplazar(
     shift_s,
     mascara_inicial=None,
 ):
+    """
+    Ejecuta la lógica asociada a suavizar y desplazar.
+
+    Parámetros
+    ----------
+    dsa : Any
+        Valor de entrada utilizado por la función.
+
+    ventana_s : Any
+        Valor de entrada utilizado por la función.
+
+    shift_s : Any
+        Valor de entrada utilizado por la función.
+
+    mascara_inicial : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     trabajo = dsa.copy()
     if mascara_inicial is not None:
         mascara_inicial = pd.Series(mascara_inicial).reset_index(drop=True)
@@ -835,6 +1328,22 @@ def _suavizar_y_desplazar(
 
 
 def _preparar_curva(valores, mask):
+    """
+    Prepara curva.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    mask : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     curva = pd.to_numeric(valores, errors="coerce").copy()
     curva[(curva < 0.5) | (curva > 30)] = np.nan
     curva.loc[mask.values] = np.nan
@@ -842,6 +1351,22 @@ def _preparar_curva(valores, mask):
 
 
 def _preparar_bis(valores, mask):
+    """
+    Prepara bis.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    mask : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     bis = pd.to_numeric(valores, errors="coerce").copy()
     bis[(bis < 0) | (bis > 100)] = np.nan
     bis.loc[mask.values] = np.nan
@@ -849,6 +1374,22 @@ def _preparar_bis(valores, mask):
 
 
 def _preparar_variable_0_100(valores, mask):
+    """
+    Prepara variable 0 100.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    mask : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     variable = pd.to_numeric(valores, errors="coerce").copy()
     variable[(variable < 0) | (variable > 100)] = np.nan
     variable.loc[mask.values] = np.nan
@@ -863,6 +1404,34 @@ def reconstruir_desde_uploads(
     df_spa,
     parametros=None,
 ):
+    """
+    Reconstruye desde uploads.
+
+    Parámetros
+    ----------
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    contents_header : Any
+        Contenido codificado de la cabecera.
+
+    contents_ta : Any
+        Contenido codificado del archivo de inicio.
+
+    contents_raw : Any
+        Contenido codificado de la onda cruda.
+
+    df_spa : Any
+        DataFrame utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     header = extraer_parametros_eeg_desde_upload(contents_header)
     inicio_raw = leer_inicio_ta_desde_upload(contents_ta)
     raw = _leer_raw_intercalado(contents_raw, header["num_canales"])
@@ -885,6 +1454,37 @@ def reconstruir_desde_rutas(
     parametros=None,
     ruta_fa=None,
 ):
+    """
+    Reconstruye desde rutas.
+
+    Parámetros
+    ----------
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    ruta_header : Any
+        Ruta utilizada por la función.
+
+    ruta_ta : Any
+        Ruta utilizada por la función.
+
+    ruta_raw : Any
+        Ruta utilizada por la función.
+
+    df_spa : Any
+        DataFrame utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    ruta_fa : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     header = extraer_parametros_eeg_desde_ruta(ruta_header)
     inicio_raw = leer_inicio_ta_desde_ruta(ruta_ta)
     raw = _leer_raw_intercalado_desde_ruta(
@@ -987,6 +1587,42 @@ def _reconstruir_desde_datos(
     parametros=None,
     tiempos_fa=None,
 ):
+    """
+    Reconstruye desde datos.
+
+    Parámetros
+    ----------
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    header : Any
+        Valor de entrada utilizado por la función.
+
+    inicio_raw : Any
+        Valor de entrada utilizado por la función.
+
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    df_spa : Any
+        DataFrame utilizado por la función.
+
+    parametros : Any
+        Valor de entrada utilizado por la función.
+
+    tiempos_fa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     parametros_finales = dict(PARAMETROS_RECONSTRUCCION)
     if parametros:
         parametros_usuario = dict(parametros)

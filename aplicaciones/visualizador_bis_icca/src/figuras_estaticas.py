@@ -30,6 +30,19 @@ _LOCK_MATPLOTLIB = Lock()
 
 
 def _crear_cmap():
+    """
+    Crea cmap.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     colores = [color for _, color in COLORES_BIS]
     posiciones = [posicion for posicion, _ in COLORES_BIS]
     cmap = LinearSegmentedColormap.from_list(
@@ -41,6 +54,22 @@ def _crear_cmap():
 
 
 def _configurar_eje_dsa(ax, titulo):
+    """
+    Ejecuta la lógica asociada a configurar eje dsa.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     ax.set_title(titulo)
     ax.set_ylabel("Frecuencia (Hz)")
     ax.set_ylim(0.5, 30)
@@ -69,6 +98,34 @@ def _configurar_eje_dsa(ax, titulo):
 
 
 def _dibujar_dsa(ax, tiempo, frecuencias, matriz, cmap, norm):
+    """
+    Dibuja dsa.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    frecuencias : Any
+        Valor de entrada utilizado por la función.
+
+    matriz : Any
+        Valor de entrada utilizado por la función.
+
+    cmap : Any
+        Valor de entrada utilizado por la función.
+
+    norm : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     x0 = mdates.date2num(tiempo.iloc[0])
     x1 = mdates.date2num(tiempo.iloc[-1])
     return ax.imshow(
@@ -84,6 +141,31 @@ def _dibujar_dsa(ax, tiempo, frecuencias, matriz, cmap, norm):
 
 
 def _dibujar_curvas(ax, tiempo, sef, mef, mostrar_leyenda=True):
+    """
+    Dibuja curvas.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    sef : Any
+        Valor de entrada utilizado por la función.
+
+    mef : Any
+        Valor de entrada utilizado por la función.
+
+    mostrar_leyenda : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     ax.plot(
         tiempo,
         np.asarray(sef, dtype=float),
@@ -107,6 +189,28 @@ def _dibujar_curvas(ax, tiempo, sef, mef, mostrar_leyenda=True):
 
 
 def _dibujar_bis(ax, tiempo, bis_izq, bis_der=None):
+    """
+    Dibuja bis.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    bis_izq : Any
+        Valor de entrada utilizado por la función.
+
+    bis_der : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     ax.plot(
         tiempo,
         np.asarray(bis_izq, dtype=float),
@@ -131,6 +235,28 @@ def _dibujar_bis(ax, tiempo, bis_izq, bis_der=None):
 
 
 def _dibujar_emg(ax, tiempo, emg_izq, emg_der=None):
+    """
+    Dibuja emg.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    emg_izq : Any
+        Valor de entrada utilizado por la función.
+
+    emg_der : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     ax.plot(
         tiempo,
         np.asarray(emg_izq, dtype=float),
@@ -155,6 +281,19 @@ def _dibujar_emg(ax, tiempo, emg_izq, emg_der=None):
 
 
 def _formatear_tiempo(ax):
+    """
+    Formatea tiempo.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     localizador = mdates.AutoDateLocator(minticks=5, maxticks=10)
     ax.xaxis.set_major_locator(localizador)
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m\n%H:%M"))
@@ -162,6 +301,19 @@ def _formatear_tiempo(ax):
 
 
 def _figura_a_data_url(fig):
+    """
+    Ejecuta la lógica asociada a figura a data url.
+
+    Parámetros
+    ----------
+    fig : Any
+        Figura que se va a modificar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     buffer = io.BytesIO()
     FigureCanvasAgg(fig).print_png(buffer)
     contenido = base64.b64encode(buffer.getvalue()).decode("ascii")
@@ -169,6 +321,31 @@ def _figura_a_data_url(fig):
 
 
 def _dibujar_resumen_bandas(fig, resumen, titulo, x, y):
+    """
+    Dibuja resumen bandas.
+
+    Parámetros
+    ----------
+    fig : Any
+        Figura que se va a modificar.
+
+    resumen : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    x : Any
+        Valor de entrada utilizado por la función.
+
+    y : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     texto = f"{titulo}\n\n" + "\n".join(lineas_densidad_bandas(resumen))
     fig.text(
         x,

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -51,6 +51,19 @@ COLORES_PERFUSIONES = [
 
 
 def _extraer_peso_kg(general):
+    """
+    Extrae peso kg.
+
+    Parámetros
+    ----------
+    general : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if general is None or general.empty or "peso_kg" not in general:
         return None
     valores = pd.to_numeric(general["peso_kg"], errors="coerce").dropna()
@@ -60,12 +73,38 @@ def _extraer_peso_kg(general):
 
 
 def _normalizar_variable(valor):
+    """
+    Normaliza variable.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = str(valor or "").casefold()
     traduccion = str.maketrans("áéíóúüñ", "aeiouun")
     return "_".join(texto.translate(traduccion).replace("-", " ").split())
 
 
 def _primer_texto_no_vacio(*valores):
+    """
+    Ejecuta la lógica asociada a primer texto no vacio.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     for valor in valores:
         if pd.notna(valor) and str(valor).strip():
             return str(valor).strip()
@@ -73,6 +112,22 @@ def _primer_texto_no_vacio(*valores):
 
 
 def cargar_datos_icca(ruta_sintetico, ruta_original):
+    """
+    Carga datos icca.
+
+    Parámetros
+    ----------
+    ruta_sintetico : Any
+        Ruta utilizada por la función.
+
+    ruta_original : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     sintetico = Path(ruta_sintetico)
     original = Path(ruta_original)
     if sintetico.suffix.casefold() == ".csv":
@@ -167,6 +222,19 @@ def cargar_datos_icca(ruta_sintetico, ruta_original):
 
 
 def _agrupar_series(metadata):
+    """
+    Agrupa series.
+
+    Parámetros
+    ----------
+    metadata : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     grupos = []
     orden = ["fc", "presion_arterial", "spo2", "pic", "frecuencia_respiratoria", "temperatura"]
     for variable in orden:
@@ -182,6 +250,25 @@ def _agrupar_series(metadata):
 
 
 def _mediciones_reales_constante(constantes, clave, columna_valor):
+    """
+    Ejecuta la lógica asociada a mediciones reales constante.
+
+    Parámetros
+    ----------
+    constantes : Any
+        Valor de entrada utilizado por la función.
+
+    clave : Any
+        Valor de entrada utilizado por la función.
+
+    columna_valor : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if columna_valor not in constantes.columns or "timestamp" not in constantes.columns:
         return pd.DataFrame(columns=["timestamp", columna_valor])
 
@@ -205,6 +292,28 @@ def _mediciones_reales_constante(constantes, clave, columna_valor):
 
 
 def _tramo_documentado(mediciones, columna_valor, inicio, fin):
+    """
+    Ejecuta la lógica asociada a tramo documentado.
+
+    Parámetros
+    ----------
+    mediciones : Any
+        Valor de entrada utilizado por la función.
+
+    columna_valor : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     mediciones = mediciones.sort_values("timestamp", kind="stable")
     anteriores = mediciones[mediciones["timestamp"] < inicio].tail(1)
     dentro = mediciones[mediciones["timestamp"].between(inicio, fin, inclusive="both")]
@@ -235,6 +344,22 @@ def _tramo_documentado(mediciones, columna_valor, inicio, fin):
 
 
 def _etiquetas_hover_tramo_constante(linea, reales_dentro):
+    """
+    Ejecuta la lógica asociada a etiquetas hover tramo constante.
+
+    Parámetros
+    ----------
+    linea : Any
+        Valor de entrada utilizado por la función.
+
+    reales_dentro : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     reales = {
         pd.Timestamp(timestamp)
         for timestamp in pd.to_datetime(
@@ -252,6 +377,19 @@ def _etiquetas_hover_tramo_constante(linea, reales_dentro):
 
 
 def _rango_y_con_margen(valores):
+    """
+    Ejecuta la lógica asociada a rango y con margen.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     serie = pd.to_numeric(pd.Series(valores), errors="coerce").dropna()
     if serie.empty:
         return None
@@ -263,6 +401,25 @@ def _rango_y_con_margen(valores):
 
 
 def _crear_figura_constantes(datos, inicio, fin):
+    """
+    Crea figura constantes.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     constantes = datos["constantes"]
     metadata = datos["series"]
     grupos = _agrupar_series(metadata)
@@ -396,6 +553,19 @@ def _crear_figura_constantes(datos, inicio, fin):
 
 
 def _aviso_rango(fila):
+    """
+    Ejecuta la lógica asociada a aviso rango.
+
+    Parámetros
+    ----------
+    fila : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     variable = _normalizar_variable(fila.get("variable"))
     valor = pd.to_numeric(pd.Series([fila.get("valor")]), errors="coerce").iloc[0]
     tipo_gas = _normalizar_variable(
@@ -422,6 +592,25 @@ def _aviso_rango(fila):
 
 
 def _crear_tarjetas_analisis(datos, inicio, fin):
+    """
+    Crea tarjetas analisis.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     analisis = datos.get("analisis")
     if analisis is None or analisis.empty or "timestamp" not in analisis:
         return html.Div("Sin análisis clínicos en este intervalo.", className="icca-sin-datos")
@@ -498,6 +687,25 @@ def _crear_tarjetas_analisis(datos, inicio, fin):
 
 
 def _curva_dosis_farmaco(grupo, inicio, fin):
+    """
+    Ejecuta la lógica asociada a curva dosis farmaco.
+
+    Parámetros
+    ----------
+    grupo : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     inicio = pd.Timestamp(inicio)
     fin = pd.Timestamp(fin)
     grupo = grupo.sort_values("timestamp", kind="stable").copy()
@@ -527,11 +735,40 @@ def _curva_dosis_farmaco(grupo, inicio, fin):
     eventos_marcados = []
 
     def anadir_punto(instante, valor):
+        """
+        Ejecuta la lógica asociada a añadir punto.
+
+        Parámetros
+        ----------
+        instante : Any
+            Valor de entrada utilizado por la función.
+
+        valor : Any
+            Valor que se va a procesar.
+
+        Devuelve
+        --------
+        None
+            La función no devuelve ningún valor.
+        """
         instante = pd.Timestamp(instante)
         if inicio <= instante <= fin:
             puntos.append({"timestamp": instante, "dosis": float(valor)})
 
     def marcar_evento(fila):
+        """
+        Ejecuta la lógica asociada a marcar evento.
+
+        Parámetros
+        ----------
+        fila : Any
+            Valor de entrada utilizado por la función.
+
+        Devuelve
+        --------
+        None
+            La función no devuelve ningún valor.
+        """
         instante = pd.Timestamp(fila["timestamp"])
         if inicio <= instante <= fin:
             evento = fila.to_dict()
@@ -560,11 +797,43 @@ def _curva_dosis_farmaco(grupo, inicio, fin):
 
 
 def _etiqueta_dosis(unidad):
+    """
+    Ejecuta la lógica asociada a etiqueta dosis.
+
+    Parámetros
+    ----------
+    unidad : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     unidad = str(unidad or "").strip()
     return f"Dosis administrada ({unidad})" if unidad else "Dosis administrada"
 
 
 def _preparar_grupo_perfusion(grupo, inicio, fin):
+    """
+    Prepara grupo perfusion.
+
+    Parámetros
+    ----------
+    grupo : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     grupo = grupo.sort_values("timestamp", kind="stable").copy()
     grupo = grupo[grupo["dosis_actual"].notna()].copy()
     if grupo.empty:
@@ -588,6 +857,22 @@ def _preparar_grupo_perfusion(grupo, inicio, fin):
 
 
 def _texto_hover_eventos_perfusion(grupo, configuracion):
+    """
+    Ejecuta la lógica asociada a texto hover eventos perfusion.
+
+    Parámetros
+    ----------
+    grupo : Any
+        Valor de entrada utilizado por la función.
+
+    configuracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     textos = []
     for _, fila in grupo.iterrows():
         lineas = []
@@ -606,6 +891,25 @@ def _texto_hover_eventos_perfusion(grupo, configuracion):
 
 
 def _crear_figura_perfusiones(datos, inicio, fin):
+    """
+    Crea figura perfusiones.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     perfusiones = datos.get("perfusiones")
     if (
         perfusiones is None
@@ -742,6 +1046,25 @@ def _crear_figura_perfusiones(datos, inicio, fin):
 
 
 def crear_panel_icca(datos, inicio, fin):
+    """
+    Crea panel icca.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not datos:
         return html.Div(
             "No hay información ICCA disponible para esta sesión.",

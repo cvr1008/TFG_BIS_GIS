@@ -21,6 +21,19 @@ def _decode_upload_to_text(contents):
 
 
 def _crear_nombres_unicos(nombres):
+    """
+    Crea nombres unicos.
+
+    Parámetros
+    ----------
+    nombres : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     contador = {}
     nombres_unicos = []
 
@@ -34,6 +47,30 @@ def _crear_nombres_unicos(nombres):
 
 
 def _seleccionar_columna(df, nombre, candidatos):
+    """
+    Ejecuta la lógica asociada a seleccionar columna.
+
+    Parámetros
+    ----------
+    df : Any
+        DataFrame de entrada.
+
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    candidatos : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     for candidato in candidatos:
         if candidato in df.columns:
             return pd.to_numeric(df[candidato], errors="coerce")
@@ -45,6 +82,22 @@ def _seleccionar_columna(df, nombre, candidatos):
 
 
 def _seleccionar_columna_opcional(df, candidatos):
+    """
+    Ejecuta la lógica asociada a seleccionar columna opcional.
+
+    Parámetros
+    ----------
+    df : Any
+        DataFrame de entrada.
+
+    candidatos : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     for candidato in candidatos:
         if candidato in df.columns:
             return pd.to_numeric(df[candidato], errors="coerce")
@@ -141,10 +194,36 @@ def _cargar_spa_unilateral_desde_texto(texto):
 
 
 def cargar_spa_unilateral_desde_upload(contents):
+    """
+    Carga spa unilateral desde upload.
+
+    Parámetros
+    ----------
+    contents : Any
+        Contenido codificado recibido desde la interfaz.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _cargar_spa_unilateral_desde_texto(_decode_upload_to_text(contents))
 
 
 def cargar_spa_unilateral_desde_ruta(ruta):
+    """
+    Carga spa unilateral desde ruta.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta, "r", encoding="latin1", errors="ignore") as archivo:
         return _cargar_spa_unilateral_desde_texto(archivo.read())
 
@@ -235,10 +314,36 @@ def _cargar_spa_bilateral_desde_texto(texto):
 
 
 def cargar_spa_bilateral_desde_upload(contents):
+    """
+    Carga spa bilateral desde upload.
+
+    Parámetros
+    ----------
+    contents : Any
+        Contenido codificado recibido desde la interfaz.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _cargar_spa_bilateral_desde_texto(_decode_upload_to_text(contents))
 
 
 def cargar_spa_bilateral_desde_ruta(ruta):
+    """
+    Carga spa bilateral desde ruta.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     with open(ruta, "r", encoding="latin1", errors="ignore") as archivo:
         return _cargar_spa_bilateral_desde_texto(archivo.read())
 
@@ -418,6 +523,39 @@ def _preparar_lado_bilateral(
     umbral_sqi,
     mask_comun=None,
 ):
+    """
+    Prepara lado bilateral.
+
+    Parámetros
+    ----------
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    dsa : Any
+        Valor de entrada utilizado por la función.
+
+    df_merge : Any
+        DataFrame utilizado por la función.
+
+    sufijo : Any
+        Valor de entrada utilizado por la función.
+
+    umbral_sqi : Any
+        Valor de entrada utilizado por la función.
+
+    mask_comun : Any
+        Máscara booleana utilizada para seleccionar o excluir datos.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     dsa_plot = dsa.copy().astype(float).reset_index(drop=True)
     sqi = pd.to_numeric(df_merge[f"SQI10_{sufijo}"], errors="coerce")
     totpow = pd.to_numeric(df_merge[f"TOTPOW08_{sufijo}"], errors="coerce")

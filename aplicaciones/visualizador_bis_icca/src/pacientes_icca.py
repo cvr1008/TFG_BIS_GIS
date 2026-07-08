@@ -71,12 +71,38 @@ CONFIGURACION_SERIES = {
 
 
 def _normalizar(texto):
+    """
+    Ejecuta la lógica asociada a normalizar.
+
+    Parámetros
+    ----------
+    texto : Any
+        Texto que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = unicodedata.normalize("NFKD", str(texto or ""))
     texto = "".join(caracter for caracter in texto if not unicodedata.combining(caracter))
     return re.sub(r"[^a-z0-9]+", "_", texto.casefold()).strip("_")
 
 
 def _tipo_gasometria_explicito(valor):
+    """
+    Ejecuta la lógica asociada a tipo gasometria explicito.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     normalizado = _normalizar(valor)
     if "arterial" in normalizado:
         return "arterial"
@@ -86,6 +112,19 @@ def _tipo_gasometria_explicito(valor):
 
 
 def _fila_marcada_fuera_de_rango(fila):
+    """
+    Ejecuta la lógica asociada a fila marcada fuera de rango.
+
+    Parámetros
+    ----------
+    fila : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     marca = str(fila.get("marca_original") or "")
     detalle = str(fila.get("detalle_original") or "")
     fuera = _normalizar(fila.get("fuera_rango_uci")) in {
@@ -97,6 +136,19 @@ def _fila_marcada_fuera_de_rango(fila):
 
 
 def _evidencias_tipo_gasometria(grupo):
+    """
+    Ejecuta la lógica asociada a evidencias tipo gasometria.
+
+    Parámetros
+    ----------
+    grupo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     evidencias = []
     for _, fila in grupo.iterrows():
         variable = _normalizar(fila.get("variable"))
@@ -251,6 +303,19 @@ def preparar_auditoria_gasometrias(analisis):
 
 
 def _variable_base(nombre):
+    """
+    Ejecuta la lógica asociada a variable base.
+
+    Parámetros
+    ----------
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     normalizada = _normalizar(nombre)
     equivalencias = {
         "fc": "fc",
@@ -268,11 +333,46 @@ def _variable_base(nombre):
 
 
 def _semilla_serie(paciente_id, sesion_id, serie):
+    """
+    Ejecuta la lógica asociada a semilla serie.
+
+    Parámetros
+    ----------
+    paciente_id : Any
+        Identificador del paciente.
+
+    sesion_id : Any
+        Identificador de la sesión.
+
+    serie : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = f"{SEMILLA_BASE}|{paciente_id}|{sesion_id}|{serie}".encode("utf-8")
     return int.from_bytes(hashlib.sha256(texto).digest()[:8], "big")
 
 
 def _prioridad_fuente(variable, fuente):
+    """
+    Ejecuta la lógica asociada a prioridad fuente.
+
+    Parámetros
+    ----------
+    variable : Any
+        Valor de entrada utilizado por la función.
+
+    fuente : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fuente = _normalizar(fuente)
     preferida = {
         "temperatura": "tcae",
@@ -286,6 +386,25 @@ def _prioridad_fuente(variable, fuente):
 
 
 def _ruido_suave_puente(longitud, rng, amplitud):
+    """
+    Ejecuta la lógica asociada a ruido suave puente.
+
+    Parámetros
+    ----------
+    longitud : Any
+        Valor de entrada utilizado por la función.
+
+    rng : Any
+        Valor de entrada utilizado por la función.
+
+    amplitud : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if longitud <= 2 or amplitud <= 0:
         return np.zeros(longitud, dtype=float)
     ruido = rng.normal(0.0, amplitud, longitud)
@@ -302,6 +421,28 @@ def _ruido_suave_puente(longitud, rng, amplitud):
 
 
 def _interpolar_controlada(reales, indice, configuracion, semilla):
+    """
+    Ejecuta la lógica asociada a interpolar controlada.
+
+    Parámetros
+    ----------
+    reales : Any
+        Valor de entrada utilizado por la función.
+
+    indice : Any
+        Valor de entrada utilizado por la función.
+
+    configuracion : Any
+        Valor de entrada utilizado por la función.
+
+    semilla : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     resultado = pd.Series(np.nan, index=indice, dtype=float)
     tipo = pd.Series(pd.NA, index=indice, dtype="object")
     reales = reales.dropna().sort_index()
@@ -354,6 +495,24 @@ def _interpolar_controlada(reales, indice, configuracion, semilla):
 
 
 def listar_pacientes(carpeta_raiz):
+    """
+    Lista pacientes.
+
+    Parámetros
+    ----------
+    carpeta_raiz : Any
+        Carpeta raíz donde se almacenan los pacientes.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     raiz = Path(carpeta_raiz or "").expanduser()
     if not raiz.is_dir():
         raise ValueError("La ruta seleccionada no es una carpeta válida.")
@@ -371,6 +530,27 @@ def listar_pacientes(carpeta_raiz):
 
 
 def cargar_paciente(carpeta_raiz, paciente_id):
+    """
+    Carga paciente.
+
+    Parámetros
+    ----------
+    carpeta_raiz : Any
+        Carpeta raíz donde se almacenan los pacientes.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     for paciente in listar_pacientes(carpeta_raiz):
         if paciente.get("paciente_id") == paciente_id:
             return paciente
@@ -378,6 +558,22 @@ def cargar_paciente(carpeta_raiz, paciente_id):
 
 
 def _resolver_ruta(carpeta_paciente, valor):
+    """
+    Resuelve ruta.
+
+    Parámetros
+    ----------
+    carpeta_paciente : Any
+        Valor de entrada utilizado por la función.
+
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not valor:
         return None
     ruta = Path(valor or "")
@@ -387,6 +583,19 @@ def _resolver_ruta(carpeta_paciente, valor):
 
 
 def _detectar_bis_con_cache(carpeta_bis):
+    """
+    Detecta bis con cache.
+
+    Parámetros
+    ----------
+    carpeta_bis : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     carpeta_bis = Path(carpeta_bis).resolve()
     carpeta_sesion = carpeta_bis.parent.parent
     cache = carpeta_sesion / "resumen_visualizador.json"
@@ -414,10 +623,36 @@ def _detectar_bis_con_cache(carpeta_bis):
 
 
 def _ruta_metadatos_sintesis(ruta):
+    """
+    Ejecuta la lógica asociada a ruta metadatos sintesis.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return Path(ruta).with_suffix(".meta.json")
 
 
 def _registros_json(dataframe):
+    """
+    Ejecuta la lógica asociada a registros json.
+
+    Parámetros
+    ----------
+    dataframe : Any
+        DataFrame de entrada.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if dataframe is None or dataframe.empty:
         return []
     return json.loads(
@@ -429,6 +664,28 @@ def _registros_json(dataframe):
 
 
 def _resumen_sintetico_existente(ruta, origen=None, inicio=None, fin=None):
+    """
+    Ejecuta la lógica asociada a resumen sintetico existente.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    origen : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     ruta = Path(ruta)
     ruta_metadatos = _ruta_metadatos_sintesis(ruta)
     try:
@@ -472,6 +729,41 @@ def generar_icca_sintetico(
     sesion_id,
     ruta_salida=None,
 ):
+    """
+    Genera icca sintetico.
+
+    Parámetros
+    ----------
+    ruta_icca : Any
+        Ruta utilizada por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    sesion_id : Any
+        Identificador de la sesión.
+
+    ruta_salida : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    FileNotFoundError
+        Si se produce una condición no válida durante la ejecución.
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     origen = Path(ruta_icca).resolve()
     if not origen.is_file():
         raise FileNotFoundError("No existe el Excel ICCA auxiliar de la sesión.")
@@ -662,6 +954,25 @@ def generar_icca_sintetico(
     }
 
 def preparar_sesiones_paciente(carpeta_raiz, paciente_id, generar_sinteticos=True):
+    """
+    Prepara sesiones paciente.
+
+    Parámetros
+    ----------
+    carpeta_raiz : Any
+        Carpeta raíz donde se almacenan los pacientes.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    generar_sinteticos : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     paciente = cargar_paciente(carpeta_raiz, paciente_id)
     carpeta_paciente = Path(paciente["_carpeta"])
     sesiones = []

@@ -28,6 +28,19 @@ TIMESTAMP_FORMATS = (
 
 
 def format_size(size_bytes):
+    """
+    Ejecuta la lógica asociada a format size.
+
+    Parámetros
+    ----------
+    size_bytes : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if size_bytes is None:
         return "No disponible"
     if size_bytes < 1024:
@@ -40,6 +53,22 @@ def format_size(size_bytes):
 
 
 def _file_info(path_text, label):
+    """
+    Ejecuta la lógica asociada a file info.
+
+    Parámetros
+    ----------
+    path_text : Any
+        Valor de entrada utilizado por la función.
+
+    label : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not path_text:
         return {
             "label": label,
@@ -63,6 +92,19 @@ def _file_info(path_text, label):
 
 
 def _pipe_fields(line):
+    """
+    Ejecuta la lógica asociada a pipe fields.
+
+    Parámetros
+    ----------
+    line : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fields = line.rstrip("\r\n").split("|")
     while fields and fields[-1].strip() == "":
         fields.pop()
@@ -70,10 +112,36 @@ def _pipe_fields(line):
 
 
 def _read_lines(path):
+    """
+    Ejecuta la lógica asociada a read lines.
+
+    Parámetros
+    ----------
+    path : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return Path(path).read_text(encoding="utf-8-sig", errors="replace").splitlines()
 
 
 def _parse_time(value):
+    """
+    Ejecuta la lógica asociada a parse time.
+
+    Parámetros
+    ----------
+    value : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     text = str(value).strip()
     if not text:
         return None
@@ -89,6 +157,19 @@ def _parse_time(value):
 
 
 def _expected_spa_variables(modo=None):
+    """
+    Ejecuta la lógica asociada a expected spa variables.
+
+    Parámetros
+    ----------
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     variables = list(KEY_SPA_VARIABLES)
     if modo == "bilateral":
         variables.extend(BILATERAL_EXTRA_SPA_VARIABLES)
@@ -96,6 +177,22 @@ def _expected_spa_variables(modo=None):
 
 
 def _empty_spa(found, modo=None):
+    """
+    Ejecuta la lógica asociada a empty spa.
+
+    Parámetros
+    ----------
+    found : Any
+        Valor de entrada utilizado por la función.
+
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     expected = _expected_spa_variables(modo)
     return {
         "found": found,
@@ -112,6 +209,22 @@ def _empty_spa(found, modo=None):
 
 
 def validate_spa_file(path_text, modo=None):
+    """
+    Valida spa file.
+
+    Parámetros
+    ----------
+    path_text : Any
+        Valor de entrada utilizado por la función.
+
+    modo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not path_text:
         return _empty_spa(False, modo=modo)
 
@@ -171,6 +284,19 @@ def validate_spa_file(path_text, modo=None):
 
 
 def _empty_fa(found):
+    """
+    Ejecuta la lógica asociada a empty fa.
+
+    Parámetros
+    ----------
+    found : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return {
         "found": found,
         "non_empty": False,
@@ -191,6 +317,19 @@ def _empty_fa(found):
 
 
 def _to_float(value):
+    """
+    Ejecuta la lógica asociada a to float.
+
+    Parámetros
+    ----------
+    value : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         number = float(str(value).strip())
     except ValueError:
@@ -199,6 +338,19 @@ def _to_float(value):
 
 
 def validate_fa_file(path_text):
+    """
+    Valida fa file.
+
+    Parámetros
+    ----------
+    path_text : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not path_text:
         return _empty_fa(False)
 
@@ -313,6 +465,22 @@ def validate_fa_file(path_text):
 
 
 def _alignment(spa, fa):
+    """
+    Ejecuta la lógica asociada a alignment.
+
+    Parámetros
+    ----------
+    spa : Any
+        Valor de entrada utilizado por la función.
+
+    fa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     result = {
         "status": "unknown",
         "start_delta_seconds": None,
@@ -344,6 +512,19 @@ def _alignment(spa, fa):
 
 
 def _leer_tiempos_archivo(path_text):
+    """
+    Lee tiempos archivo.
+
+    Parámetros
+    ----------
+    path_text : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not path_text:
         return []
     tiempos = []
@@ -359,6 +540,24 @@ def _leer_tiempos_archivo(path_text):
 
 
 def _leer_inicio_ta(path_text):
+    """
+    Lee inicio ta.
+
+    Parámetros
+    ----------
+    path_text : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not path_text:
         raise ValueError("No se encontró el archivo .t_a.")
     lineas = _read_lines(path_text)
@@ -371,6 +570,27 @@ def _leer_inicio_ta(path_text):
 
 
 def _leer_parametros_raw(header_path, raw_path):
+    """
+    Lee parametros raw.
+
+    Parámetros
+    ----------
+    header_path : Any
+        Valor de entrada utilizado por la función.
+
+    raw_path : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not header_path or not raw_path:
         raise ValueError("Faltan la cabecera o la onda cruda.")
     datos = Path(header_path).read_bytes()
@@ -386,6 +606,19 @@ def _leer_parametros_raw(header_path, raw_path):
 
 
 def _serializar_cobertura(cobertura):
+    """
+    Ejecuta la lógica asociada a serializar cobertura.
+
+    Parámetros
+    ----------
+    cobertura : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fuentes = {}
     for nombre, datos in cobertura["fuentes"].items():
         tramos_recortados = [
@@ -422,6 +655,22 @@ def _serializar_cobertura(cobertura):
 
 
 def _validar_cobertura_temporal(archivos, fa_disponible):
+    """
+    Valida cobertura temporal.
+
+    Parámetros
+    ----------
+    archivos : Any
+        Valor de entrada utilizado por la función.
+
+    fa_disponible : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         fs, muestras_raw = _leer_parametros_raw(
             archivos.get("header"),

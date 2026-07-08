@@ -14,6 +14,19 @@ FORMATOS_FECHA = (
 
 
 def _parsear_fecha(valor):
+    """
+    Ejecuta la lógica asociada a parsear fecha.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if valor is None:
         return None
     if isinstance(valor, datetime):
@@ -34,14 +47,61 @@ def _parsear_fecha(valor):
 
 
 def _iso(valor):
+    """
+    Ejecuta la lógica asociada a iso.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return valor.isoformat(sep=" ") if valor is not None else None
 
 
 def _duracion_segundos(inicio, fin):
+    """
+    Ejecuta la lógica asociada a duracion segundos.
+
+    Parámetros
+    ----------
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return max(0, int((fin - inicio).total_seconds()))
 
 
 def _buscar_archivo_spa(carpeta):
+    """
+    Busca archivo spa.
+
+    Parámetros
+    ----------
+    carpeta : Any
+        Carpeta de trabajo utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     candidatos = [
         ruta
         for ruta in Path(carpeta).rglob("*.spa")
@@ -89,6 +149,24 @@ def descubrir_sesiones_bis_en_carpeta(carpeta):
 
 
 def leer_intervalo_bis(carpeta):
+    """
+    Lee intervalo bis.
+
+    Parámetros
+    ----------
+    carpeta : Any
+        Carpeta de trabajo utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     carpeta = Path(carpeta).expanduser().resolve()
     if not carpeta.is_dir():
         raise ValueError("La ruta BIS no es una carpeta valida.")
@@ -155,6 +233,22 @@ def leer_intervalo_bis(carpeta):
 
 
 def _buscar_hoja(libro, nombre):
+    """
+    Busca hoja.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     objetivo = nombre.casefold()
     for hoja in libro.worksheets:
         if hoja.title.casefold() == objetivo:
@@ -163,6 +257,19 @@ def _buscar_hoja(libro, nombre):
 
 
 def _intervalo_desde_general(libro):
+    """
+    Ejecuta la lógica asociada a intervalo desde general.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     hoja = _buscar_hoja(libro, "general")
     if hoja is None:
         return None, None
@@ -183,6 +290,19 @@ def _intervalo_desde_general(libro):
 
 
 def _intervalo_desde_observaciones(libro):
+    """
+    Ejecuta la lógica asociada a intervalo desde observaciones.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     inicio = None
     fin = None
     for nombre in ("constantes_vitales", "analisis", "perfusiones"):
@@ -210,6 +330,24 @@ def _intervalo_desde_observaciones(libro):
 
 
 def leer_intervalo_icca(ruta_excel):
+    """
+    Lee intervalo icca.
+
+    Parámetros
+    ----------
+    ruta_excel : Any
+        Ruta del archivo Excel que se va a leer.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     ruta = Path(ruta_excel).expanduser().resolve()
     if not ruta.is_file() or ruta.suffix.lower() not in {".xlsx", ".xlsm"}:
         raise ValueError("La ruta ICCA debe ser un archivo Excel .xlsx o .xlsm.")
@@ -261,6 +399,22 @@ def descubrir_icca_en_carpeta(carpeta):
 
 
 def calcular_solapamiento(intervalo_bis, intervalo_icca):
+    """
+    Calcula solapamiento.
+
+    Parámetros
+    ----------
+    intervalo_bis : Any
+        Valor de entrada utilizado por la función.
+
+    intervalo_icca : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     bis_inicio = _parsear_fecha(intervalo_bis["inicio"])
     bis_fin = _parsear_fecha(intervalo_bis["fin"])
     icca_inicio = _parsear_fecha(intervalo_icca["inicio"])
@@ -281,6 +435,22 @@ def calcular_solapamiento(intervalo_bis, intervalo_icca):
 
 
 def analizar_seleccion(rutas_icca, carpetas_bis):
+    """
+    Analiza seleccion.
+
+    Parámetros
+    ----------
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    carpetas_bis : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     icca = [leer_intervalo_icca(ruta) for ruta in rutas_icca]
     bis = [leer_intervalo_bis(ruta) for ruta in carpetas_bis]
     for sesion in bis:

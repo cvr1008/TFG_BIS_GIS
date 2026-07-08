@@ -74,6 +74,19 @@ REGISTROS_LOCK = Lock()
 
 
 def _directorio_pacientes_predeterminado():
+    """
+    Ejecuta la lógica asociada a directorio pacientes predeterminado.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     raiz_proyecto = Path(__file__).resolve().parent.parent.parent
     candidatos = [
         os.environ.get("TFG_PACIENTES_DIR"),
@@ -89,6 +102,22 @@ DIRECTORIO_PACIENTES_PREDETERMINADO = _directorio_pacientes_predeterminado()
 
 
 def _env_bool(nombre, valor_por_defecto=False):
+    """
+    Obtiene un valor de configuración desde variables de entorno.
+
+    Parámetros
+    ----------
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    valor_por_defecto : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     valor = os.environ.get(nombre)
     if valor is None:
         return valor_por_defecto
@@ -96,6 +125,22 @@ def _env_bool(nombre, valor_por_defecto=False):
 
 
 def _env_int(nombre, valor_por_defecto):
+    """
+    Obtiene un valor de configuración desde variables de entorno.
+
+    Parámetros
+    ----------
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    valor_por_defecto : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         return int(os.environ.get(nombre, valor_por_defecto))
     except (TypeError, ValueError):
@@ -121,6 +166,19 @@ ESTILO_CONTROLES_TRAMO = {
 
 
 def _id_disparado():
+    """
+    Obtiene el identificador asociado al contexto actual.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     identificador = ctx.triggered_id
     if isinstance(identificador, dict):
         return identificador
@@ -128,6 +186,19 @@ def _id_disparado():
 
 
 def _crear_spinner_visualizador():
+    """
+    Crea spinner visualizador.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return html.Div(
         html.Div(className="spinner-visualizador-anillo"),
         className="spinner-visualizador-contenedor",
@@ -137,6 +208,19 @@ def _crear_spinner_visualizador():
 
 
 def _formatear_instante(valor):
+    """
+    Formatea instante.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not valor:
         return "No disponible"
     instante = pd.to_datetime(valor, errors="coerce")
@@ -146,6 +230,19 @@ def _formatear_instante(valor):
 
 
 def _formatear_duracion_segundos(segundos):
+    """
+    Formatea duracion segundos.
+
+    Parámetros
+    ----------
+    segundos : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     segundos = max(0, int(segundos or 0))
     horas, resto = divmod(segundos, 3600)
     minutos, segundos = divmod(resto, 60)
@@ -160,6 +257,25 @@ def _formatear_duracion_segundos(segundos):
 
 
 def _badge(texto, fondo, color):
+    """
+    Ejecuta la lógica asociada a badge.
+
+    Parámetros
+    ----------
+    texto : Any
+        Texto que se va a procesar.
+
+    fondo : Any
+        Valor de entrada utilizado por la función.
+
+    color : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return html.Span(
         texto,
         style={
@@ -175,6 +291,22 @@ def _badge(texto, fondo, color):
 
 
 def _crear_tarjeta_sesion(sesion, seleccionada=False):
+    """
+    Crea tarjeta sesion.
+
+    Parámetros
+    ----------
+    sesion : Any
+        Valor de entrada utilizado por la función.
+
+    seleccionada : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     estado_icca = sesion.get("estado_icca")
     if estado_icca == "completa":
         badges = [_badge("ICCA disponible para toda la sesión", "#e7f5ea", "#225c2e")]
@@ -275,6 +407,19 @@ def _crear_tarjeta_sesion(sesion, seleccionada=False):
 
 
 def _archivo_estado_texto(estado):
+    """
+    Ejecuta la lógica asociada a archivo estado texto.
+
+    Parámetros
+    ----------
+    estado : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return {
         "found": "Encontrado",
         "empty": "Vacío",
@@ -283,6 +428,19 @@ def _archivo_estado_texto(estado):
 
 
 def _archivo_estado_color(estado):
+    """
+    Ejecuta la lógica asociada a archivo estado color.
+
+    Parámetros
+    ----------
+    estado : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return {
         "found": ("#edf7ef", "#225c2e"),
         "empty": ("#fff4d9", "#725400"),
@@ -291,6 +449,19 @@ def _archivo_estado_color(estado):
 
 
 def _crear_panel_validacion(deteccion):
+    """
+    Crea panel validacion.
+
+    Parámetros
+    ----------
+    deteccion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     validacion = deteccion.get("validacion") or {}
     warnings = validacion.get("warnings") or []
     cobertura = validacion.get("cobertura_temporal") or {}
@@ -1062,6 +1233,22 @@ app.index_string = """
     prevent_initial_call=True,
 )
 def abrir_selector_carpeta(_n_clicks, ruta_actual):
+    """
+    Abre selector carpeta.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    ruta_actual : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     codigo_selector = r"""
 import sys
 from pathlib import Path
@@ -1107,6 +1294,19 @@ finally:
     Input("ruta-carpeta-pacientes", "value"),
 )
 def actualizar_selector_pacientes(ruta_pacientes):
+    """
+    Actualiza selector pacientes.
+
+    Parámetros
+    ----------
+    ruta_pacientes : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not ruta_pacientes:
         return [], None, "Selecciona primero la carpeta que contiene los pacientes."
     try:
@@ -1134,6 +1334,25 @@ def actualizar_selector_pacientes(ruta_pacientes):
     State("ruta-carpeta-pacientes", "value"),
 )
 def cargar_sesiones_del_paciente(paciente_id, sesion_seleccionada, ruta_pacientes):
+    """
+    Carga sesiones del paciente.
+
+    Parámetros
+    ----------
+    paciente_id : Any
+        Identificador del paciente.
+
+    sesion_seleccionada : Any
+        Valor de entrada utilizado por la función.
+
+    ruta_pacientes : Any
+        Ruta utilizada por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not paciente_id:
         return [], html.Div(
             "Selecciona un paciente para consultar sus sesiones BIS.",
@@ -1168,6 +1387,19 @@ def cargar_sesiones_del_paciente(paciente_id, sesion_seleccionada, ruta_paciente
     prevent_initial_call=True,
 )
 def limpiar_sesion_al_cambiar_paciente(_paciente_id):
+    """
+    Ejecuta la lógica asociada a limpiar sesion al cambiar paciente.
+
+    Parámetros
+    ----------
+    _paciente_id : Any
+        Identificador del paciente.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     return None
 
 
@@ -1178,6 +1410,27 @@ def limpiar_sesion_al_cambiar_paciente(_paciente_id):
     prevent_initial_call=True,
 )
 def seleccionar_sesion(n_clicks, sesiones):
+    """
+    Ejecuta la lógica asociada a seleccionar sesion.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    sesiones : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     identificador_disparado = _id_disparado()
     if not any(n_clicks or []) or not identificador_disparado:
         raise PreventUpdate
@@ -1207,6 +1460,19 @@ def seleccionar_sesion(n_clicks, sesiones):
     Input("sesion-seleccionada", "data"),
 )
 def analizar_carpeta(sesion):
+    """
+    Analiza carpeta.
+
+    Parámetros
+    ----------
+    sesion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     estilo_base = {
         "padding": "12px 14px",
         "marginBottom": "14px",
@@ -1312,6 +1578,22 @@ def analizar_carpeta(sesion):
     Input("origen-dsa", "value"),
 )
 def actualizar_accion_carpeta(deteccion, origen_dsa):
+    """
+    Actualiza accion carpeta.
+
+    Parámetros
+    ----------
+    deteccion : Any
+        Valor de entrada utilizado por la función.
+
+    origen_dsa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     disponible = bool(
         deteccion
         and origen_dsa
@@ -1336,6 +1618,19 @@ def actualizar_accion_carpeta(deteccion, origen_dsa):
 
 
 def _guardar_registro(registro):
+    """
+    Guarda registro.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     identificador = uuid4().hex
     with REGISTROS_LOCK:
         REGISTROS.clear()
@@ -1344,6 +1639,19 @@ def _guardar_registro(registro):
 
 
 def _eliminar_registro(datos_registro):
+    """
+    Elimina registro.
+
+    Parámetros
+    ----------
+    datos_registro : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     if not datos_registro:
         return
     with REGISTROS_LOCK:
@@ -1351,6 +1659,19 @@ def _eliminar_registro(datos_registro):
 
 
 def _obtener_registro(datos_registro):
+    """
+    Obtiene registro.
+
+    Parámetros
+    ----------
+    datos_registro : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not datos_registro:
         return None
     with REGISTROS_LOCK:
@@ -1358,6 +1679,22 @@ def _obtener_registro(datos_registro):
 
 
 def _crear_figura_vista(vista, vista_completa):
+    """
+    Crea figura vista.
+
+    Parámetros
+    ----------
+    vista : Any
+        Valor de entrada utilizado por la función.
+
+    vista_completa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     argumentos_comunes = {
         "tiempo": vista["tiempo"],
         "frecuencias": vista["frecuencias"],
@@ -1400,6 +1737,22 @@ def _crear_figura_vista(vista, vista_completa):
 
 
 def _crear_componente_vista(vista, vista_completa):
+    """
+    Crea componente vista.
+
+    Parámetros
+    ----------
+    vista : Any
+        Valor de entrada utilizado por la función.
+
+    vista_completa : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if vista.get("vista_estatica", False):
         return html.Img(
             src=crear_panoramica_estatica(vista),
@@ -1448,6 +1801,31 @@ def cambiar_pantalla(
     origen_dsa,
     registro_activo,
 ):
+    """
+    Ejecuta la lógica asociada a cambiar pantalla.
+
+    Parámetros
+    ----------
+    _n_ver : Any
+        Contador o número asociado a la operación.
+
+    _n_volver : Any
+        Contador o número asociado a la operación.
+
+    deteccion : Any
+        Valor de entrada utilizado por la función.
+
+    origen_dsa : Any
+        Valor de entrada utilizado por la función.
+
+    registro_activo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     estilo_error = {
         "display": "block",
         "padding": "12px 14px",
@@ -1721,6 +2099,25 @@ def cambiar_pantalla(
     Input("duracion-vista", "value"),
 )
 def actualizar_vista_temporal(registro_activo, valor_tramo, duracion):
+    """
+    Actualiza vista temporal.
+
+    Parámetros
+    ----------
+    registro_activo : Any
+        Valor de entrada utilizado por la función.
+
+    valor_tramo : Any
+        Valor de entrada utilizado por la función.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not registro_activo:
         return None, "", "", {"display": "none"}
 
@@ -1812,6 +2209,33 @@ def actualizar_vista_temporal(registro_activo, valor_tramo, duracion):
     prevent_initial_call=True,
 )
 def exportar_informe_pdf(n_clicks, registro_activo, valor_tramo, duracion):
+    """
+    Exporta informe pdf.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    registro_activo : Any
+        Valor de entrada utilizado por la función.
+
+    valor_tramo : Any
+        Valor de entrada utilizado por la función.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not n_clicks:
         raise PreventUpdate
 
@@ -1871,6 +2295,19 @@ def exportar_informe_pdf(n_clicks, registro_activo, valor_tramo, duracion):
     Input("registro-activo", "data"),
 )
 def mostrar_estado_icca_matriz(registro_activo):
+    """
+    Construye o actualiza estado icca matriz.
+
+    Parámetros
+    ----------
+    registro_activo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     registro = _obtener_registro(registro_activo)
     if registro is None:
         return "", {"display": "none"}
@@ -1899,6 +2336,19 @@ def mostrar_estado_icca_matriz(registro_activo):
     Input("duracion-vista", "value"),
 )
 def bloquear_selector_en_vista_completa(duracion):
+    """
+    Ejecuta la lógica asociada a bloquear selector en vista completa.
+
+    Parámetros
+    ----------
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return duracion == "todo"
 
 

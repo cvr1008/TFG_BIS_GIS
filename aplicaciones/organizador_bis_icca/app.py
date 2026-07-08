@@ -235,6 +235,19 @@ print(json.dumps(ruta, ensure_ascii=False))
 
 
 def _opciones(rutas):
+    """
+    Ejecuta la lógica asociada a opciones.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return [
         {"label": f"{Path(ruta).name}  |  {ruta}", "value": ruta}
         for ruta in rutas
@@ -242,6 +255,19 @@ def _opciones(rutas):
 
 
 def _id_disparado():
+    """
+    Obtiene el identificador asociado al contexto actual.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     identificador = ctx.triggered_id
     if isinstance(identificador, dict):
         return identificador
@@ -254,6 +280,19 @@ def _id_disparado():
 
 
 def _normalizar_ruta_para_comparar(ruta):
+    """
+    Normaliza ruta para comparar.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         return str(Path(ruta).expanduser().resolve()).casefold()
     except (OSError, RuntimeError, TypeError, ValueError):
@@ -261,6 +300,22 @@ def _normalizar_ruta_para_comparar(ruta):
 
 
 def _quitar_ruta(rutas, objetivo):
+    """
+    Quita ruta.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    objetivo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     objetivo_normalizado = _normalizar_ruta_para_comparar(objetivo)
     return [
         ruta
@@ -303,12 +358,38 @@ def _tarjetas_seleccion(rutas, tipo, etiqueta, mensaje_vacio):
 
 
 def _formatear_fecha(valor):
+    """
+    Formatea fecha.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not valor:
         return "Sin fecha"
     return datetime.fromisoformat(valor).strftime("%d/%m/%Y %H:%M:%S")
 
 
 def _formatear_duracion(segundos):
+    """
+    Formatea duracion.
+
+    Parámetros
+    ----------
+    segundos : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     segundos = int(segundos or 0)
     dias, resto = divmod(segundos, 86400)
     horas, resto = divmod(resto, 3600)
@@ -323,6 +404,19 @@ def _formatear_duracion(segundos):
 
 
 def _formatear_bytes(numero):
+    """
+    Formatea bytes.
+
+    Parámetros
+    ----------
+    numero : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     valor = float(numero or 0)
     for unidad in ("B", "KB", "MB", "GB", "TB"):
         if valor < 1024 or unidad == "TB":
@@ -331,6 +425,22 @@ def _formatear_bytes(numero):
 
 
 def _buscar_paciente(directorio, paciente_id):
+    """
+    Busca paciente.
+
+    Parámetros
+    ----------
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return next(
         (
             item
@@ -421,6 +531,19 @@ def _vista_analisis(analisis):
 
 
 def _detalle_paciente(datos):
+    """
+    Ejecuta la lógica asociada a detalle paciente.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     carpeta = Path(datos["carpeta"])
     registros_icca = []
     for registro in datos.get("icca", []):
@@ -486,6 +609,19 @@ def _detalle_paciente(datos):
 # ------------------------ Paneles de la interfaz -------------------------------
 def _panel_nuevo_paciente():
     # Crear la pestaña de Añadir paciente
+    """
+    Ejecuta la lógica asociada a panel nuevo paciente.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return html.Div(
         [
             html.H2("Añadir paciente"),
@@ -541,6 +677,19 @@ def _panel_nuevo_paciente():
 
 def _panel_pacientes():
     # Crea la pestaña de Pacientes creados
+    """
+    Ejecuta la lógica asociada a panel pacientes.
+
+    Parámetros
+    ----------
+    Ninguno
+        La función no recibe parámetros.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return html.Div(
         [
             # aquí se pueden ver los pacientes ya creados -> inspección de los archivos que contienen
@@ -810,6 +959,22 @@ app.index_string = f"""
     prevent_initial_call=True,
 )
 def examinar_directorio(_n_clicks, actual):
+    """
+    Ejecuta la lógica asociada a examinar directorio.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    actual : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         return _seleccionar_carpeta("Selecciona la carpeta donde guardar los pacientes", actual) or no_update
     except Exception:
@@ -825,6 +990,22 @@ def examinar_directorio(_n_clicks, actual):
 )
 # Se ejecuta cuando pulsas: Añadir Excel ICCA
 def anadir_excel_icca(_n_clicks, valores_actuales):
+    """
+    Ejecuta la lógica asociada a añadir excel icca.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    valores_actuales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     existentes = list(valores_actuales or [])
     try:
         nuevos = _seleccionar_icca(existentes[-1] if existentes else "")
@@ -836,6 +1017,19 @@ def anadir_excel_icca(_n_clicks, valores_actuales):
 
 @callback(Output("selecciones-icca", "children"), Input("lista-icca", "value"))
 def mostrar_selecciones_icca(rutas):
+    """
+    Construye o actualiza selecciones icca.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _tarjetas_seleccion(
         rutas,
         "quitar-icca",
@@ -852,6 +1046,27 @@ def mostrar_selecciones_icca(rutas):
     prevent_initial_call=True,
 )
 def quitar_excel_icca(n_clicks, rutas):
+    """
+    Quita excel icca.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     identificador = _id_disparado()
     if not any(n_clicks or []) or not identificador:
         raise PreventUpdate
@@ -867,6 +1082,22 @@ def quitar_excel_icca(n_clicks, rutas):
     prevent_initial_call=True,
 )
 def anadir_carpeta_bis(_n_clicks, valores_actuales):
+    """
+    Ejecuta la lógica asociada a añadir carpeta bis.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    valores_actuales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     existentes = list(valores_actuales or [])
     inicial = str(Path(existentes[-1]).parent) if existentes else ""
     try:
@@ -883,6 +1114,19 @@ def anadir_carpeta_bis(_n_clicks, valores_actuales):
 
 @callback(Output("selecciones-bis", "children"), Input("lista-bis", "value"))
 def mostrar_selecciones_bis(rutas):
+    """
+    Construye o actualiza selecciones bis.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _tarjetas_seleccion(
         rutas,
         "quitar-bis",
@@ -899,6 +1143,27 @@ def mostrar_selecciones_bis(rutas):
     prevent_initial_call=True,
 )
 def quitar_carpeta_bis(n_clicks, rutas):
+    """
+    Quita carpeta bis.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     identificador = _id_disparado()
     if not any(n_clicks or []) or not identificador:
         raise PreventUpdate
@@ -913,6 +1178,25 @@ def quitar_carpeta_bis(n_clicks, rutas):
     Input("actualizacion-gestion", "data"),
 )
 def mostrar_siguiente_paciente(directorio, _creacion, _gestion):
+    """
+    Construye o actualiza siguiente paciente.
+
+    Parámetros
+    ----------
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         identificador = siguiente_paciente(directorio or DIRECTORIO_PREDETERMINADO)
         return f"La próxima carpeta será: {identificador}"
@@ -930,6 +1214,28 @@ def mostrar_siguiente_paciente(directorio, _creacion, _gestion):
 )
 # Se ejecuta cuando pulsas: Analizar intervalos
 def analizar_intervalos(n_clicks, rutas_icca, carpetas_bis, directorio):
+    """
+    Analiza intervalos.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    carpetas_bis : Any
+        Valor de entrada utilizado por la función.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if ctx.triggered_id != "analizar":
         return html.Div("Pulsa «Analizar intervalos» después de completar la selección."), True
     if not carpetas_bis:
@@ -955,6 +1261,31 @@ def analizar_intervalos(n_clicks, rutas_icca, carpetas_bis, directorio):
 )
 # Se ejecuta cuando pulsas: Crear carpeta del paciente y llama a crear_paciente(...)
 def crear_carpeta_paciente(_n_clicks, directorio, rutas_icca, carpetas_bis, actualizacion):
+    """
+    Crea carpeta paciente.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    carpetas_bis : Any
+        Valor de entrada utilizado por la función.
+
+    actualizacion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not directorio or not carpetas_bis:
         return (
             html.Div("La selección está incompleta.", className="mensaje-error"),
@@ -989,6 +1320,19 @@ def crear_carpeta_paciente(_n_clicks, directorio, rutas_icca, carpetas_bis, actu
     prevent_initial_call=True,
 )
 def limpiar_estado_creacion(_n_intervals):
+    """
+    Ejecuta la lógica asociada a limpiar estado creacion.
+
+    Parámetros
+    ----------
+    _n_intervals : Any
+        Contador o número asociado a la operación.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return None, True
 
 
@@ -1004,6 +1348,22 @@ def limpiar_estado_creacion(_n_intervals):
     prevent_initial_call=True,
 )
 def limpiar_formulario_nuevo_tras_guardar(_creacion, _gestion):
+    """
+    Ejecuta la lógica asociada a limpiar formulario nuevo tras guardar.
+
+    Parámetros
+    ----------
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return (
         [],
         [],
@@ -1015,6 +1375,25 @@ def limpiar_formulario_nuevo_tras_guardar(_creacion, _gestion):
 
 
 def _valor_selector_paciente(opciones, seleccionado, disparador):
+    """
+    Ejecuta la lógica asociada a valor selector paciente.
+
+    Parámetros
+    ----------
+    opciones : Any
+        Valor de entrada utilizado por la función.
+
+    seleccionado : Any
+        Valor de entrada utilizado por la función.
+
+    disparador : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     valores = {opcion["value"] for opcion in opciones}
     if disparador == "actualizacion-gestion":
         return None
@@ -1034,6 +1413,28 @@ def _valor_selector_paciente(opciones, seleccionado, disparador):
     State("selector-paciente", "value"),
 )
 def actualizar_lista_pacientes(directorio, _creacion, _gestion, seleccionado):
+    """
+    Actualiza lista pacientes.
+
+    Parámetros
+    ----------
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    seleccionado : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         pacientes = listar_pacientes(directorio or DIRECTORIO_PREDETERMINADO)
     except Exception:
@@ -1061,6 +1462,28 @@ def actualizar_lista_pacientes(directorio, _creacion, _gestion, seleccionado):
     Input("actualizacion-gestion", "data"),
 )
 def visualizar_paciente(paciente_id, directorio, _creacion, _gestion):
+    """
+    Ejecuta la lógica asociada a visualizar paciente.
+
+    Parámetros
+    ----------
+    paciente_id : Any
+        Identificador del paciente.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         pacientes = listar_pacientes(directorio or DIRECTORIO_PREDETERMINADO)
     except Exception as exc:
@@ -1093,6 +1516,42 @@ def cargar_o_anadir_icca(
     directorio,
     actuales,
 ):
+    """
+    Carga o añadir icca.
+
+    Parámetros
+    ----------
+    paciente_id : Any
+        Identificador del paciente.
+
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    quitar_clicks : Any
+        Valor de entrada utilizado por la función.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    actuales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     if ctx.triggered_id == "editar-anadir-icca":
         existentes = list(actuales or [])
         try:
@@ -1117,6 +1576,19 @@ def cargar_o_anadir_icca(
     Input("editar-lista-icca", "value"),
 )
 def mostrar_edicion_icca(rutas):
+    """
+    Construye o actualiza edicion icca.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _tarjetas_seleccion(
         rutas,
         "editar-quitar-icca",
@@ -1145,6 +1617,42 @@ def cargar_o_anadir_bis(
     directorio,
     actuales,
 ):
+    """
+    Carga o añadir bis.
+
+    Parámetros
+    ----------
+    paciente_id : Any
+        Identificador del paciente.
+
+    _creacion : Any
+        Valor de entrada utilizado por la función.
+
+    _gestion : Any
+        Valor de entrada utilizado por la función.
+
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    quitar_clicks : Any
+        Valor de entrada utilizado por la función.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    actuales : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     if ctx.triggered_id == "editar-anadir-bis":
         existentes = list(actuales or [])
         inicial = str(Path(existentes[-1]).parent) if existentes else ""
@@ -1174,6 +1682,19 @@ def cargar_o_anadir_bis(
     Input("editar-lista-bis", "value"),
 )
 def mostrar_edicion_bis(rutas):
+    """
+    Construye o actualiza edicion bis.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return _tarjetas_seleccion(
         rutas,
         "editar-quitar-bis",
@@ -1192,6 +1713,31 @@ def mostrar_edicion_bis(rutas):
     State("directorio-pacientes", "value"),
 )
 def analizar_edicion(_n_clicks, rutas_icca, carpetas_bis, paciente_id, directorio):
+    """
+    Analiza edicion.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    carpetas_bis : Any
+        Valor de entrada utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if ctx.triggered_id != "editar-analizar":
         return html.Div("Comprueba los cambios antes de guardarlos."), True
     if not paciente_id or not carpetas_bis:
@@ -1217,6 +1763,19 @@ def analizar_edicion(_n_clicks, rutas_icca, carpetas_bis, paciente_id, directori
     prevent_initial_call=True,
 )
 def pedir_confirmacion_eliminacion(_n_clicks):
+    """
+    Ejecuta la lógica asociada a pedir confirmacion eliminacion.
+
+    Parámetros
+    ----------
+    _n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return True
 
 
@@ -1242,6 +1801,42 @@ def guardar_o_eliminar_paciente(
     carpetas_bis,
     actualizacion,
 ):
+    """
+    Guarda o eliminar paciente.
+
+    Parámetros
+    ----------
+    _guardar : Any
+        Valor de entrada utilizado por la función.
+
+    _eliminar : Any
+        Valor de entrada utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    carpetas_bis : Any
+        Valor de entrada utilizado por la función.
+
+    actualizacion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not paciente_id:
         return html.Div("Selecciona un paciente.", className="mensaje-error"), no_update, False
     try:
@@ -1274,6 +1869,19 @@ def guardar_o_eliminar_paciente(
     prevent_initial_call=True,
 )
 def limpiar_estado_edicion(_n_intervals):
+    """
+    Ejecuta la lógica asociada a limpiar estado edicion.
+
+    Parámetros
+    ----------
+    _n_intervals : Any
+        Contador o número asociado a la operación.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return None, True
 
 
@@ -1285,6 +1893,29 @@ def limpiar_estado_edicion(_n_intervals):
     prevent_initial_call=True,
 )
 def abrir_excel_auxiliar(n_clicks, directorio):
+    """
+    Abre excel auxiliar.
+
+    Parámetros
+    ----------
+    n_clicks : Any
+        Número de clics recibido desde la interfaz.
+
+    directorio : Any
+        Directorio raíz utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    PreventUpdate
+        Si se produce una condición no válida durante la ejecución.
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not any(n_clicks or []) or not isinstance(ctx.triggered_id, dict):
         raise PreventUpdate
     try:
@@ -1311,6 +1942,19 @@ def abrir_excel_auxiliar(n_clicks, directorio):
     prevent_initial_call=True,
 )
 def limpiar_notificacion_abrir(_n_intervals):
+    """
+    Ejecuta la lógica asociada a limpiar notificacion abrir.
+
+    Parámetros
+    ----------
+    _n_intervals : Any
+        Contador o número asociado a la operación.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return None, True
 
 # Arranque de la app

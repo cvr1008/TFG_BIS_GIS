@@ -13,6 +13,22 @@ from src.libros import abrir_libro
 
 HOJAS_TEMPORALES = ("constantes_vitales", "analisis", "perfusiones")
 def _buscar_hoja(libro, nombre):
+    """
+    Busca hoja.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     objetivo = nombre.casefold()
     for hoja in libro.worksheets:
         if hoja.title.casefold() == objetivo:
@@ -21,6 +37,19 @@ def _buscar_hoja(libro, nombre):
 
 
 def _cabeceras(hoja):
+    """
+    Ejecuta la lógica asociada a cabeceras.
+
+    Parámetros
+    ----------
+    hoja : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return [
         str(celda.value).strip() if celda.value is not None else ""
         for celda in hoja[3]
@@ -28,6 +57,19 @@ def _cabeceras(hoja):
 
 
 def _clave_fila(valores):
+    """
+    Ejecuta la lógica asociada a clave fila.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     clave = []
     for valor in valores:
         if isinstance(valor, datetime):
@@ -38,6 +80,37 @@ def _clave_fila(valores):
 
 
 def _recoger_filas(rutas, nombre_hoja, cabeceras_destino, inicio, fin, paciente_id, sesion_id):
+    """
+    Ejecuta la lógica asociada a recoger filas.
+
+    Parámetros
+    ----------
+    rutas : Any
+        Conjunto de rutas que se van a procesar.
+
+    nombre_hoja : Any
+        Valor de entrada utilizado por la función.
+
+    cabeceras_destino : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    sesion_id : Any
+        Identificador de la sesión.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     filas = []
     vistos = set()
     for ruta in rutas:
@@ -82,6 +155,25 @@ def _recoger_filas(rutas, nombre_hoja, cabeceras_destino, inicio, fin, paciente_
 
 
 def _capturar_estilo_fila(hoja, fila, numero_columnas):
+    """
+    Ejecuta la lógica asociada a capturar estilo fila.
+
+    Parámetros
+    ----------
+    hoja : Any
+        Valor de entrada utilizado por la función.
+
+    fila : Any
+        Valor de entrada utilizado por la función.
+
+    numero_columnas : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return [
         {
             "style": copy(hoja.cell(fila, columna)._style),
@@ -93,6 +185,22 @@ def _capturar_estilo_fila(hoja, fila, numero_columnas):
 
 
 def _reemplazar_datos(hoja, filas):
+    """
+    Ejecuta la lógica asociada a reemplazar datos.
+
+    Parámetros
+    ----------
+    hoja : Any
+        Valor de entrada utilizado por la función.
+
+    filas : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     cabeceras = _cabeceras(hoja)
     numero_columnas = len(cabeceras)
     estilo = _capturar_estilo_fila(hoja, 4, numero_columnas)
@@ -116,6 +224,28 @@ def _reemplazar_datos(hoja, filas):
 
 
 def _actualizar_general(libro, paciente_id, carpeta_paciente, sesion_id):
+    """
+    Actualiza general.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    carpeta_paciente : Any
+        Valor de entrada utilizado por la función.
+
+    sesion_id : Any
+        Identificador de la sesión.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     hoja = _buscar_hoja(libro, "general")
     if hoja is None:
         return
@@ -135,6 +265,28 @@ def _actualizar_general(libro, paciente_id, carpeta_paciente, sesion_id):
 
 
 def _crear_metadata(libro, paciente_id, sesion, rutas_icca):
+    """
+    Crea metadata.
+
+    Parámetros
+    ----------
+    libro : Any
+        Valor de entrada utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    sesion : Any
+        Valor de entrada utilizado por la función.
+
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     if "metadata_sesion" in libro.sheetnames:
         del libro["metadata_sesion"]
     hoja = libro.create_sheet("metadata_sesion", 1)
@@ -165,6 +317,36 @@ def generar_excel_icca_sesion(
     paciente_id,
     carpeta_paciente,
 ):
+    """
+    Genera excel icca sesion.
+
+    Parámetros
+    ----------
+    rutas_icca : Any
+        Valor de entrada utilizado por la función.
+
+    sesion : Any
+        Valor de entrada utilizado por la función.
+
+    salida : Any
+        Valor de entrada utilizado por la función.
+
+    paciente_id : Any
+        Identificador del paciente.
+
+    carpeta_paciente : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     if not rutas_icca:
         raise ValueError("No hay archivos ICCA compatibles con la sesion BIS.")
 

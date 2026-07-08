@@ -53,6 +53,22 @@ rcParams.update(
 
 
 def _primer_texto(*valores, defecto="No disponible"):
+    """
+    Ejecuta la lógica asociada a primer texto.
+
+    Parámetros
+    ----------
+    defecto : Any
+        Valor de entrada utilizado por la función.
+
+    valores : Any
+        Valores que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     for valor in valores:
         if valor is None:
             continue
@@ -68,6 +84,19 @@ def _primer_texto(*valores, defecto="No disponible"):
 
 
 def _formatear_fecha(valor):
+    """
+    Formatea fecha.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     try:
         fecha = pd.Timestamp(valor)
     except (TypeError, ValueError):
@@ -78,6 +107,19 @@ def _formatear_fecha(valor):
 
 
 def _formatear_numero(valor):
+    """
+    Formatea numero.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     numero = pd.to_numeric(pd.Series([valor]), errors="coerce").iloc[0]
     if pd.isna(numero):
         return str(valor)
@@ -85,10 +127,63 @@ def _formatear_numero(valor):
 
 
 def _guardar_pagina(pdf, fig):
+    """
+    Guarda pagina.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    fig : Any
+        Figura que se va a modificar.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     pdf.savefig(fig)
 
 
 def _texto_en_figura(fig, x, y, texto, width=100, fontsize=9.5, color=GRIS_TEXTO, weight=None, line_height=0.023):
+    """
+    Ejecuta la lógica asociada a texto en figura.
+
+    Parámetros
+    ----------
+    fig : Any
+        Figura que se va a modificar.
+
+    x : Any
+        Valor de entrada utilizado por la función.
+
+    y : Any
+        Valor de entrada utilizado por la función.
+
+    texto : Any
+        Texto que se va a procesar.
+
+    width : Any
+        Valor de entrada utilizado por la función.
+
+    fontsize : Any
+        Valor de entrada utilizado por la función.
+
+    color : Any
+        Valor de entrada utilizado por la función.
+
+    weight : Any
+        Valor de entrada utilizado por la función.
+
+    line_height : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     lineas = textwrap.wrap(str(texto), width=width) or [""]
     for indice, linea in enumerate(lineas):
         fig.text(
@@ -103,12 +198,38 @@ def _texto_en_figura(fig, x, y, texto, width=100, fontsize=9.5, color=GRIS_TEXTO
 
 
 def _formatear_eje_tiempo(ax):
+    """
+    Formatea eje tiempo.
+
+    Parámetros
+    ----------
+    ax : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     localizador = mdates.AutoDateLocator(minticks=4, maxticks=9)
     ax.xaxis.set_major_locator(localizador)
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m\n%H:%M"))
 
 
 def _rango_y_con_margen(valores):
+    """
+    Ejecuta la lógica asociada a rango y con margen.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     serie = pd.to_numeric(pd.Series(valores), errors="coerce").dropna()
     if serie.empty:
         return None
@@ -120,6 +241,19 @@ def _rango_y_con_margen(valores):
 
 
 def _texto_origen(registro):
+    """
+    Ejecuta la lógica asociada a texto origen.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     origen = registro.get("origen")
     if origen == "fa":
         return "Archivo .f_a"
@@ -129,6 +263,28 @@ def _texto_origen(registro):
 
 
 def _datos_basicos(registro, inicio, fin, duracion):
+    """
+    Ejecuta la lógica asociada a datos basicos.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     sesion = registro.get("sesion_paciente") or {}
     return [
         ("Paciente", _primer_texto(sesion.get("paciente_id"), registro.get("paciente_id"))),
@@ -151,6 +307,25 @@ def _datos_basicos(registro, inicio, fin, duracion):
 
 
 def nombre_archivo_informe(registro, inicio, fin):
+    """
+    Ejecuta la lógica asociada a nombre archivo informe.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     sesion = registro.get("sesion_paciente") or {}
     sesion_nombre = _primer_texto(
         sesion.get("nombre_carpeta"),
@@ -164,12 +339,50 @@ def nombre_archivo_informe(registro, inicio, fin):
 
 
 def _limpiar_nombre_archivo(texto):
+    """
+    Ejecuta la lógica asociada a limpiar nombre archivo.
+
+    Parámetros
+    ----------
+    texto : Any
+        Texto que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = re.sub(r"[^A-Za-z0-9_-]+", "_", str(texto).strip())
     texto = re.sub(r"_+", "_", texto).strip("_")
     return texto or "sin_nombre"
 
 
 def _pagina_portada(pdf, registro, inicio, fin, duracion):
+    """
+    Ejecuta la lógica asociada a pagina portada.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     fig = Figure(figsize=A4_VERTICAL, dpi=150)
     fig.patch.set_facecolor("white")
     fig.text(0.11, 0.90, "Visualizador BIS-ICCA", fontsize=22, weight="bold", color=AZUL)
@@ -224,12 +437,47 @@ def _pagina_portada(pdf, registro, inicio, fin, duracion):
 
 
 def _imagen_desde_data_url(data_url):
+    """
+    Ejecuta la lógica asociada a imagen desde data url.
+
+    Parámetros
+    ----------
+    data_url : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     _, contenido = data_url.split(",", 1)
     datos = base64.b64decode(contenido)
     return Image.open(io.BytesIO(datos)).convert("RGB")
 
 
 def _pagina_dsa(pdf, vista, inicio, fin):
+    """
+    Ejecuta la lógica asociada a pagina dsa.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    vista : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     imagen = _imagen_desde_data_url(crear_panoramica_estatica(vista))
     fig = Figure(figsize=A4_HORIZONTAL, dpi=150)
     fig.patch.set_facecolor("white")
@@ -255,6 +503,19 @@ def _pagina_dsa(pdf, vista, inicio, fin):
 
 
 def _agrupar_series_icca(metadata):
+    """
+    Agrupa series icca.
+
+    Parámetros
+    ----------
+    metadata : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     grupos = []
     orden = [
         "fc",
@@ -277,6 +538,28 @@ def _agrupar_series_icca(metadata):
 
 
 def _tramo_documentado_constante(mediciones, columna_valor, inicio, fin):
+    """
+    Ejecuta la lógica asociada a tramo documentado constante.
+
+    Parámetros
+    ----------
+    mediciones : Any
+        Valor de entrada utilizado por la función.
+
+    columna_valor : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     mediciones = mediciones.sort_values("timestamp", kind="stable")
     anteriores = mediciones[mediciones["timestamp"] < inicio].tail(1)
     dentro = mediciones[mediciones["timestamp"].between(inicio, fin, inclusive="both")]
@@ -303,6 +586,25 @@ def _tramo_documentado_constante(mediciones, columna_valor, inicio, fin):
 
 
 def _pagina_mensaje_horizontal(pdf, titulo, mensaje):
+    """
+    Ejecuta la lógica asociada a pagina mensaje horizontal.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    mensaje : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     fig = Figure(figsize=A4_HORIZONTAL, dpi=150)
     fig.patch.set_facecolor("white")
     fig.text(0.055, 0.91, titulo, fontsize=17, weight="bold", color=AZUL)
@@ -311,6 +613,28 @@ def _pagina_mensaje_horizontal(pdf, titulo, mensaje):
 
 
 def _pagina_constantes(pdf, datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a pagina constantes.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     if not datos:
         return
     constantes = datos.get("constantes")
@@ -416,12 +740,44 @@ def _pagina_constantes(pdf, datos, inicio, fin):
 
 
 def _normalizar_variable(valor):
+    """
+    Normaliza variable.
+
+    Parámetros
+    ----------
+    valor : Any
+        Valor que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     texto = str(valor or "").casefold()
     traduccion = str.maketrans("áéíóúüñ", "aeiouun")
     return "_".join(texto.translate(traduccion).replace("-", " ").split())
 
 
 def _filtrar_analisis_para_tarjetas(datos, inicio, fin):
+    """
+    Filtra analisis para tarjetas.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     analisis = _filtrar_intervalo(datos.get("analisis"), inicio, fin)
     if analisis.empty or "variable" not in analisis:
         return pd.DataFrame()
@@ -445,6 +801,40 @@ def _filtrar_analisis_para_tarjetas(datos, inicio, fin):
 
 
 def _dibujar_tarjeta(fig, x, y, w, h, titulo, subtitulo, lineas):
+    """
+    Dibuja tarjeta.
+
+    Parámetros
+    ----------
+    fig : Any
+        Figura que se va a modificar.
+
+    x : Any
+        Valor de entrada utilizado por la función.
+
+    y : Any
+        Valor de entrada utilizado por la función.
+
+    w : Any
+        Valor de entrada utilizado por la función.
+
+    h : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    subtitulo : Any
+        Valor de entrada utilizado por la función.
+
+    lineas : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     tarjeta = FancyBboxPatch(
         (x, y),
         w,
@@ -467,6 +857,19 @@ def _dibujar_tarjeta(fig, x, y, w, h, titulo, subtitulo, lineas):
 
 
 def _aviso_analisis(fila):
+    """
+    Ejecuta la lógica asociada a aviso analisis.
+
+    Parámetros
+    ----------
+    fila : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     for columna in ("aviso", "interpretacion", "comentario"):
         valor = fila.get(columna)
         if pd.notna(valor) and str(valor).strip():
@@ -479,6 +882,28 @@ def _aviso_analisis(fila):
 
 
 def _pagina_tarjetas_analisis(pdf, datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a pagina tarjetas analisis.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     if not datos:
         return
     analisis = _filtrar_analisis_para_tarjetas(datos, inicio, fin)
@@ -544,6 +969,25 @@ def _pagina_tarjetas_analisis(pdf, datos, inicio, fin):
 
 
 def _preparar_curva_perfusion(grupo, inicio, fin):
+    """
+    Prepara curva perfusion.
+
+    Parámetros
+    ----------
+    grupo : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     grupo = grupo.sort_values("timestamp", kind="stable").copy()
     grupo = grupo[grupo["dosis_actual"].notna()].copy()
     if grupo.empty:
@@ -566,6 +1010,22 @@ def _preparar_curva_perfusion(grupo, inicio, fin):
     marcados = []
 
     def anadir_punto(instante, valor):
+        """
+        Ejecuta la lógica asociada a añadir punto.
+
+        Parámetros
+        ----------
+        instante : Any
+            Valor de entrada utilizado por la función.
+
+        valor : Any
+            Valor que se va a procesar.
+
+        Devuelve
+        --------
+        None
+            La función no devuelve ningún valor.
+        """
         instante = pd.Timestamp(instante)
         if inicio <= instante <= fin:
             puntos.append({"timestamp": instante, "dosis": float(valor)})
@@ -592,6 +1052,28 @@ def _preparar_curva_perfusion(grupo, inicio, fin):
 
 
 def _pagina_perfusiones(pdf, datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a pagina perfusiones.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     if not datos:
         return
     perfusiones = datos.get("perfusiones")
@@ -680,6 +1162,25 @@ def _pagina_perfusiones(pdf, datos, inicio, fin):
 
 
 def _filtrar_intervalo(tabla, inicio, fin):
+    """
+    Filtra intervalo.
+
+    Parámetros
+    ----------
+    tabla : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if tabla is None or tabla.empty or "timestamp" not in tabla:
         return pd.DataFrame()
     trabajo = tabla.copy()
@@ -690,6 +1191,25 @@ def _filtrar_intervalo(tabla, inicio, fin):
 
 
 def _mediciones_reales_constante(constantes, clave, columna_valor):
+    """
+    Ejecuta la lógica asociada a mediciones reales constante.
+
+    Parámetros
+    ----------
+    constantes : Any
+        Valor de entrada utilizado por la función.
+
+    clave : Any
+        Valor de entrada utilizado por la función.
+
+    columna_valor : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if constantes is None or constantes.empty:
         return pd.DataFrame(columns=["timestamp", columna_valor])
     if columna_valor not in constantes.columns or "timestamp" not in constantes.columns:
@@ -714,6 +1234,25 @@ def _mediciones_reales_constante(constantes, clave, columna_valor):
 
 
 def _lineas_constantes(datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a lineas constantes.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     constantes = datos.get("constantes")
     metadata = datos.get("series")
     if constantes is None or metadata is None or constantes.empty or metadata.empty:
@@ -746,6 +1285,25 @@ def _lineas_constantes(datos, inicio, fin):
 
 
 def _lineas_analisis(datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a lineas analisis.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     analisis = _filtrar_intervalo(datos.get("analisis"), inicio, fin)
     if analisis.empty:
         return [("Sin analisis clinicos documentados en este intervalo.", "normal")]
@@ -776,6 +1334,25 @@ def _lineas_analisis(datos, inicio, fin):
 
 
 def _lineas_perfusiones(datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a lineas perfusiones.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     perfusiones = datos.get("perfusiones")
     if perfusiones is None or perfusiones.empty or "farmaco" not in perfusiones:
         return [("Sin perfusiones documentadas en este intervalo.", "normal")]
@@ -823,6 +1400,25 @@ def _lineas_perfusiones(datos, inicio, fin):
 
 
 def _lineas_icca(datos, inicio, fin):
+    """
+    Ejecuta la lógica asociada a lineas icca.
+
+    Parámetros
+    ----------
+    datos : Any
+        Datos de entrada que se van a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     if not datos:
         return [("No hay informacion ICCA disponible para esta sesion.", "normal")]
 
@@ -844,6 +1440,19 @@ def _lineas_icca(datos, inicio, fin):
 
 
 def _lineas_fuentes(registro):
+    """
+    Ejecuta la lógica asociada a lineas fuentes.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     sesion = registro.get("sesion_paciente") or {}
     ruta_bis = _primer_texto(sesion.get("carpeta_bis_absoluta"), sesion.get("carpeta_bis"), defecto="")
     ruta_icca = _primer_texto(
@@ -860,6 +1469,28 @@ def _lineas_fuentes(registro):
 
 
 def _lineas_resumen_final(registro, inicio, fin, duracion):
+    """
+    Ejecuta la lógica asociada a lineas resumen final.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     lineas = [
         ("Resumen del caso", "section"),
     ]
@@ -879,10 +1510,42 @@ def _lineas_resumen_final(registro, inicio, fin, duracion):
 
 
 def _paginas_texto(pdf, titulo, lineas):
+    """
+    Ejecuta la lógica asociada a paginas texto.
+
+    Parámetros
+    ----------
+    pdf : Any
+        Documento PDF en construcción.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    lineas : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fig = None
     y = 0
 
     def nueva_pagina():
+        """
+        Ejecuta la lógica asociada a nueva pagina.
+
+        Parámetros
+        ----------
+        Ninguno
+            La función no recibe parámetros.
+
+        Devuelve
+        --------
+        Any
+            Resultado generado por la función.
+        """
         nueva = Figure(figsize=A4_VERTICAL, dpi=150)
         nueva.patch.set_facecolor("#f6f9fc")
         nueva.patches.append(
@@ -955,6 +1618,31 @@ def _paginas_texto(pdf, titulo, lineas):
 
 
 def crear_informe_pdf(registro, vista, inicio, fin, duracion):
+    """
+    Crea informe pdf.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    vista : Any
+        Valor de entrada utilizado por la función.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     buffer = io.BytesIO()
     sesion = registro.get("sesion_paciente") or {}
     inicio_analisis = _primer_texto(sesion.get("inicio_bis"), defecto="")

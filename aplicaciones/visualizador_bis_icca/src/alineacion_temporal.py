@@ -90,6 +90,31 @@ def crear_mascara_discontinuidades(timeline, tiempos_fuente):
 
 
 def _resumen_fuente(nombre, tiempos, inicio_comun, fin_comun, duplicados=0):
+    """
+    Ejecuta la lógica asociada a resumen fuente.
+
+    Parámetros
+    ----------
+    nombre : Any
+        Valor de entrada utilizado por la función.
+
+    tiempos : Any
+        Valor de entrada utilizado por la función.
+
+    inicio_comun : Any
+        Valor de entrada utilizado por la función.
+
+    fin_comun : Any
+        Valor de entrada utilizado por la función.
+
+    duplicados : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     inicio_fuente = tiempos.iloc[0]
     fin_fuente = tiempos.iloc[-1]
     total = int((fin_fuente - inicio_fuente).total_seconds()) + 1

@@ -35,6 +35,24 @@ def crear_opciones_tramos_horarios(tiempo):
 
 
 def _interpretar_tramo(valor_tramo):
+    """
+    Interpreta tramo.
+
+    Parámetros
+    ----------
+    valor_tramo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     try:
         inicio_texto, fin_texto = valor_tramo.split("|", 1)
         inicio = pd.Timestamp(inicio_texto)
@@ -48,6 +66,30 @@ def _interpretar_tramo(valor_tramo):
 
 
 def _recortar_registro(registro, inicio, fin):
+    """
+    Ejecuta la lógica asociada a recortar registro.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    inicio : Any
+        Instante inicial del intervalo.
+
+    fin : Any
+        Instante final del intervalo.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     tiempo = pd.to_datetime(pd.Series(registro["tiempo"]), errors="coerce")
     indices = np.flatnonzero((tiempo >= inicio) & (tiempo <= fin))
     if indices.size == 0:
@@ -82,6 +124,30 @@ def preparar_registro_completo(registro):
 
 
 def preparar_vista_temporal(registro, valor_tramo, duracion):
+    """
+    Prepara vista temporal.
+
+    Parámetros
+    ----------
+    registro : Any
+        Datos del registro que se va a procesar.
+
+    valor_tramo : Any
+        Valor de entrada utilizado por la función.
+
+    duracion : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     tiempo = pd.to_datetime(pd.Series(registro["tiempo"]), errors="coerce")
     inicio_registro = tiempo.iloc[0]
     fin_registro = tiempo.iloc[-1]

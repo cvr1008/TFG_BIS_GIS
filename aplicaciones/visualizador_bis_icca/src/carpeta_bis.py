@@ -13,6 +13,19 @@ EXTENSIONES_RAW = {".r2a": "unilateral", ".r4a": "bilateral"}
 
 
 def _archivo_util(ruta):
+    """
+    Ejecuta la lógica asociada a archivo util.
+
+    Parámetros
+    ----------
+    ruta : Any
+        Ruta del archivo o carpeta que se va a procesar.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return (
         ruta.is_file()
         and not ruta.name.startswith("._")
@@ -21,6 +34,30 @@ def _archivo_util(ruta):
 
 
 def _buscar_companero(archivos, raw, extension):
+    """
+    Busca companero.
+
+    Parámetros
+    ----------
+    archivos : Any
+        Valor de entrada utilizado por la función.
+
+    raw : Any
+        Valor de entrada utilizado por la función.
+
+    extension : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     candidatos = [
         archivo
         for archivo in archivos

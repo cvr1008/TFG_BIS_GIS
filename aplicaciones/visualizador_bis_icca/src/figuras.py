@@ -41,6 +41,31 @@ def _añadir_etiquetas_bandas(fig, xref="x domain", yref="y"):
 
 
 def _añadir_resumen_bandas(fig, resumen, titulo, x, y):
+    """
+    Ejecuta la lógica asociada a añadir resumen bandas.
+
+    Parámetros
+    ----------
+    fig : Any
+        Figura que se va a modificar.
+
+    resumen : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    x : Any
+        Valor de entrada utilizado por la función.
+
+    y : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    None
+        La función no devuelve ningún valor.
+    """
     lineas = [
         linea.replace(" ", "\u00a0")
         for linea in lineas_densidad_bandas(resumen)
@@ -69,6 +94,22 @@ def _añadir_resumen_bandas(fig, resumen, titulo, x, y):
 
 
 def _formatear_sr_hover(sr, etiqueta="SR"):
+    """
+    Formatea sr hover.
+
+    Parámetros
+    ----------
+    sr : Any
+        Valor de entrada utilizado por la función.
+
+    etiqueta : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     textos = []
     for valor in np.asarray(sr, dtype=float):
         if np.isfinite(valor):
@@ -89,6 +130,28 @@ def _formatear_variable_hover(
     decimales=1,
     unidad="",
 ):
+    """
+    Formatea variable hover.
+
+    Parámetros
+    ----------
+    valores : Any
+        Valores que se van a procesar.
+
+    etiqueta : Any
+        Valor de entrada utilizado por la función.
+
+    decimales : Any
+        Valor de entrada utilizado por la función.
+
+    unidad : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     sufijo = f" {unidad}" if unidad else ""
     textos = []
     for valor in np.asarray(valores, dtype=float):
@@ -102,6 +165,19 @@ def _formatear_variable_hover(
 
 
 def _combinar_lineas_hover(*lineas):
+    """
+    Ejecuta la lógica asociada a combinar lineas hover.
+
+    Parámetros
+    ----------
+    lineas : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     return np.asarray(
         ["<br>".join(valores) for valores in zip(*lineas)],
         dtype=object,
@@ -171,6 +247,28 @@ def crear_figura_dsa(tiempo, frecuencias, dsa, titulo="DSA"):
 
 
 def crear_figura_dsa_plotly(tiempo, frecuencias, matriz, titulo="DSA"):
+    """
+    Crea figura dsa plotly.
+
+    Parámetros
+    ----------
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    frecuencias : Any
+        Valor de entrada utilizado por la función.
+
+    matriz : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fig = go.Figure(
         data=go.Heatmap(
             x=tiempo,
@@ -209,6 +307,33 @@ def _normalizar_potencia(
     vmax=DSA_FA_VMAX_DB,
     gamma=DSA_FA_GAMMA,
 ):
+    """
+    Normaliza potencia.
+
+    Parámetros
+    ----------
+    matriz : Any
+        Valor de entrada utilizado por la función.
+
+    vmin : Any
+        Valor de entrada utilizado por la función.
+
+    vmax : Any
+        Valor de entrada utilizado por la función.
+
+    gamma : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+
+    Lanza
+    -----
+    ValueError
+        Si se produce una condición no válida durante la ejecución.
+    """
     matriz = np.asarray(matriz, dtype=float)
     valores = matriz[np.isfinite(matriz)]
 
@@ -556,6 +681,31 @@ def crear_figura_dsa_bilateral_plotly(
     matriz_der,
     titulo="DSA bilateral",
 ):
+    """
+    Crea figura dsa bilateral plotly.
+
+    Parámetros
+    ----------
+    tiempo : Any
+        Valor de entrada utilizado por la función.
+
+    frecuencias : Any
+        Valor de entrada utilizado por la función.
+
+    matriz_izq : Any
+        Valor de entrada utilizado por la función.
+
+    matriz_der : Any
+        Valor de entrada utilizado por la función.
+
+    titulo : Any
+        Valor de entrada utilizado por la función.
+
+    Devuelve
+    --------
+    Any
+        Resultado generado por la función.
+    """
     fig = make_subplots(
         rows=2,
         cols=1,
@@ -660,6 +810,19 @@ def crear_figura_dsa_bilateral_interactiva(
         raise ValueError("La escala bilateral no tiene un intervalo válido.")
 
     def normalizar(matriz):
+        """
+        Ejecuta la lógica asociada a normalizar.
+
+        Parámetros
+        ----------
+        matriz : Any
+            Valor de entrada utilizado por la función.
+
+        Devuelve
+        --------
+        Any
+            Resultado generado por la función.
+        """
         resultado = np.clip((matriz - vmin) / (vmax - vmin), 0, 1)
         return np.power(resultado, gamma)
 
@@ -727,6 +890,43 @@ def crear_figura_dsa_bilateral_interactiva(
         mostrar_leyenda,
         texto_adicional=None,
     ):
+        """
+        Ejecuta la lógica asociada a añadir curva.
+
+        Parámetros
+        ----------
+        valores_curva : Any
+            Valor de entrada utilizado por la función.
+
+        fila : Any
+            Valor de entrada utilizado por la función.
+
+        nombre : Any
+            Valor de entrada utilizado por la función.
+
+        color : Any
+            Valor de entrada utilizado por la función.
+
+        borde : Any
+            Valor de entrada utilizado por la función.
+
+        leyenda : Any
+            Valor de entrada utilizado por la función.
+
+        grupo_leyenda : Any
+            Valor de entrada utilizado por la función.
+
+        mostrar_leyenda : Any
+            Valor de entrada utilizado por la función.
+
+        texto_adicional : Any
+            Valor de entrada utilizado por la función.
+
+        Devuelve
+        --------
+        None
+            La función no devuelve ningún valor.
+        """
         texto_hover = _formatear_variable_hover(
             valores_curva,
             nombre,
