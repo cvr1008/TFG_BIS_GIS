@@ -1,5 +1,5 @@
 # Descarga las dependencias a aplicaciones\wheelhouse para poder instalar la demo
-# sin internet en el ordenador de la defensa.
+# sin internet 
 
 $ErrorActionPreference = "Stop"
 
