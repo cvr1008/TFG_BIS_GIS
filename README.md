@@ -10,7 +10,7 @@ Este proyecto ha sido posible gracias a una asociación entre la Universidad de 
 
 La herramienta no sustituye la valoración clínica ni los sistemas hospitalarios originales. Su finalidad es organizar los datos exportados, facilitar su consulta y permitir una visualización integrada del caso.
 
-En este proyecto se han utilizado datos reales de pacientes. El uso de los datos del proyecto fue tramitado y cuenta con la aprobación del CEIm con fecha 30 de junio de 2026.
+En este proyecto se han utilizado datos reales de pacientes. El uso de los datos del proyecto fue tramitado y cuenta con la aprobación del CEIm con fecha 2 de julio de 2026.
 
 Este repositorio contiene una aplicación desarrollada en Python/Dash para organizar, integrar y visualizar información clínica procedente de pacientes ingresados en UCI.
 
