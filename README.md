@@ -71,7 +71,7 @@ Esta integración permite visualizar, junto a la información cerebral, variable
 La visualización de las variables ICCA se ha planteado evitando inventar datos entre mediciones: se muestran las mediciones reales documentadas y, cuando procede, tramos que indican el último valor registrado hasta la siguiente medición.
 
 ## Estructura del repositorio
-
+```text
 TFG_BIS_GIS/
 |-- aplicaciones/
 |   |-- portal_bis_icca/
@@ -98,6 +98,7 @@ TFG_BIS_GIS/
 |-- cerrar_aplicaciones.bat
 |-- README.md
 `-- .gitignore
+```
 
 La carpeta `aplicaciones/` contiene el código fuente del sistema. Dentro de ella se encuentran los tres módulos principales:
 
