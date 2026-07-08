@@ -77,13 +77,15 @@ TFG_BIS_GIS/
 |-- aplicaciones/
 |   |-- portal_bis_icca/
 |   |-- organizador_bis_icca/
-|   |   `-- requirements.txt
 |   |-- visualizador_bis_icca/
-|   |   `-- requirements.txt
+|   |
+|   |  
 |   |-- requirements.txt
-|   |-- preparar_entornos.bat
-|   |-- abrir_aplicaciones.bat
-|   `-- cerrar_aplicaciones.bat
+|
+|-- preparar_entornos.bat
+|-- abrir_aplicaciones.bat
+|-- cerrar_aplicaciones.bat
+|
 |-- datos/
 |   `-- pacientes/
 |-- TFG/
