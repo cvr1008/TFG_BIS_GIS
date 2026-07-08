@@ -181,11 +181,8 @@ El proyecto evolucionó mediante ciclos de prueba y ajuste. Cada iteración inco
 La organización de los datos por paciente y sesión, descrita anteriormente, ya aporta una primera capa de trazabilidad mediante la separación entre archivos originales y derivados y los manifiestos `paciente.json` y `sesion.json`. A nivel de desarrollo, esta separación se completa con la posibilidad de regenerar los archivos derivados a partir de las fuentes iniciales y de los parámetros definidos en el procesamiento, sin necesidad de repetir manualmente cada paso. Esto permite comparar configuraciones distintas de reconstrucción o enmascarado y mantener siempre una relación clara entre cada resultado mostrado y los archivos de entrada utilizados.
 
 ### Entorno de ejecución y máquinas virtuales
-
 La aplicación se ha preparado para poder ejecutarse en un entorno controlado mediante máquinas virtuales, con el objetivo de aproximar su funcionamiento a un posible despliegue dentro de una intranet hospitalaria.
 
-La arquitectura propuesta separa la ejecución de la aplicación y el almacenamiento de los datos. Para ello, se plantea una máquina virtual destinada a ejecutar la aplicación Dash y otra máquina virtual destinada a actuar como repositorio común de pacientes.
-
-La aplicación trabaja siempre sobre una ruta fija de pacientes, evitando que el usuario tenga que seleccionar manualmente la carpeta de trabajo. Los datos no se almacenan en una base de datos relacional, sino mediante una estructura organizada de carpetas y archivos, acorde con el origen de los registros utilizados en el proyecto.
+La arquitectura propuesta separa la ejecución de la aplicación del almacenamiento de los datos: una máquina virtual ejecuta la aplicación Dash y otra actúa como repositorio común de pacientes, comunicadas mediante el protocolo SMB a través de Samba [@SambaWhatIs] sobre una red privada de tipo host-only [@OracleVirtualBoxHostOnly]. La aplicación trabaja siempre sobre una ruta fija de pacientes, sin que el usuario tenga que seleccionarla manualmente, y los datos se organizan mediante carpetas y archivos en lugar de una base de datos relacional.
 
 Esta configuración permite simular un escenario en el que varios usuarios acceden a una misma herramienta y consultan una ubicación común de pacientes. La configuración técnica detallada de las máquinas virtuales, la unidad compartida y el protocolo Samba/SMB se recoge en el Anexo E (Manual del programador).

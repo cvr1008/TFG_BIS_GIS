@@ -6,126 +6,520 @@
 
 \apendice{Manual del desarrollador e investigador}
 
+## Introducción
+
+Este anexo recoge la información necesaria para comprender, mantener y ampliar el código desarrollado en el proyecto. Está orientado a una persona que quiera continuar el trabajo, revisar la estructura interna de las aplicaciones o adaptar el sistema a un nuevo entorno de ejecución.
+
+El proyecto está desarrollado en Python y utiliza Dash para construir las interfaces web. La aplicación se divide en tres módulos principales: un portal de entrada, un organizador de pacientes y un visualizador BIS-ICCA. Los datos no se almacenan en una base de datos relacional, sino mediante una estructura de carpetas y archivos asociada a cada paciente.
+
+## Repositorio del proyecto
+
+El código fuente del proyecto se gestiona mediante control de versiones (Git) y está disponible públicamente en GitHub:
+
+<https://github.com/cvr1008/TFG_BIS_GIS>
+
+Para clonar el repositorio:
+
+```text
+git clone https://github.com/cvr1008/TFG_BIS_GIS.git
+```
+
+El repositorio no incluye datos clínicos de pacientes, exportaciones BIS reales ni plantillas ICCA reales; los registros empleados durante el desarrollo y la validación (Anexo G) se han gestionado siempre fuera del repositorio, conforme a las condiciones de confidencialidad establecidas por el CEIm (Anexo F).
+
 ## Estructura de directorios
 
-El proyecto se organiza en torno a una carpeta principal que contiene las aplicaciones desarrolladas, los datos de trabajo y los archivos auxiliares necesarios para la ejecución local del sistema. La estructura general es la siguiente:
+La estructura general del repositorio es la siguiente:
 
 ```text
 TFG_BIS_GIS/
 |-- aplicaciones/
 |   |-- portal_bis_icca/
+|   |   `-- app.py
 |   |-- organizador_bis_icca/
+|   |   |-- app.py
+|   |   |-- src/
+|   |   |-- tests/
 |   |   `-- requirements.txt
 |   |-- visualizador_bis_icca/
+|   |   |-- app.py
+|   |   |-- src/
+|   |   |-- tests/
 |   |   `-- requirements.txt
 |   |-- requirements.txt
 |   |-- preparar_entorno.ps1
+|   |-- preparar_entorno_offline.ps1
 |   |-- iniciar_aplicaciones.ps1
 |   `-- detener_aplicaciones.ps1
 |-- datos/
 |   `-- pacientes/
+|-- TFG/
+|   |-- img/
+|   |-- qmd/
+|   |-- memoria.qmd
+|   `-- anexos.qmd
+|-- preparar_entornos.bat
+|-- abrir_aplicaciones.bat
+|-- cerrar_aplicaciones.bat
 |-- README.md
 `-- .gitignore
 ```
 
-La carpeta `aplicaciones/` contiene el sistema ejecutable del proyecto, dividido en tres aplicaciones complementarias:
+La carpeta `aplicaciones/` contiene el código ejecutable del sistema. En ella se agrupan las tres aplicaciones Dash que forman la herramienta:
 
-- `portal_bis_icca/`: pantalla inicial de acceso al sistema.
-- `organizador_bis_icca/`: aplicación encargada de organizar pacientes, asociar sesiones BIS y archivos ICCA, y generar la estructura de carpetas de trabajo.
-- `visualizador_bis_icca/`: aplicación principal de visualización conjunta de DSA, parámetros BIS y variables clínicas ICCA.
+- `portal_bis_icca/`: contiene la pantalla inicial del sistema. Desde este portal se puede acceder al organizador de pacientes o al visualizador.
+- `organizador_bis_icca/`: contiene la aplicación encargada de crear pacientes, asociar sesiones BIS, incorporar archivos ICCA y generar la estructura ordenada de carpetas.
+- `visualizador_bis_icca/`: contiene la aplicación encargada de consultar pacientes ya organizados, visualizar las sesiones BIS, integrar la información ICCA y generar informes.
 
-La versión final del proyecto centraliza las tres aplicaciones dentro de la carpeta `aplicaciones/`. Cualquier referencia previa a rutas directas como `tfg/organizador_bis_icca/` corresponde a una estructura anterior del desarrollo, ya sustituida por `tfg/aplicaciones/organizador_bis_icca/`.
+Cada módulo principal contiene un archivo `app.py`, donde se define la interfaz Dash y los *callbacks* principales. Las funciones auxiliares se agrupan en la carpeta `src/`, mientras que las pruebas automáticas se almacenan en la carpeta `tests/`.
 
-Cada aplicación contiene un archivo `app.py`, que define la interfaz Dash y sus *callbacks* principales. Las funciones auxiliares se agrupan en la carpeta `src/` de cada aplicación, mientras que las pruebas automáticas se almacenan en su carpeta `tests/`.
+La carpeta `datos/pacientes/` es la ubicación local utilizada por defecto para almacenar los pacientes creados desde la aplicación. Esta carpeta puede estar vacía al descargar el repositorio y se irá rellenando durante el uso del sistema. No deben subirse al repositorio datos clínicos reales.
 
-La carpeta `datos/pacientes/` contiene las carpetas generadas para cada paciente durante el uso del sistema. Contienen: 
-* Las sesiones BIS seleccionadas, 
-* los archivos ICCA asociados 
-* los archivos auxiliares generados para la visualización. 
+La carpeta `TFG/` contiene la documentación académica del proyecto: memoria, anexos, imágenes y otros materiales utilizados en la redacción.
 
-Los archivos originales no se modifican durante este proceso; cuando es necesario, se trabaja sobre copias o archivos derivados.
+## Arquitectura general del sistema
 
+El sistema se ha diseñado como un conjunto de aplicaciones Dash independientes pero conectadas por una misma ubicación de pacientes.
 
-## Compilación, instalación y ejecución del proyecto
+El flujo general es el siguiente:
 
-El proyecto está desarrollado en Python y utiliza Dash para la construcción de las interfaces web. No requiere compilación en sentido estricto, pero sí la preparación de un entorno de ejecución con las dependencias necesarias.
+1. El usuario accede al portal inicial.
+2. Desde el portal puede entrar al organizador o al visualizador.
+3. El organizador crea y modifica la estructura de pacientes.
+4. El visualizador lee esa misma estructura de pacientes y permite consultar las sesiones disponibles.
+5. Los datos se guardan en una ruta fija, local o compartida, según el entorno de ejecución.
 
-La primera vez que se utilice el sistema, debe abrirse una terminal de PowerShell en la carpeta de aplicaciones:
+En modo local o de demostración, la ruta de pacientes es:
 
-```powershell
-cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones"
+```text
+datos/pacientes
 ```
 
-A continuación, se prepara el entorno local:
+En un posible entorno hospitalario, esta ruta puede sustituirse por una unidad de red compartida, por ejemplo:
+
+```text
+P:\Pacientes
+```
+
+De esta forma, el código de la aplicación no depende de que el usuario seleccione manualmente una carpeta cada vez que inicia el sistema.
+
+## Organización de pacientes
+
+El organizador genera una estructura homogénea para cada paciente. Cada caso se guarda en una carpeta propia, identificada mediante un nombre del tipo:
+
+```text
+PACIENTE_001
+PACIENTE_002
+PACIENTE_003
+```
+
+Dentro de cada paciente se almacenan los metadatos, las sesiones BIS asociadas, los registros ICCA y los archivos auxiliares generados por la aplicación. Una estructura simplificada puede representarse así:
+
+```text
+datos/
+`-- pacientes/
+    `-- PACIENTE_001/
+        |-- paciente.json
+        |-- ICCA/
+        `-- SESIONES/
+            |-- SESION_001_...
+            `-- SESION_002_...
+```
+
+El archivo `paciente.json` permite conservar información estructurada sobre el paciente y sus sesiones. Las carpetas de sesiones contienen los datos BIS originales o copiados, junto con los archivos ICCA auxiliares generados cuando existe correspondencia temporal.
+
+El objetivo de esta organización es que el visualizador pueda leer siempre una estructura predecible, independientemente del origen original de los archivos.
+
+## Visualizador BIS-ICCA
+
+El visualizador permite consultar un paciente organizado y seleccionar una de sus sesiones BIS. A partir de esa sesión se muestran las señales y variables disponibles.
+
+Entre las funcionalidades principales del visualizador se encuentran:
+
+- Lectura de sesiones BIS organizadas.
+- Visualización de la matriz DSA bilateral.
+- Reconstrucción de la matriz DSA cuando no está disponible directamente.
+- Representación de variables BIS, EMG, SEF, MEF y ASYM09.
+- Integración de variables clínicas ICCA.
+- Representación de constantes vitales documentadas.
+- Representación de perfusiones y medicación administrada.
+- Exportación de un informe en PDF del caso visualizado.
+
+Uno de los apartados principales del proyecto es la reconstrucción de la matriz DSA. Para ello se parte de los archivos crudos exportados por el monitor BIS y de la documentación disponible sobre su estructura. El procesamiento permite reconstruir una representación visual de la densidad espectral, facilitando la consulta de sesiones en las que no existe una matriz DSA ya preparada.
+
+## Integración de datos ICCA
+
+La integración de datos ICCA se realiza a partir de archivos Excel previamente exportados. Estos registros pueden contener constantes vitales, análisis clínicos, perfusiones y otra información relevante del paciente.
+
+La aplicación no modifica los archivos ICCA originales. Cuando es necesario, se generan archivos auxiliares asociados a cada sesión para facilitar la visualización posterior.
+
+En el visualizador, las variables clínicas se muestran respetando las mediciones documentadas. En el caso de constantes vitales, se representan los valores registrados y los tramos correspondientes al último valor documentado hasta la siguiente medición. En el caso de perfusiones, se representa la dosis o el acumulado disponible según la información contenida en los registros.
+
+## Entorno de desarrollo
+
+Para desarrollar o ejecutar el proyecto se recomienda utilizar Python 3.12.10.
+
+En Windows, durante la instalación de Python debe marcarse la opción:
+
+```text
+Add python.exe to PATH
+```
+
+Esto permite ejecutar Python desde la terminal y facilita el uso de los scripts de preparación.
+
+El entorno virtual del proyecto se crea dentro de `aplicaciones/.venv/`. Esta carpeta no debe subirse al repositorio, ya que puede regenerarse automáticamente a partir de los archivos `requirements.txt`.
+
+### Dependencias
+
+El archivo principal de dependencias es `aplicaciones/requirements.txt`. Este archivo contiene las librerías necesarias para ejecutar el sistema completo.
+
+Además, algunos módulos conservan su propio archivo `requirements.txt`, por ejemplo:
+
+- `aplicaciones/organizador_bis_icca/requirements.txt`
+- `aplicaciones/visualizador_bis_icca/requirements.txt`
+
+Estos archivos específicos sirven como referencia técnica sobre las dependencias propias de cada módulo. Para una instalación normal del sistema completo, debe utilizarse el archivo general de `aplicaciones/requirements.txt`.
+
+### Instalación para desarrollo
+
+Desde la raíz del repositorio puede prepararse el entorno ejecutando:
+
+```text
+preparar_entornos.bat
+```
+
+Este archivo llama a los scripts internos de PowerShell y crea el entorno virtual necesario para ejecutar la aplicación.
+
+También puede prepararse manualmente desde PowerShell entrando en la carpeta de aplicaciones:
 
 ```powershell
+cd aplicaciones
 .\preparar_entorno.ps1
 ```
 
-Este script crea un entorno virtual de Python en `aplicaciones/.venv/` e instala las dependencias indicadas en `aplicaciones/requirements.txt`.
+Una vez preparado el entorno, las dependencias quedan instaladas en `aplicaciones/.venv/`.
 
-La carpeta `aplicaciones/` contiene un archivo `requirements.txt` general, utilizado para preparar el entorno común de ejecución de las tres aplicaciones. Además, el organizador y el visualizador conservan cada uno su propio `requirements.txt`, que documenta las dependencias específicas de esa aplicación y permite su ejecución independiente si fuera necesario.
+### Ejecución del sistema
 
-Para iniciar las tres aplicaciones se ejecuta:
+Para iniciar la aplicación completa desde Windows se utiliza:
 
-```powershell
-.\iniciar_aplicaciones.ps1 `
-  -PacientesDir "..\datos\pacientes" `
-  -RutaPacientesFija
+```text
+abrir_aplicaciones.bat
 ```
 
-Una vez iniciado el sistema, las aplicaciones quedan disponibles en las siguientes direcciones locales:
+Este script arranca las tres aplicaciones Dash y abre el portal principal en el navegador. Las direcciones locales utilizadas son:
 
 - Portal: <http://127.0.0.1:8040/>
 - Visualizador: <http://127.0.0.1:8050/>
 - Organizador: <http://127.0.0.1:8060/>
 
-Para detener las aplicaciones se utiliza:
+Para detener los servidores se utiliza:
+
+```text
+cerrar_aplicaciones.bat
+```
+
+Este script no tiene por qué cerrar la ventana del navegador, pero sí detiene los procesos de la aplicación para que no sigan ejecutándose en segundo plano.
+
+### Ejecución manual desde PowerShell
+
+Durante el desarrollo puede resultar útil ejecutar las aplicaciones manualmente. Para ello se puede usar el script interno:
+
+```powershell
+cd aplicaciones
+.\iniciar_aplicaciones.ps1 `
+  -PacientesDir "..\datos\pacientes" `
+  -RutaPacientesFija
+```
+
+El parámetro `-PacientesDir` indica la ubicación de la carpeta de pacientes. El parámetro `-RutaPacientesFija` evita que el usuario tenga que seleccionar manualmente una carpeta desde la interfaz.
+
+Para detener las aplicaciones:
 
 ```powershell
 .\detener_aplicaciones.ps1
 ```
 
-En un despliegue hospitalario, la ruta local `datos/pacientes` puede sustituirse por una ruta compartida definida por el servicio técnico, manteniendo el mismo código de la aplicación.
+### Configuración de rutas
+
+La aplicación puede trabajar con distintas ubicaciones de pacientes, siempre que se indique una ruta válida. En modo local, la ruta recomendada es:
+
+```text
+datos/pacientes
+```
+
+En modo hospitalario o con máquinas virtuales, la ruta puede apuntar a una unidad de red compartida, por ejemplo:
+
+```text
+P:\Pacientes
+```
+
+Esta separación permite que el mismo código pueda utilizarse en un entorno local de demostración o en un entorno de red donde los datos estén almacenados en una máquina distinta.
+
+### Arquitectura con máquinas virtuales
+
+Como prueba de arquitectura hospitalaria, el sistema se planteó también mediante dos máquinas virtuales, descrita en detalle en la sección "Entorno virtualizado y comunicación mediante Samba/SMB" de este mismo anexo.
+
+## Entorno virtualizado y comunicación mediante Samba/SMB
+
+Para simular un posible despliegue en una intranet hospitalaria se configuró una arquitectura basada en dos máquinas virtuales. El objetivo de esta configuración fue separar la ejecución de la aplicación del almacenamiento de los datos de pacientes.
+
+La arquitectura utilizada fue la siguiente:
+
+```text
+VM 1 - TFG_BIS_ICCA_APP
+  Sistema operativo: Windows
+  Función: ejecutar la aplicación Dash
+
+VM 2 - TFG_BIS_ICCA_DATOS
+  Sistema operativo: Ubuntu Server
+  Función: almacenar la carpeta común de pacientes
+```
+
+La arquitectura virtualizada se probó con ambas máquinas en ejecución dentro de VirtualBox, como se muestra en la @fig-vm-ambas.
+
+![Máquinas virtuales de aplicación y datos en ejecución. Fuente: elaboración propia.](img/capturas_vm/ambas_MV.png){#fig-vm-ambas width=75%}
+
+La máquina Windows ejecuta la aplicación BIS-ICCA y accede a los pacientes mediante una unidad de red. La máquina Ubuntu Server actúa como repositorio de datos y comparte una carpeta mediante Samba/SMB.
+
+### Protocolo SMB y Samba
+
+SMB, siglas de *Server Message Block*, es un protocolo de red utilizado para compartir archivos, impresoras y otros recursos entre equipos [@MicrosoftSMBOverview]. En sistemas Windows, SMB permite acceder a carpetas remotas mediante rutas de red del tipo:
+
+```text
+\\servidor\recurso
+```
+
+Por ejemplo:
+
+```text
+\\192.168.56.10\tfg
+```
+
+La dirección IP asignada a la interfaz de red utilizada para la comunicación entre máquinas fue `192.168.56.10`, como se muestra en la @fig-vm-ip-ubuntu.
+
+![Dirección IP de la máquina Ubuntu utilizada como servidor de datos. Fuente: elaboración propia.](img/capturas_vm/ubuntuMostrandoIP.png){#fig-vm-ip-ubuntu width=75%}
+
+Samba es una implementación libre del protocolo SMB para sistemas Linux y Unix [@SambaWhatIs]. Gracias a Samba, una carpeta ubicada en un servidor Ubuntu puede aparecer en Windows como si fuera una carpeta compartida normal de red.
+
+En este proyecto, Samba permite que la carpeta real `/srv/tfg/Pacientes`, ubicada en la máquina Ubuntu, sea accesible desde la máquina Windows como `P:\Pacientes`.
+
+De esta forma, la aplicación no necesita saber que los datos están físicamente en una máquina Linux. Desde el punto de vista de Windows y de la aplicación, `P:\Pacientes` funciona como una carpeta más.
+
+### Comunicación entre las máquinas virtuales
+
+Las máquinas virtuales se configuraron en Oracle VM VirtualBox [@OracleVirtualBoxNetworking]. Para que pudieran comunicarse entre sí se utilizó una red virtual de tipo *host-only* [@OracleVirtualBoxHostOnly].
+
+Este tipo de red permite que las máquinas virtuales y el equipo anfitrión se comuniquen dentro de una red privada creada por VirtualBox, sin depender necesariamente de una red física externa. En este caso, la máquina de datos recibió la dirección IP:
+
+```text
+192.168.56.10
+```
+
+La comunicación queda resumida así:
+
+```text
+Aplicación Dash
+    |
+    v
+Ruta fija en Windows:  P:\Pacientes
+    |
+    v
+Unidad de red SMB:     \\192.168.56.10\tfg\Pacientes
+    |
+    v
+Servidor Samba Ubuntu: /srv/tfg/Pacientes
+```
+
+Por tanto, cuando la aplicación crea o consulta un paciente en `P:\Pacientes`, realmente está leyendo o escribiendo en la carpeta `/srv/tfg/Pacientes` de la máquina Ubuntu.
+
+### Comprobación de conectividad con ping
+
+Antes de montar la unidad de red, se comprobó que la máquina Windows podía comunicarse con la máquina Ubuntu mediante el comando `ping`. El comando utilizado fue:
+
+```text
+ping 192.168.56.10
+```
+
+`ping` envía mensajes de prueba ICMP al equipo de destino y muestra si recibe respuesta [@MicrosoftPing]. Si el comando devuelve respuestas desde la IP indicada, significa que existe conectividad básica entre ambas máquinas.
+
+Un resultado correcto indica que la máquina Windows puede alcanzar a la máquina Ubuntu dentro de la red virtual. Si no hay respuesta, el problema suele estar en la configuración de red de VirtualBox, en la IP asignada o en el estado de la máquina Ubuntu.
+
+### Configuración de Samba en Ubuntu
+
+En la máquina Ubuntu Server se creó la carpeta que actuaría como repositorio real de pacientes:
+
+```bash
+sudo mkdir -p /srv/tfg/Pacientes
+sudo chown -R tfg:tfg /srv/tfg
+sudo chmod -R 775 /srv/tfg
+```
+
+Después se instaló Samba:
+
+```bash
+sudo apt update
+sudo apt install samba
+```
+
+La configuración de la carpeta compartida se añadió al archivo `/etc/samba/smb.conf`, con el siguiente bloque:
+
+```ini
+[tfg]
+   path = /srv/tfg
+   browseable = yes
+   read only = no
+   guest ok = yes
+   create mask = 0666
+   directory mask = 0777
+```
+
+Esta configuración crea un recurso compartido llamado `tfg`, que apunta a la carpeta `/srv/tfg`.
+
+Tras modificar la configuración, se reinició el servicio Samba:
+
+```bash
+sudo systemctl restart smbd
+```
+
+Y se comprobó su estado con:
+
+```bash
+sudo systemctl status smbd
+```
+
+El servicio `smbd` es el proceso principal de Samba encargado de atender las conexiones SMB de los clientes.
+
+El servicio Samba quedó activo y preparado para aceptar conexiones SMB desde la máquina Windows, como se observa en la @fig-vm-samba-activo.
+
+![Comprobación del servicio Samba activo en Ubuntu Server. Fuente: elaboración propia.](img/capturas_vm/ubuntuSambaActivo.png){#fig-vm-samba-activo width=85%}
+
+### Montaje de la unidad de red en Windows
+
+En la máquina Windows se montó la carpeta compartida como unidad de red `P:` mediante el comando:
+
+```text
+net use P: \\192.168.56.10\tfg /user:tfg tfg
+```
+
+Este comando indica a Windows que conecte la unidad `P:` con el recurso compartido `tfg` de la máquina Ubuntu. A partir de ese momento, la ruta `P:\Pacientes` queda disponible para la aplicación.
+
+Desde la máquina Windows se comprobó primero la conectividad con `ping` y posteriormente se montó el recurso compartido mediante `net use`, tal como se muestra en la @fig-vm-montaje-samba.
+
+![Comprobación de conectividad y montaje de la carpeta compartida Samba desde Windows. Fuente: elaboración propia.](img/capturas_vm/montajeCarpetaCompartidaSamba.png){#fig-vm-montaje-samba width=85%}
+
+Una vez completado el montaje, Windows muestra la carpeta compartida como una unidad de red `P:`, dentro de la cual se encuentra la carpeta `Pacientes` (@fig-vm-unidad-p).
+
+![Unidad de red P: montada en Windows y acceso a la carpeta Pacientes. Fuente: elaboración propia.](img/capturas_vm/windowsConUnidadPmontada.png){#fig-vm-unidad-p width=85%}
+
+### Uso desde la aplicación BIS-ICCA
+
+Una vez montada la unidad de red, la aplicación puede ejecutarse indicando `P:\Pacientes` como ubicación fija de pacientes.
+
+La aplicación se ejecutó en la máquina Windows indicando como carpeta fija de pacientes la ruta `P:\Pacientes`, como se muestra en la @fig-vm-ejecucion-app.
+
+![Ejecución de la aplicación en la máquina Windows usando P:\Pacientes como ruta de pacientes. Fuente: elaboración propia.](img/capturas_vm/EjecutarAppEnWindows.png){#fig-vm-ejecucion-app width=85%}
+
+El organizador guarda ahí los pacientes creados, y el visualizador lee desde esa misma ubicación. Esto permite simular un funcionamiento hospitalario en el que los datos no dependen de una carpeta local de un único ordenador, sino de un repositorio común accesible en red.
+
+Finalmente, el portal de la aplicación muestra `P:\Pacientes` como ubicación configurada, confirmando que la aplicación trabaja sobre la unidad compartida mediante Samba (@fig-vm-app-pacientes-p).
+
+![Portal BIS-ICCA ejecutándose en la máquina virtual Windows con P:\Pacientes como ubicación configurada. Fuente: elaboración propia.](img/capturas_vm/AppEjecutandoseEnVMcarpetaP.png){#fig-vm-app-pacientes-p width=85%}
+
+Esta configuración es una prueba de concepto. En un entorno hospitalario real, la máquina Ubuntu podría sustituirse por un servidor o recurso compartido gestionado por el servicio informático del hospital.
 
 ## Pruebas del sistema
 
-Durante el desarrollo se incluyeron pruebas automáticas para comprobar partes críticas del sistema. Estas pruebas se centran en la lectura y validación de archivos BIS, la alineación temporal, la reconstrucción de la DSA, el cálculo de bandas espectrales, la integración de datos ICCA y la generación de informes.
+El proyecto incluye pruebas automáticas en las carpetas `tests/` de las aplicaciones principales. Las pruebas del organizador se encuentran en `aplicaciones/organizador_bis_icca/tests/`, y las del visualizador en `aplicaciones/visualizador_bis_icca/tests/`.
 
-Las pruebas del visualizador se encuentran en \ruta{aplicaciones/visualizador_bis_icca/tests/}, y las del organizador en \ruta{aplicaciones/organizador_bis_icca/tests/}.
-
-Para ejecutar las pruebas del visualizador puede utilizarse:
+Para ejecutar las pruebas del visualizador puede utilizarse, desde la carpeta `aplicaciones`:
 
 ```powershell
-cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones\visualizador_bis_icca" `
-..\.venv\Scripts\python.exe -m unittest
+cd aplicaciones
+.\.venv\Scripts\python.exe -m unittest discover visualizador_bis_icca\tests
 ```
 
-En caso de ejecutar los tests desde el entorno común de aplicaciones, debe emplearse el intérprete del entorno virtual creado en `aplicaciones/.venv/`.
+Y para las pruebas del organizador:
 
-Además de las pruebas automáticas, se realizaron pruebas funcionales manuales con registros BIS unilaterales y bilaterales. Estas pruebas permitieron comprobar la detección de sesiones, la disponibilidad de matriz original o reconstruida, la visualización por intervalos temporales, la integración de variables ICCA y la exportación de informes en PDF.
+```powershell
+cd aplicaciones
+.\.venv\Scripts\python.exe -m unittest discover organizador_bis_icca\tests
+```
 
-## Instrucciones para la modificación o mejora del proyecto
+El intérprete común del proyecto se encuentra en `aplicaciones/.venv/Scripts/python.exe`.
 
-Para ampliar el sistema se recomienda mantener la separación entre organización de datos, procesamiento BIS, procesamiento ICCA y visualización. Esta separación facilita modificar una parte del sistema sin alterar el resto.
+Además de las pruebas automáticas, durante el desarrollo se realizaron pruebas funcionales manuales con sesiones BIS unilaterales y bilaterales, registros ICCA asociados, sesiones de distinta duración y casos con matriz DSA original o reconstruida.
 
-| Área de modificación | Archivos principales |
+## Archivos principales para modificación
+
+Para futuras modificaciones, los archivos más relevantes se agrupan según el área funcional:
+
+| Área | Ubicación principal |
 |---|---|
-| Reconstrucción de la DSA | `reconstruccion.py`<br>`alineacion_temporal.py`<br>`figuras.py` |
-| Variables clínicas ICCA | `visualizacion_icca.py`<br>`pacientes_icca.py` |
-| Organización de pacientes | Carpeta `organizador_bis_icca/src/` |
+| Portal inicial | `aplicaciones/portal_bis_icca/app.py` |
+| Organización de pacientes | `aplicaciones/organizador_bis_icca/app.py` y `aplicaciones/organizador_bis_icca/src/` |
+| Visualización BIS | `aplicaciones/visualizador_bis_icca/app.py` y `aplicaciones/visualizador_bis_icca/src/` |
+| Reconstrucción de DSA | módulos de procesamiento dentro de `aplicaciones/visualizador_bis_icca/src/` |
+| Integración ICCA | módulos de ICCA dentro de `aplicaciones/visualizador_bis_icca/src/` |
+| Informes PDF | módulos de informe dentro de `aplicaciones/visualizador_bis_icca/src/` |
+| Scripts de arranque | `aplicaciones/*.ps1` y archivos `.bat` de la raíz |
 
 : Ubicación de las modificaciones más habituales {#tbl-modificaciones-desarrollador}
 
-Salvo que se indique lo contrario, los archivos del visualizador se encuentran en `aplicaciones/visualizador_bis_icca/src/`.
+Antes de modificar una funcionalidad se recomienda localizar primero si pertenece al organizador, al visualizador o al portal. Esta separación evita introducir cambios cruzados innecesarios.
 
-Se recomienda no modificar directamente los datos originales exportados del monitor BIS ni los archivos ICCA originales. Cualquier procesamiento adicional debe generar archivos auxiliares identificables dentro de la carpeta del paciente o de la sesión correspondiente.
+## Recomendaciones para futuras ampliaciones
 
-Como líneas futuras de mejora orientadas al desarrollador, se plantean:
+Para continuar el desarrollo del proyecto se recomienda mantener la separación entre:
 
-- Incorporar nuevos tipos de variables ICCA cuando estén disponibles.
-- Mejorar la validación automática de solapamientos temporales entre sesiones BIS e ICCA.
-- Añadir nuevos criterios de calidad de señal o artefactos.
-- Optimizar la carga de registros de larga duración.
-- Ampliar la exportación de informes con nuevas gráficas o resúmenes clínicos.
-- Preparar una versión desplegable en red hospitalaria con rutas compartidas y control de permisos.
+- Organización de pacientes.
+- Lectura y procesamiento BIS.
+- Reconstrucción de DSA.
+- Integración de datos ICCA.
+- Visualización.
+- Generación de informes.
+
+También se recomienda no modificar directamente los archivos originales exportados del monitor BIS ni los archivos ICCA originales. Cualquier procesamiento nuevo debería generar archivos derivados o auxiliares claramente identificados dentro de la carpeta del paciente o de la sesión.
+
+Como posibles líneas futuras de mejora se proponen:
+
+- Ampliar la compatibilidad con nuevos formatos de exportación ICCA.
+- Añadir nuevas variables clínicas al visualizador.
+- Mejorar la validación automática de sesiones BIS largas o fragmentadas.
+- Optimizar la carga de sesiones de gran tamaño.
+- Incorporar nuevos indicadores de calidad de señal.
+- Mejorar la generación de informes PDF.
+- Preparar un despliegue hospitalario más robusto con control de permisos y rutas de red configurables.
+
+## Consideraciones sobre datos clínicos
+
+El repositorio no debe contener datos clínicos reales. La carpeta `datos/pacientes/` se conserva únicamente como ubicación de trabajo y puede estar vacía en el repositorio.
+
+Si se utilizan datos reales o pseudonimizados durante el desarrollo, estos deben mantenerse fuera del control de versiones y tratarse de acuerdo con las condiciones aprobadas por el CEIm y la normativa aplicable de protección de datos.
+
+## Control de versiones
+
+Para mantener el repositorio limpio se recomienda no subir:
+
+- Entornos virtuales, como `aplicaciones/.venv/`.
+- Carpetas temporales.
+- Archivos generados automáticamente.
+- Datos clínicos reales.
+- Pacientes completos creados durante pruebas reales.
+- Archivos pesados que puedan regenerarse.
+
+El archivo `.gitignore` debe mantenerse actualizado para evitar que estos elementos se incorporen accidentalmente al repositorio.
+
+## Resumen para el desarrollador
+
+Para trabajar sobre el proyecto desde cero, el flujo recomendado es:
+
+1. Descargar o clonar el repositorio.
+2. Instalar Python 3.12.10 y añadirlo al PATH.
+3. Ejecutar `preparar_entornos.bat`.
+4. Ejecutar `abrir_aplicaciones.bat`.
+5. Acceder al portal en `http://127.0.0.1:8040/`.
+6. Modificar el módulo correspondiente.
+7. Ejecutar pruebas o comprobar manualmente el flujo afectado.
+8. Detener la aplicación con `cerrar_aplicaciones.bat`.
+
+Esta estructura permite que el sistema pueda ejecutarse de forma local para desarrollo y demostración, manteniendo al mismo tiempo una arquitectura adaptable a un entorno hospitalario con almacenamiento compartido.

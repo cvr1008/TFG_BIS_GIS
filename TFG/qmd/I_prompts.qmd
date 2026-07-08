@@ -6,32 +6,74 @@
 
 \apendice{Registro de interacciones con sistemas de IA}
 
-\section{Registro de interacciones con sistemas de IA}
+## Introducción
 
-Este anexo tiene como objetivo garantizar la transparencia en el uso de
-herramientas de inteligencia artificial generativa durante la realización
-del Trabajo de Fin de Grado. En él se deberá incluir un registro
-ordenado de los \textit{prompts}, solicitudes, o peticiones formuladas por el estudiante en las interacciones con sistemas de IA que hayan sido más significativas en relación al desarrollo del TFG. Asimismo se incluirán bien las respuestas generadas directamente por los sistemas de IA, o bien se reflejará la importancia que ha tenido esa interacción en el desarrollo del trabajo ( código, texto, enfoque...) de esas interacciones significativas.
+Este anexo tiene como objetivo garantizar la transparencia en el uso de herramientas de inteligencia artificial generativa durante la realización del Trabajo de Fin de Grado. En él se recoge un registro resumido de las interacciones más significativas mantenidas con sistemas de IA, indicando la herramienta utilizada, la fecha aproximada, la finalidad de la consulta y el uso posterior de la respuesta.
 
-El propósito de este anexo no es penalizar el uso de inteligencia artificial,
-sino documentarlo de forma clara, permitiendo al tribunal evaluar el alcance,
-la finalidad y el impacto real de dichas herramientas en el proceso de
-aprendizaje y en los resultados obtenidos. El uso de IA debe entenderse como
-una herramienta de apoyo, nunca como un sustituto del razonamiento,
-la toma de decisiones técnicas o la autoría del trabajo.
+Debido al carácter iterativo del proyecto y al uso continuado de herramientas como ChatGPT y Codex, no se incluye una transcripción completa de todas las conversaciones mantenidas. En su lugar, se documentan únicamente aquellas interacciones que tuvieron una influencia relevante en la orientación conceptual, la organización del documento, el desarrollo técnico o la redacción final del trabajo.
 
-Para cada interacción relevante con sistemas de IA, se deberá indicar, al
-menos, la siguiente información:
-\begin{itemize}
-    \item Herramienta o modelo de IA utilizado.
-    \item Fecha aproximada de uso.
-    \item Prompt/petición/solicitud/forma de uso realizada por el estudiante.
-    \item Respuesta completa generada por la IA (opcional)
-    \item Uso posterior de dicha respuesta en el TFG (orientación conceptual,
-    mejora de redacción, generación de ideas, apoyo técnico, generación de código, etc.).
-\end{itemize}
+El uso de IA se ha realizado como herramienta de apoyo. Las respuestas generadas fueron revisadas, modificadas y contrastadas por la autora antes de incorporarse al TFG. En ningún caso se emplearon como sustituto de la interpretación clínica, de la toma de decisiones técnicas ni de la revisión de la bibliografía original.
 
-Este anexo podrá estructurarse en forma de tablas o listados numerados, y
-solo deberá incluir aquellas interacciones que hayan tenido una influencia
-significativa en el desarrollo del trabajo. 
+## Registro de interacciones significativas
 
+### Interacción I.1. Definición del enfoque general del proyecto
+
+- **Herramienta utilizada:** ChatGPT / Codex.
+- **Fecha aproximada:** marzo-abril de 2026.
+- **Solicitud realizada:** apoyo para delimitar el alcance del TFG como una prueba de concepto orientada a la integración retrospectiva de datos BIS e ICCA en pacientes críticos.
+- **Respuesta generada:** la IA propuso estructurar el trabajo en torno a tres ejes: organización de pacientes y sesiones, recuperación o reconstrucción de la DSA y visualización conjunta de variables neurofisiológicas y clínicas.
+- **Uso posterior:** esta interacción ayudó a formular el objetivo general, los objetivos específicos y el enfoque metodológico del proyecto.
+- **Revisión realizada:** la propuesta fue adaptada al contexto del HUBU, a los datos disponibles y a las indicaciones de los tutores.
+
+### Interacción I.2. Organización de la memoria y los anexos
+
+- **Herramienta utilizada:** ChatGPT / Codex.
+- **Fecha aproximada:** mayo-julio de 2026.
+- **Solicitud realizada:** ayuda para organizar los capítulos de la memoria y distribuir el contenido entre marco teórico, metodología, resultados, discusión, conclusiones y anexos.
+- **Respuesta generada:** la IA sugirió separar la explicación general del trabajo de los detalles técnicos extensos, reservando para los anexos la descripción detallada de archivos BIS, datos ICCA, reconstrucción de la DSA, validación y manuales.
+- **Uso posterior:** la propuesta sirvió para reorganizar el documento y reducir duplicidades entre memoria y anexos.
+- **Revisión realizada:** la estructura final fue ajustada manualmente para respetar el límite de extensión de la memoria y las necesidades específicas del TFG.
+
+### Interacción I.3. Apoyo en conceptos teóricos y estado del arte
+
+- **Herramienta utilizada:** ChatGPT / Codex.
+- **Fecha aproximada:** mayo-junio de 2026.
+- **Solicitud realizada:** apoyo para revisar conceptos relacionados con UCI, sedación, EEG, análisis frecuencial, BIS, DSA, qEEG, SEF, MEF, EMG, SR, SQI, ICCA y dashboards en UCI.
+- **Respuesta generada:** la IA propuso reformulaciones, agrupaciones temáticas y advertencias sobre posibles repeticiones o conceptos poco relevantes para el alcance del trabajo.
+- **Uso posterior:** se empleó como apoyo para mejorar la claridad del marco teórico y del estado del arte.
+- **Revisión realizada:** las explicaciones fueron contrastadas con bibliografía científica, manuales técnicos y artículos revisados durante el proyecto.
+
+### Interacción I.4. Metodología de tratamiento de datos BIS e ICCA
+
+- **Herramienta utilizada:** Codex.
+- **Fecha aproximada:** junio-julio de 2026.
+- **Solicitud realizada:** ayuda para ordenar la metodología de lectura de archivos BIS, reconstrucción de la DSA, normalización temporal, creación de una timeline común, aplicación de máscaras e integración de variables ICCA.
+- **Respuesta generada:** la IA propuso estructurar el flujo metodológico diferenciando entre el uso directo del archivo `.f_a`, la reconstrucción desde EEG crudo y la integración temporal de variables clínicas según su naturaleza.
+- **Uso posterior:** esta interacción influyó en la redacción de la metodología y en la organización de los anexos técnicos.
+- **Revisión realizada:** el contenido se ajustó al código realmente implementado y a las decisiones técnicas adoptadas durante el proyecto.
+
+### Interacción I.5. Apoyo en desarrollo, depuración y visualización
+
+- **Herramienta utilizada:** Codex.
+- **Fecha aproximada:** abril-julio de 2026.
+- **Solicitud realizada:** apoyo técnico para revisar código, organizar módulos, diseñar la estructura de las aplicaciones, mejorar la visualización con Dash/Plotly y preparar diagramas o tablas explicativas.
+- **Respuesta generada:** la IA ayudó a localizar incoherencias, proponer ajustes de código, explicar el funcionamiento de algunos módulos y generar propuestas de diagramas, cronogramas y textos de apoyo.
+- **Uso posterior:** se utilizó como apoyo durante el desarrollo de la aplicación organizadora, el visualizador interactivo y la documentación técnica.
+- **Revisión realizada:** todo el código y los elementos incorporados fueron ejecutados, revisados y modificados por la autora según las necesidades reales del proyecto.
+
+### Interacción I.6. Redacción final, planificación y aspectos éticos
+
+- **Herramienta utilizada:** ChatGPT / Codex.
+- **Fecha aproximada:** julio de 2026.
+- **Solicitud realizada:** ayuda para redactar y revisar los capítulos finales, el anexo de planificación, la discusión, las conclusiones, las líneas futuras y la inclusión de la aprobación ética del proyecto.
+- **Respuesta generada:** la IA propuso formulaciones para explicar la procedencia de los datos del HUBU, la aprobación del CEIm el 2 de julio de 2026, las limitaciones del trabajo y la planificación real del proyecto.
+- **Uso posterior:** se empleó como apoyo para cerrar la memoria y los anexos.
+- **Revisión realizada:** las fechas, afirmaciones y limitaciones fueron revisadas manualmente para reflejar fielmente la evolución real del TFG.
+
+## Consideraciones finales sobre el uso de IA
+
+El uso de sistemas de inteligencia artificial generativa permitió agilizar tareas de revisión, estructuración, redacción preliminar, depuración y organización del trabajo. Sin embargo, las decisiones técnicas, la interpretación de los resultados, la selección final de contenidos, la validación del código y la integración en la memoria fueron realizadas por la autora.
+
+Las herramientas de IA no sustituyeron la consulta de bibliografía científica, manuales técnicos ni documentación del proyecto. Su papel fue auxiliar, principalmente como apoyo para ordenar ideas, detectar incoherencias, proponer formulaciones alternativas y acelerar tareas de documentación.
+
+Por tanto, el contenido final del TFG debe entenderse como resultado del trabajo de la autora, apoyado por herramientas de IA generativa cuyo uso queda documentado de forma resumida en este anexo.

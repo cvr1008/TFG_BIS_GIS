@@ -6,113 +6,284 @@
 
 \apendice{Manual de usuario}
 
+## Objetivo del manual
+
+Este manual está dirigido al usuario final de la aplicación BIS-ICCA. Su finalidad es explicar cómo abrir el sistema, cómo crear pacientes, cómo consultar sesiones ya organizadas y cómo interpretar de forma general las pantallas principales.
+
+La aplicación está pensada para facilitar la organización y visualización conjunta de registros BIS e información clínica procedente de ICCA. No sustituye a los sistemas clínicos originales ni a la valoración médica, sino que actúa como una herramienta auxiliar de consulta y revisión de los datos exportados.
+
 ## Requisitos software y hardware para ejecutar el proyecto
 
-Para utilizar la aplicación BIS-ICCA es necesario disponer de un equipo con sistema operativo Windows y un navegador web moderno. La aplicación se ha desarrollado en Python utilizando Dash, por lo que su ejecución se realiza desde un entorno Python previamente configurado.
+Para utilizar la aplicación se recomienda disponer de un equipo con sistema operativo Windows y un navegador web moderno.
 
 Los requisitos mínimos recomendados son:
 
 - Sistema operativo: Windows 10 o superior.
-- Memoria RAM: al menos 8 GB, recomendable 16 GB si se trabaja con sesiones BIS largas.
-- Procesador: de 64 bits.
+- Memoria RAM: al menos 8 GB; recomendable 16 GB si se trabaja con sesiones BIS largas.
+- Procesador: 64 bits.
 - Navegador web: Google Chrome, Microsoft Edge o Mozilla Firefox.
-- Python: versión 3.12 o compatible.
-- Espacio en disco suficiente para almacenar las sesiones BIS, los registros ICCA y los informes generados.
+- Python: versión 3.12.10.
+- Espacio en disco suficiente para almacenar sesiones BIS, archivos ICCA, pacientes organizados e informes generados.
 
-No es necesario instalar una base de datos externa, ya que el sistema organiza la información mediante una estructura de carpetas y archivos (Anexo B). Cada paciente dispone de su propia carpeta, donde se guardan las sesiones BIS, los registros ICCA asociados y los archivos auxiliares generados por la aplicación.
+No es necesario instalar una base de datos externa. La aplicación trabaja mediante carpetas y archivos. Cada paciente se guarda en una carpeta propia, que contiene sus sesiones BIS, sus registros ICCA asociados y los archivos auxiliares generados por el sistema.
 
-Para la simulación del entorno hospitalario se emplean máquinas virtuales: una para ejecutar la aplicación y otra para almacenar los datos de pacientes mediante una carpeta compartida por red (ver diseño de despliegue en el Anexo B).
-
-## Instalación y puesta en marcha
-
-La aplicación puede ejecutarse en dos escenarios: en local durante el desarrollo, y en un entorno virtualizado para simular su funcionamiento dentro de una intranet hospitalaria.
-
-### Ejecución local
-
-Para ejecutar la aplicación en local, se debe abrir una terminal de PowerShell y situarse en la carpeta del proyecto:
-
-```powershell
-cd "C:\Users\usuario\TFG_BIS_GIS\aplicaciones"
-```
-
-A continuación, se lanza el script de inicio:
-
-```powershell
-.\iniciar_aplicaciones.ps1 `
-  -PacientesDir "..\datos\pacientes" `
-  -RutaPacientesFija
-```
-
-Una vez iniciado el sistema, se accede desde el navegador a la siguiente dirección:
+En el repositorio, la carpeta de trabajo por defecto es:
 
 ```text
-http://127.0.0.1:8040
+datos/pacientes
 ```
 
-Esta dirección abre el portal principal de la aplicación, desde el que se puede acceder al organizador de pacientes o al visualizador. El proceso de instalación del entorno (creación del entorno virtual e instalación de dependencias) se detalla en el Anexo E.
-
-### Ejecución en entorno con máquinas virtuales
-
-Para simular el funcionamiento en un entorno hospitalario, se plantea una arquitectura con dos máquinas virtuales:
-
-- Una **máquina virtual de aplicación**, donde se ejecuta el sistema BIS-ICCA.
-- Una **máquina virtual de datos**, donde se almacenan los pacientes en una ubicación común.
-
-La máquina de datos comparte la carpeta de pacientes mediante Samba/SMB. Desde la máquina de aplicación, esta carpeta se monta como una unidad de red, por ejemplo:
+En un entorno hospitalario, esta ubicación puede sustituirse por una carpeta de red común, por ejemplo:
 
 ```text
 P:\Pacientes
 ```
 
-De esta forma, la aplicación trabaja siempre sobre una ruta fija y el usuario no tiene que seleccionar manualmente dónde guardar o buscar los pacientes.
+## Instalación y puesta en marcha
+
+### Descarga del proyecto
+
+El proyecto puede descargarse desde GitHub como archivo comprimido ZIP o mediante clonación del repositorio. Para un usuario sin conocimientos técnicos, la opción más sencilla es descargar el ZIP y descomprimirlo en una carpeta del ordenador.
+
+Una vez descomprimido, la carpeta principal del proyecto contiene, entre otros elementos:
+
+```text
+TFG_BIS_GIS/
+|-- aplicaciones/
+|-- datos/
+|-- TFG/
+|-- preparar_entornos.bat
+|-- abrir_aplicaciones.bat
+|-- cerrar_aplicaciones.bat
+`-- README.md
+```
+
+Los archivos `.bat` permiten preparar, abrir y cerrar la aplicación sin escribir comandos manualmente.
+
+### Instalación de Python
+
+Antes de abrir la aplicación por primera vez, debe instalarse Python 3.12.10.
+
+Durante la instalación es importante marcar la opción:
+
+```text
+Add python.exe to PATH
+```
+
+Esta opción permite que Windows reconozca Python correctamente.
+
+Para comprobar la instalación, puede abrirse una terminal de Windows y escribir:
+
+```text
+python --version
+```
+
+Si la instalación se ha realizado correctamente, aparecerá una versión de Python 3.12.
+
+### Preparar el entorno
+
+La primera vez que se utilice la aplicación, hay que ejecutar:
+
+```text
+preparar_entornos.bat
+```
+
+Este archivo prepara automáticamente el entorno necesario para que la aplicación pueda funcionar.
+
+Este paso puede tardar varios minutos, especialmente la primera vez, porque se instalan las dependencias necesarias. Si el proceso termina sin errores, el sistema queda preparado para abrir la aplicación.
+
+### Abrir la aplicación
+
+Para abrir la aplicación, ejecutar:
+
+```text
+abrir_aplicaciones.bat
+```
+
+Al ejecutarlo, se arrancan las aplicaciones necesarias y se abre el portal principal en el navegador.
+
+Si el navegador no se abre automáticamente, puede accederse manualmente a la dirección:
+
+```text
+http://127.0.0.1:8040/
+```
+
+El navegador puede ser Chrome, Edge, Firefox u otro navegador moderno.
+
+### Cerrar la aplicación
+
+Cuando se termine de usar la aplicación, debe ejecutarse:
+
+```text
+cerrar_aplicaciones.bat
+```
+
+Este archivo detiene los servidores de la aplicación. Puede ocurrir que la ventana del navegador permanezca abierta, pero la aplicación deja de ejecutarse en segundo plano.
 
 ## Manuales y demostraciones prácticas
 
-### Acceso al portal principal
+### Portal principal
 
-Al abrir la aplicación desde el navegador, aparece el portal principal (@fig-manual-portal). Desde esta pantalla se puede elegir entre dos opciones:
+Al abrir la aplicación aparece el portal principal (@fig-manual-portal), que actúa como pantalla de entrada al sistema.
+
+Desde esta pantalla se puede acceder a dos flujos de trabajo:
 
 - Añadir / gestionar pacientes.
 - Visualizar paciente.
 
 ![Portal principal de acceso al sistema. Fuente: elaboración propia.](img/capturas_portal/captura_menu_portal.png){#fig-manual-portal width=90%}
 
-El portal funciona como punto de entrada común y permite separar claramente las tareas de organización de pacientes de las tareas de consulta o visualización.
+El portal permite separar claramente las tareas de organización de pacientes de las tareas de consulta y visualización.
 
 ### Añadir o gestionar pacientes
 
-La opción de añadir o gestionar pacientes permite crear nuevos pacientes a partir de registros ICCA y sesiones BIS. El flujo general es el siguiente:
+La opción "Añadir / gestionar pacientes" permite crear pacientes nuevos y asociarles sesiones BIS y registros ICCA. Este flujo se utiliza cuando se dispone de archivos nuevos que todavía no han sido organizados dentro de la aplicación. Las capturas de pantalla correspondientes a este flujo se muestran en el Anexo C, apartado de prototipos de interfaz (@fig-inicio-organizador, @fig-revision-paciente y @fig-editar-paciente).
 
-1. Seleccionar uno o varios archivos Excel ICCA, si están disponibles.
-2. Seleccionar una carpeta BIS o una carpeta madre que contenga varias sesiones BIS.
-3. Analizar los intervalos temporales.
-4. Comprobar que las sesiones se asignan correctamente.
-5. Crear la carpeta del paciente.
+#### Selección de archivos ICCA
 
-Las capturas de las pantallas correspondientes a este flujo (pantalla inicial del organizador, revisión de asignaciones y edición de un paciente ya creado) se muestran en el Anexo C, apartado de prototipos de interfaz (@fig-inicio-organizador, @fig-revision-paciente y @fig-editar-paciente).
+En primer lugar, se pueden añadir uno o varios archivos Excel ICCA, si están disponibles. Estos archivos contienen información clínica exportada desde ICCA, como constantes vitales, análisis clínicos o perfusiones.
 
-La aplicación genera una estructura de carpetas organizada, en la que se almacenan las sesiones BIS, los registros ICCA originales y los archivos auxiliares necesarios para la visualización posterior (@fig-contenido-paciente, Anexo C).
+Si no existe archivo ICCA para una sesión concreta, también es posible crear un paciente solo con sesiones BIS.
+
+#### Selección de sesiones BIS
+
+A continuación, se selecciona una carpeta BIS o una carpeta madre que contenga varias sesiones BIS. La aplicación analiza las sesiones seleccionadas e intenta identificar sus intervalos temporales. Esto permite comprobar qué sesiones pertenecen al mismo paciente y si existe correspondencia con los registros ICCA disponibles.
+
+#### Análisis de intervalos
+
+Una vez seleccionados los archivos, debe pulsarse el botón de análisis de intervalos. La aplicación revisa las fechas y horas de las sesiones BIS y de los registros ICCA. Si detecta solapamientos importantes o inconsistencias temporales, muestra un aviso para que el usuario pueda revisar la selección.
+
+Se permite cierta tolerancia en los solapamientos pequeños, ya que algunos monitores pueden cerrar una sesión y abrir otra de forma automática con ligeros solapes o diferencias de segundos.
+
+#### Creación del paciente
+
+Después de revisar la asignación de sesiones, se puede crear la carpeta del paciente. La aplicación genera automáticamente una estructura ordenada dentro de la carpeta común de pacientes. Cada paciente recibe un nombre del tipo:
+
+```text
+PACIENTE_001
+PACIENTE_002
+PACIENTE_003
+```
+
+Dentro de cada paciente se guardan las sesiones BIS, los registros ICCA asociados y los archivos auxiliares necesarios para su posterior visualización (@fig-contenido-paciente, Anexo C). El usuario no tiene que elegir manualmente dónde guardar el paciente, ya que la aplicación utiliza siempre la ubicación de pacientes configurada.
+
+#### Gestión de pacientes ya creados
+
+Desde el organizador también se pueden consultar y editar pacientes ya existentes. Esta opción permite revisar las sesiones asociadas, modificar la organización si fuera necesario o eliminar elementos seleccionados. Después de guardar los cambios, la pantalla vuelve a quedar preparada para seleccionar otro paciente o crear uno nuevo.
 
 ### Visualizar paciente
 
-La opción de visualizar paciente permite consultar los pacientes ya creados. El flujo general es el siguiente:
+La opción "Visualizar paciente" permite consultar los pacientes ya creados desde el organizador. El flujo habitual es:
 
-1. Seleccionar un paciente de la lista.
-2. Seleccionar una sesión BIS asociada.
-3. Elegir el tramo temporal que se desea visualizar.
-4. Consultar la matriz DSA, el índice BIS, la señal EMG y la información clínica ICCA disponible.
-5. Exportar un informe en PDF si se desea conservar o imprimir la visualización del caso.
+1. Seleccionar un paciente.
+2. Seleccionar una sesión BIS.
+3. Elegir el tramo horario que se desea visualizar.
+4. Consultar la matriz DSA, las variables BIS y la información ICCA disponible.
+5. Exportar un informe PDF si se desea.
 
-Las capturas de la pantalla inicial del visualizador y de la selección de paciente y sesión se muestran en el Anexo C (@fig-visualizador-inicio y @fig-visualizador-seleccion). El resultado de la carga (DSA, variables BIS e información ICCA) se muestra en el capítulo de Resultados de la memoria.
+Las capturas de la pantalla inicial del visualizador y de la selección de paciente y sesión se muestran en el Anexo C (@fig-visualizador-inicio y @fig-visualizador-seleccion).
+
+#### Selección de paciente
+
+En la pantalla inicial del visualizador aparece una lista con los pacientes disponibles en la ubicación configurada. Al seleccionar un paciente, se muestran sus sesiones BIS organizadas.
+
+#### Selección de sesión BIS
+
+Una vez elegido el paciente, se selecciona una de sus sesiones BIS. Cada tarjeta de sesión muestra información básica sobre el intervalo temporal disponible. Al seleccionar una sesión, la tarjeta queda marcada visualmente para indicar que está activa.
+
+#### Selección de tramo horario
+
+Después de seleccionar una sesión, se puede elegir el tramo temporal que se desea visualizar. La aplicación permite consultar intervalos de diferente duración, como una hora, dos horas, cuatro horas o la sesión completa, según la disponibilidad de datos.
+
+#### Visualización BIS
+
+La pantalla de visualización muestra la información principal procedente del monitor BIS.
+
+Entre los elementos disponibles se incluyen:
+
+- Matriz DSA bilateral.
+- Índice BIS.
+- Electromiograma frontal.
+- Variables SEF y MEF.
+- Asimetría bilateral ASYM09.
+- Ratio alfa-delta.
+
+La matriz DSA permite observar la distribución de potencia espectral a lo largo del tiempo y la frecuencia. Cuando la matriz original no está disponible directamente, la aplicación puede mostrar una reconstrucción generada a partir de los archivos crudos del monitor BIS. El usuario puede desplazarse por la gráfica, ampliar zonas concretas y consultar valores al pasar el cursor sobre las señales.
+
+#### Visualización ICCA
+
+Cuando existe información ICCA asociada a la sesión, el visualizador muestra también variables clínicas procedentes de los archivos Excel.
+
+La información puede incluir:
+
+- Constantes vitales.
+- Mediciones puntuales.
+- Análisis clínicos.
+- Perfusiones.
+- Medicación administrada.
+
+En las constantes vitales se muestran las mediciones registradas y los tramos correspondientes al último valor documentado hasta la siguiente medición. Esto evita inventar valores intermedios no registrados.
+
+En las perfusiones se representa la evolución de la dosis o del acumulado administrado según la información disponible en el archivo ICCA.
+
+La aplicación distingue entre valores documentados y cálculos derivados cuando procede. En cualquier caso, la visualización debe entenderse como apoyo a la revisión de datos exportados, no como sustitución del registro clínico original.
 
 ### Exportación de informe PDF
 
-El visualizador permite generar un informe PDF del intervalo seleccionado. Este informe incluye una portada con los datos identificativos de la sesión, la representación de la DSA junto con las variables procesadas del monitor, y un resumen de la información clínica ICCA disponible para ese intervalo (constantes vitales, análisis clínicos y perfusiones). El resultado de este proceso se muestra en el capítulo de Resultados de la memoria.
+El visualizador permite generar un informe PDF del caso visualizado.
 
-El informe está pensado como documento auxiliar para revisión o impresión, pero no sustituye la valoración clínica ni la revisión de los registros originales.
+El informe incluye:
 
-## Consideraciones de uso
+- Resumen del paciente y de la sesión seleccionada.
+- Intervalo temporal mostrado.
+- Representación gráfica de la DSA y variables BIS.
+- Información clínica ICCA disponible.
+- Resumen de constantes, análisis y perfusiones.
 
-Todos los usuarios acceden a la misma ubicación común de pacientes. La aplicación no distingue entre usuarios individuales ni incorpora roles de administrador, ya que el objetivo es que los pacientes creados puedan ser consultados por cualquier profesional autorizado dentro del entorno de trabajo.
+El informe está pensado para impresión o revisión posterior. No sustituye la valoración clínica ni la consulta de los registros originales.
 
-Se recomienda no modificar manualmente la estructura interna de las carpetas de pacientes, salvo para realizar copias de seguridad o trasladar el repositorio completo.
+## Uso en entorno hospitalario
+
+Además del uso local, el sistema se ha planteado para poder adaptarse a un entorno hospitalario o de intranet. En ese escenario, la aplicación se ejecutaría en una máquina controlada y los pacientes se almacenarían en una ubicación común de red. Para simular este funcionamiento se ha probado una arquitectura con dos máquinas virtuales:
+
+- Una máquina virtual para ejecutar la aplicación.
+- Una máquina virtual para almacenar los pacientes.
+
+La carpeta de pacientes se comparte mediante Samba/SMB y se monta en la máquina de aplicación como una unidad de red, por ejemplo:
+
+```text
+P:\Pacientes
+```
+
+Para el usuario final, el funcionamiento es equivalente: abre la aplicación desde el navegador y trabaja con pacientes organizados. La diferencia es que los datos no se guardan en una carpeta local del ordenador, sino en una ubicación común.
+
+## Recomendaciones de uso
+
+Se recomienda seguir estas pautas:
+
+- No modificar manualmente la estructura interna de las carpetas de pacientes.
+- No mover archivos BIS o ICCA después de haber creado un paciente, salvo que se haga una copia completa del caso.
+- Cerrar la aplicación con `cerrar_aplicaciones.bat` al terminar.
+- Revisar los avisos de solapamiento o inconsistencias temporales antes de crear un paciente.
+- Comprobar que se ha seleccionado la sesión correcta antes de exportar un informe.
+- No incluir datos clínicos reales en repositorios públicos.
+
+## Limitaciones
+
+La aplicación depende de la calidad y disponibilidad de los archivos exportados. Si una sesión BIS está incompleta, corrupta o no contiene determinados registros, algunas visualizaciones pueden no estar disponibles.
+
+Del mismo modo, la información ICCA solo se muestra cuando existe un archivo Excel asociado y cuando las fechas permiten relacionarlo con la sesión BIS seleccionada.
+
+La herramienta está diseñada como apoyo a la organización y visualización de datos, pero no reemplaza la revisión clínica ni los sistemas hospitalarios originales.
+
+## Resumen de uso rápido
+
+El flujo básico para utilizar la aplicación es:
+
+1. Ejecutar `preparar_entornos.bat` la primera vez.
+2. Ejecutar `abrir_aplicaciones.bat`.
+3. Abrir el portal en `http://127.0.0.1:8040/`.
+4. Entrar en "Añadir / gestionar pacientes" para crear pacientes.
+5. Entrar en "Visualizar paciente" para consultar sesiones.
+6. Exportar informe PDF si es necesario.
+7. Ejecutar `cerrar_aplicaciones.bat` al terminar.

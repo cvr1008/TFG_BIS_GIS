@@ -396,9 +396,5 @@ Esta configuración ofreció el mejor equilibrio entre correspondencia con la DS
 
 ## G.16 Limitaciones
 
-La reconstrucción no pretende reproducir exactamente el algoritmo propietario del monitor BIS, sino generar una aproximación reproducible de la DSA a partir de la señal cruda disponible. Algunas diferencias pueden deberse a filtrados internos no documentados, tratamiento propietario de artefactos, suavizados internos o detalles de escalado no accesibles públicamente.
+La reconstrucción no pretende reproducir exactamente el algoritmo propietario del monitor BIS, sino generar una aproximación reproducible de la DSA a partir de la señal cruda disponible. Algunas diferencias pueden deberse a filtrados internos no documentados, tratamiento de artefactos propio de la empresa, suavizados internos o detalles de escalado no accesibles públicamente.
 
-En particular, dos parámetros de la reconstrucción tienen una naturaleza distinta y no deben presentarse con el mismo nivel de certeza:
-
-- **`SpSmooth`** es un parámetro real, extraído directamente del `.spa` de cada registro; lo que se aproxima mediante una media móvil causal es únicamente la forma interna de ese suavizado, no su existencia.
-- **El desplazamiento temporal (`shift`)** es un ajuste enteramente empírico, obtenido por comparación con el archivo `.f_a`, y no se apoya en ninguna documentación del fabricante ni en un fundamento fisiológico.

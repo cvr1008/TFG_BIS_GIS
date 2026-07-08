@@ -120,3 +120,5 @@ El diseño propuesto responde a las necesidades principales del proyecto: organi
 La separación entre organizador y visualizador evita mezclar tareas de preparación de datos con tareas de consulta. A su vez, el uso de una estructura fija de carpetas permite mantener los archivos originales y auxiliares asociados a cada paciente, sin necesidad de implantar una base de datos.
 
 Por último, la arquitectura basada en máquinas virtuales permite simular un escenario de uso en intranet, separando la ejecución de la aplicación del almacenamiento común de los pacientes.
+
+La explicación detallada de la configuración del entorno con Samba se recoge en el Anexo E (Manual del Programador).
