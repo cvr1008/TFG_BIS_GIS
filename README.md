@@ -88,6 +88,8 @@ TFG_BIS_GIS/
 |   `-- pacientes/
 |-- TFG/
 |   `-- memoria, anexos e imágenes del trabajo
+|-- notebooks/
+|   `-- validacion_metodos_dsa_multiregistro
 `-- README.md
 ```
 
@@ -104,6 +106,8 @@ Los tres archivos `.bat` de la carpeta `aplicaciones/` se utilizan para preparar
 La carpeta `datos/` contiene la ubicación de trabajo de la aplicación. En concreto, `datos/pacientes/` es la carpeta donde se guardan los pacientes creados durante el uso local o de demostración.
 
 La carpeta `TFG/` contiene la documentación académica del proyecto, incluyendo memoria, anexos, imágenes y otros materiales utilizados en la redacción del trabajo.
+
+La carpeta notebooks contiene el notebook en el que se desgrana la validación de la metodología elegida para la reconstrucción de la DSA.
 
 En la raíz del repositorio se incluyen tres archivos `.bat` pensados para facilitar el uso en Windows. Estos permiten preparar el entorno, abrir la aplicación y detener los servidores sin necesidad de escribir comandos manualmente.
 
